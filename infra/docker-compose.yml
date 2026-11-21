@@ -1,5 +1,8 @@
-# 로컬에서 운영과 같은 이미지로 띄워 보기 (선택). 평소 개발은 npm run dev로 충분하다.
-#   docker compose -f infra/docker-compose.yml up --build
+# 로컬에서 운영과 같은 이미지로 띄워 보기 (선택). 평소 개발은 npm run dev로 충분하다(키 불필요).
+# 운영 이미지(NODE_ENV=production)라 ENCRYPTION_KEY가 없으면 app이 시작 검사에서 멈춘다.
+# 실제 키를 이 파일이나 infra/.env에 적지 않는다. 실행할 때마다 임시 키를 셸에서 넘긴다:
+#   ENCRYPTION_KEY="$(openssl rand -base64 32)" docker compose -f infra/docker-compose.yml up --build
+# (STORE=memory라 컨테이너를 내리면 데이터가 사라지므로 키가 매번 바뀌어도 된다)
 # RedisStore를 구현한 뒤에는 app의 STORE를 redis로 바꿔 로컬 redis로 시험한다.
 services:
   app:
@@ -12,6 +15,8 @@ services:
       MOCK_AI: "1"
       STORE: memory
       REDIS_URL: redis://redis:6379
+      # 셸의 값을 그대로 전달만 한다. 비어 있으면 컨테이너가 시작을 거부한다(down·logs는 정상 동작).
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
     depends_on:
       - redis
   redis:
