@@ -95,6 +95,21 @@ export function unmappedSpeakers(raw: string, speakerMap: Record<string, Alias>)
   return listSpeakers(raw).filter((s) => !speakerMap[s]);
 }
 
+/**
+ * 화자 이름 → 별칭 연결 추천. 이름이 별칭과 같거나 별칭으로 끝나면(김가람 → 가람) 연결한다.
+ * 추천이 여러 개면 연결하지 않는다(총무가 고른다).
+ */
+export function suggestSpeakerMap(speakers: string[], roster: Alias[]): Record<string, Alias> {
+  const out: Record<string, Alias> = {};
+  for (const sp of speakers) {
+    const name = sp.trim();
+    const exact = roster.filter((a) => a === name);
+    const hits = exact.length > 0 ? exact : roster.filter((a) => a.length >= 2 && name.endsWith(a));
+    if (hits.length === 1) out[sp] = hits[0];
+  }
+  return out;
+}
+
 /** 실명 → 본문에서 찾을 이름들 (전체 이름, 성을 뺀 이름) */
 function nameVariants(name: string): string[] {
   const n = name.trim();
