@@ -8,7 +8,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ADMIN_HEADER, type AnswersRequest, type ApiError } from "@/lib/api";
-import type { Alias, Answer, Blocker, Draft, LineStatus, ManualItem, Question } from "@/lib/types";
+import type { Alias, Answer, Blocker, Draft, LineStatus, ManualItem, MaskedLine, Question } from "@/lib/types";
 import { won } from "./format";
 import s from "./ReviewBoard.module.css";
 
@@ -150,6 +150,20 @@ export function ReviewBoard({
   const addFromLine = (no: string, speaker: string | null) =>
     setPrefill((p) => ({ line: no, payer: speaker && roster.includes(speaker) ? speaker : "", n: (p?.n ?? 0) + 1 }));
 
+  /** 선택지가 결제 id(P1 등)면 그 결제의 근거 줄을 나란히 보여 준다 (발표 10쪽: 후보 결제와 근거를 나란히) */
+  const optionEvidence = (q: Question): Record<string, QuoteLine[]> => {
+    const out: Record<string, QuoteLine[]> = {};
+    for (const o of q.options) {
+      const it = resolution.items.find((x) => x.id === o.value);
+      if (!it) continue;
+      out[o.value] = it.evidence
+        .map((no) => draft.lines.find((l) => l.no === no))
+        .filter((l): l is MaskedLine => !!l)
+        .map((l) => ({ no: l.no, who: l.speaker ?? "말한 사람 없음", text: l.text }));
+    }
+    return out;
+  };
+
   const unresolved = resolution.questions.length;
   const outOfScope = resolution.blockers.filter((b) => isOutOfScope(b.reason)).length;
   const invalid = resolution.blockers.filter((b) => b.reason === "invalid_item").length;
@@ -202,7 +216,14 @@ export function ReviewBoard({
           <h2>확인이 필요한 것 ({resolution.questions.length})</h2>
           <div className={s.questions}>
             {resolution.questions.map((q) => (
-              <QuestionCard key={q.id} q={q} line={draft.lines.find((l) => l.no === q.line)} busy={busy} onAnswer={answer} />
+              <QuestionCard
+                key={q.id}
+                q={q}
+                line={draft.lines.find((l) => l.no === q.line)}
+                optionEvidence={optionEvidence(q)}
+                busy={busy}
+                onAnswer={answer}
+              />
             ))}
           </div>
         </section>
@@ -310,17 +331,27 @@ export function ReviewBoard({
   );
 }
 
+interface QuoteLine {
+  no: string;
+  who: string;
+  text: string;
+}
+
 function QuestionCard({
   q,
   line,
+  optionEvidence,
   busy,
   onAnswer,
 }: {
   q: Question;
   line?: { no: string; speaker: string | null; text: string };
+  /** 선택지 값 → 그 후보 결제의 근거 줄 */
+  optionEvidence: Record<string, QuoteLine[]>;
   busy: boolean;
   onAnswer: (a: Answer) => Promise<boolean>;
 }) {
+  const withEvidence = q.options.some((o) => (optionEvidence[o.value]?.length ?? 0) > 0);
   const [value, setValue] = useState("");
   const [amount, setAmount] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -350,11 +381,20 @@ function QuestionCard({
         </blockquote>
       )}
       <p className={s.prompt}>{q.prompt}</p>
-      <div className={s.options} role="radiogroup" aria-label={q.prompt}>
+      <div className={withEvidence ? s.optionCards : s.options} role="radiogroup" aria-label={q.prompt}>
         {q.options.map((o) => (
           <label key={o.value} className={value === o.value ? s.picked : undefined}>
             <input type="radio" name={q.id} value={o.value} checked={value === o.value} onChange={() => setValue(o.value)} />
-            {o.label}
+            <span className={s.optionLabel}>{o.label}</span>
+            {(optionEvidence[o.value]?.length ?? 0) > 0 && (
+              <ul className={s.optionQuotes}>
+                {optionEvidence[o.value].map((l) => (
+                  <li key={l.no}>
+                    <span className={s.no}>{l.no}</span> <b>{l.who}</b> {l.text}
+                  </li>
+                ))}
+              </ul>
+            )}
           </label>
         ))}
       </div>

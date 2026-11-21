@@ -5,6 +5,7 @@
  */
 import type { Draft, Item, LineNo, MaskedLine, PersonResult } from "@/lib/types";
 import { signedWon, won } from "./format";
+import { OpenDetailsOnHash } from "./OpenDetailsOnHash";
 
 const STATUS_LABEL: Record<Item["status"], string> = {
   candidate: "확정 후보",
@@ -86,13 +87,44 @@ function ItemEvidence({ item, lines }: { item: Item; lines: Map<LineNo, MaskedLi
   );
 }
 
-function PersonCard({ person, items, lines }: { person: PersonResult; items: Item[]; lines: Map<LineNo, MaskedLine> }) {
+function PersonCard({
+  person,
+  items,
+  lines,
+  anchor,
+}: {
+  person: PersonResult;
+  items: Item[];
+  lines: Map<LineNo, MaskedLine>;
+  anchor: string;
+}) {
   const tone = person.balance > 0 ? "plus" : person.balance < 0 ? "minus" : "zero";
   const owed = items.filter((it) => (person.shares[it.id] ?? 0) > 0 || it.split.includes(person.alias));
+
+  // 그 금액의 이유 요약 (발표 12쪽: 항목·참여자·원 발언·정정 발언·총무 확인값)
+  const paidFor = owed.filter((it) => (person.shares[it.id] ?? 0) > 0);
+  const quote = (no: LineNo) => {
+    const l = lines.get(no);
+    return l ? `${no} ${l.text}` : `${no}줄`;
+  };
+  const originals = paidFor.filter((it) => it.status !== "manual" && it.evidence[0]).map((it) => quote(it.evidence[0]));
+  const corrections = paidFor.filter((it) => it.status !== "manual").flatMap((it) => it.evidence.slice(1).map(quote));
+  const confirmed = [
+    ...new Set(
+      paidFor.flatMap((it) => [
+        ...it.confirmations.map((c) => confirmationLabel(c)).filter((t): t is string => !!t),
+        ...(it.status === "manual" ? [`직접 입력: ${it.name}`] : []),
+      ]),
+    ),
+  ];
+
   return (
-    <details className={`person tone-${tone}`}>
+    <details className={`person tone-${tone}`} id={anchor}>
       <summary>
-        <span className="alias">{person.alias}</span>
+        <span className="alias">
+          {person.alias}
+          <small>총부담 {won(person.total)}</small>
+        </span>
         <span className="balance">
           {signedWon(person.balance)}
           <small>{person.balance > 0 ? "받을 돈" : person.balance < 0 ? "보낼 돈" : "정산 끝"}</small>
@@ -104,6 +136,50 @@ function PersonCard({ person, items, lines }: { person: PersonResult; items: Ite
         <dt>총부담</dt>
         <dd>{won(person.total)}</dd>
       </dl>
+      {paidFor.length > 0 && (
+        <dl className="reasons">
+          <dt>항목</dt>
+          <dd>{paidFor.map((it) => `${it.name} ${won(person.shares[it.id] ?? 0)}`).join(" · ")}</dd>
+          <dt>참여자</dt>
+          <dd>{paidFor.map((it) => `${it.name} ${it.split.length}명`).join(" · ")}</dd>
+          {originals.length > 0 && (
+            <>
+              <dt>원 발언</dt>
+              <dd>
+                <ul>
+                  {originals.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </dd>
+            </>
+          )}
+          {corrections.length > 0 && (
+            <>
+              <dt>정정 발언</dt>
+              <dd>
+                <ul>
+                  {corrections.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </dd>
+            </>
+          )}
+          {confirmed.length > 0 && (
+            <>
+              <dt>총무 확인값</dt>
+              <dd>
+                <ul>
+                  {confirmed.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </dd>
+            </>
+          )}
+        </dl>
+      )}
       <ul className="shares">
         {owed.map((it) => {
           const share = person.shares[it.id] ?? 0;
@@ -187,20 +263,27 @@ export function SettlementView({ draft }: { draft: Draft }) {
                 </tr>
               </thead>
               <tbody>
-                {settlement.people.map((p) => (
+                {settlement.people.map((p, i) => (
                   <tr key={p.alias}>
-                    <th scope="row">{p.alias}</th>
+                    <th scope="row">
+                      <a href={`#person-${i}`}>{p.alias}</a>
+                    </th>
                     <td>{won(p.paid)}</td>
-                    <td>{won(p.total)}</td>
+                    <td>
+                      <a href={`#person-${i}`} className="amount-link" aria-label={`${p.alias} 총부담 ${won(p.total)}의 이유 보기`}>
+                        {won(p.total)}
+                      </a>
+                    </td>
                     <td className={p.balance > 0 ? "plus" : p.balance < 0 ? "minus" : ""}>{signedWon(p.balance)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <p className="hint">이름을 누르면 항목별 몫과 그 이유가 나와요.</p>
+            <p className="hint">이름이나 총부담 금액을 누르면 그 금액의 이유가 나와요.</p>
+            <OpenDetailsOnHash />
             <div className="people">
-              {settlement.people.map((p) => (
-                <PersonCard key={p.alias} person={p} items={resolution.items} lines={lines} />
+              {settlement.people.map((p, i) => (
+                <PersonCard key={p.alias} person={p} items={resolution.items} lines={lines} anchor={`person-${i}`} />
               ))}
             </div>
           </section>
