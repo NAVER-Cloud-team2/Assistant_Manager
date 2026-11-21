@@ -66,6 +66,13 @@ describe("extractEvents · Gemini", () => {
     expect(body.contents[0].parts[0].text).toContain("01 가람: 저녁 네 명 52,001원 내가 냈어");
   });
 
+  it("AI가 사건을 내지 않은 줄은 정산 외로 채운다", async () => {
+    const without05 = { events: events.filter((e) => e.line !== "05").map(flat) };
+    stubFetch(gemini(without05));
+    const r = await extractEvents(masked, roster, parsed);
+    expect(r.events.filter((e) => e.line === "05")).toEqual([{ type: "not_settlement", line: "05" }]);
+  });
+
   it("GEMINI_MODEL로 모델을 바꾼다", async () => {
     vi.stubEnv("GEMINI_MODEL", "gemini-4-hydrogen");
     const fetch = stubFetch(gemini(aiEvents));
@@ -197,6 +204,7 @@ describe("toEvents (응답 검사)", () => {
       { ...base, type: "correct", line: "03", target: ["P5"], amount: 1000 }, // 없는 결제
       { ...base, type: "correct", line: "03", target: ["P1"] }, // 바뀐 값 없음
       { ...base, type: "exclude", line: "02", target: ["P1"], who: "누구" }, // 명단 밖
+      { ...base, type: "exclude", line: "02", target: ["P1"], who: "라온", what: "" }, // 빠질 부분 없음
       { ...base, type: "unknown", line: "01" },
       "not an object",
     ];
@@ -248,6 +256,27 @@ describe("toEvents (응답 검사)", () => {
 
     it("항목 이름이 있으면 대상 하나를 그대로 둔다", () => {
       expect(excludeOf(ex("05", null))).toMatchObject({ target: "P1" });
+    });
+
+    it("AI가 붙인 이름이 달라도 결제 줄에 쓴 말이 있으면 그 항목으로 본다", () => {
+      const D1named = { ...D1, item: "백반" }; // 01줄에는 "점심"이라고 썼다
+      const { events } = toEvents({ events: [D1named, D2, ex("05", null)] }, lines, roster, parsedLines);
+      expect(events[2]).toMatchObject({ target: "P1" });
+    });
+
+    it("숫자가 없는 줄의 외화 범위 밖은 정산 외로 바꾼다", () => {
+      const oos = (l: string) => ({ ...base, type: "out_of_scope", line: l, reason: "foreign_currency" });
+      const { events } = toEvents({ events: [oos("04"), oos("02")] }, lines, roster, parsedLines);
+      expect(events).toEqual([
+        { type: "not_settlement", line: "04" },
+        { type: "out_of_scope", line: "02", reason: "foreign_currency" },
+      ]);
+    });
+
+    it("여러 단어 항목 이름은 한 단어만 있어도 그 항목으로 본다", () => {
+      const D1w = { ...D1, item: "점심 백반" };
+      const { events } = toEvents({ events: [D1w, D2, ex("05", null)] }, lines, roster, parsedLines);
+      expect(events[2]).toMatchObject({ target: "P1" });
     });
   });
 
