@@ -75,16 +75,19 @@ export async function loadDraft(meta: EventMeta, confirm?: StoredConfirm): Promi
     store.get<Sealed>(keys.confirm(meta.id)),
   ]);
   if (!lines || !extract) return null;
+  // 먼저 모두 복호화해 유효성을 확인한다. 실패(변조·키 불일치·운영의 평문)하면 TTL을 연장하지 않고 여기서 멈춘다.
+  const openedLines = open<MaskedLine[]>(lines);
+  const openedExtract = open<StoredExtract>(extract);
   const c = confirm ?? (saved ? open<StoredConfirm>(saved) : EMPTY_CONFIRM);
   if (confirm) {
-    // 수정할 때마다 7일 TTL을 다시 건다
+    // 수정할 때마다 7일 TTL을 다시 건다 (검증을 통과한 기존 레코드는 그대로 다시 쓴다)
     await Promise.all([
       store.set(keys.confirm(meta.id), seal(confirm), TTL.source),
       store.set(keys.excerpt(meta.id), lines, TTL.source),
       store.set(keys.extract(meta.id), extract, TTL.source),
     ]);
   }
-  return compose(meta, open<MaskedLine[]>(lines), open<StoredExtract>(extract), c);
+  return compose(meta, openedLines, openedExtract, c);
 }
 
 function compose(meta: EventMeta, lines: MaskedLine[], extract: StoredExtract, c: StoredConfirm): Draft {
