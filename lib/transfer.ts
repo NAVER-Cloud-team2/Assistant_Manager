@@ -5,12 +5,28 @@
  * 앞에서부터 min(보낼 돈, 받을 돈)씩 짝짓는다.
  * 기준 예시 결과: 다온→가람 22,000 / 라온→가람 3,999 / 라온→보람 8,001
  */
-import { clone, garam4 } from "./fixture";
 import type { Alias, PersonResult, Transfer } from "./types";
 
 export function planTransfers(people: PersonResult[], roster: Alias[]): Transfer[] {
-  // TODO(A): 위 규칙대로 구현한다. 지금은 기준 예시 결과를 돌려준다.
-  void people;
-  void roster;
-  return clone(garam4.settlement.transfers);
+  const rank = (a: Alias) => {
+    const i = roster.indexOf(a);
+    return i === -1 ? roster.length : i;
+  };
+  // sort는 같은 순위끼리 원래 순서를 지킨다 → 명단 밖 사람은 들어온 순서대로 뒤에
+  const sorted = [...people].sort((a, b) => rank(a.alias) - rank(b.alias));
+  const senders = sorted.filter((p) => p.balance < 0).map((p) => ({ alias: p.alias, left: -p.balance }));
+  const receivers = sorted.filter((p) => p.balance > 0).map((p) => ({ alias: p.alias, left: p.balance }));
+
+  const transfers: Transfer[] = [];
+  let s = 0;
+  let r = 0;
+  while (s < senders.length && r < receivers.length) {
+    const amount = Math.min(senders[s].left, receivers[r].left);
+    transfers.push({ from: senders[s].alias, to: receivers[r].alias, amount });
+    senders[s].left -= amount;
+    receivers[r].left -= amount;
+    if (senders[s].left === 0) s++;
+    if (receivers[r].left === 0) r++;
+  }
+  return transfers;
 }
