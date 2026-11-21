@@ -211,6 +211,46 @@ describe("toEvents (응답 검사)", () => {
     expect(events[1]).toEqual({ type: "refund", line: "06", target: "P1", status: "done", full: false, amount: 2000 });
   });
 
+  describe("제외·환불·취소 대상과 제외 금액을 코드로 고정", () => {
+    const line = (no: string, text: string) => ({ no, speaker: "가람" as const, text });
+    const lines = [
+      line("01", "점심 60,000원 내가 냈어"),
+      line("02", "카페 9,000원 내가 냈어"),
+      line("03", "점심 디저트는 난 안 먹었어. 디저트가 12,000원"),
+      line("04", "그거 돌려받았어"),
+      line("05", "점심 디저트는 난 빼줘"),
+      line("06", "점심 60,000원 중에 디저트는 난 안 먹었어"),
+    ];
+    const p = (no: string, amounts: number[]) => ({ no, speaker: "가람", amounts });
+    const parsedLines = [p("01", [60000]), p("02", [9000]), p("03", [12000]), p("04", []), p("05", []), p("06", [60000])];
+    const D1 = { ...P1, amount: 60000, item: "점심" };
+    const D2 = { ...P1, line: "02", id: "P2", amount: 9000, item: "카페" };
+    const ex = (lineNo: string, amount: number | null) => ({ ...base, type: "exclude", line: lineNo, target: ["P1"], who: "라온", what: "디저트", amount });
+    const excludeOf = (r: unknown) => toEvents({ events: [D1, D2, r] }, lines, roster, parsedLines).events[2];
+
+    it("AI가 제외 금액을 비워도 그 줄에 결제액보다 작은 금액이 하나면 채운다", () => {
+      expect(excludeOf(ex("03", null))).toMatchObject({ type: "exclude", target: "P1", amount: 12000 });
+    });
+
+    it("그 줄 금액이 결제 전체 금액이면 채우지 않는다 (질문으로)", () => {
+      expect(excludeOf(ex("06", null))).toMatchObject({ amount: null });
+    });
+
+    it("대화 어디에도 없는 제외 금액은 추측으로 보고 비운다", () => {
+      expect(excludeOf(ex("05", 7000))).toMatchObject({ amount: null });
+      expect(excludeOf(ex("03", 12000))).toMatchObject({ amount: 12000 });
+    });
+
+    it("항목 이름 없는 환불을 AI가 하나로 정해도 앞 결제를 모두 후보로 돌린다", () => {
+      const refund = { ...base, type: "refund", line: "04", target: ["P2"], full: true };
+      expect(excludeOf(refund)).toEqual({ type: "refund", line: "04", target: ["P1", "P2"], status: "done", full: true });
+    });
+
+    it("항목 이름이 있으면 대상 하나를 그대로 둔다", () => {
+      expect(excludeOf(ex("05", null))).toMatchObject({ target: "P1" });
+    });
+  });
+
   it("범위 밖 사유가 목록에 없으면 other", () => {
     const { events } = toEvents({ events: [{ ...base, type: "out_of_scope", line: "05", reason: "weird" }] }, masked, roster);
     expect(events).toEqual([{ type: "out_of_scope", line: "05", reason: "other" }]);
