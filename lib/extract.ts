@@ -2,7 +2,7 @@
  * AI 추출 — 담당: B (구현계획서 4-2)
  *
  * 가린 줄 + 명단 + 파서 결과 → 생성형 AI 구조화 출력(JSON Schema) → 사건 목록(lib/types.ts SettlementEvent)
- * - 제공사: AI_PROVIDER=gemini(개발, 기본) | openai(배포). CLOVA Studio는 쓰지 않는다
+ * - 제공사: AI_PROVIDER=openai(기본) | gemini(선택). CLOVA Studio는 쓰지 않는다
  *   Gemini: generateContent + responseJsonSchema / OpenAI: chat completions + json_schema(strict)
  * - 스키마는 두 제공사가 함께 받는 모양: 사건 하나를 평평한 객체로, 모든 필드 required, 안 쓰는 값은 null·[]
  * - 응답은 서버에서 다시 검사한다. 근거 줄이 없거나 없는 줄·없는 결제를 가리키는 사건은 버린다
@@ -321,7 +321,8 @@ export async function extractEvents(
   if (env.mockAI) {
     return { events: clone(garam4.events), model: "mock", promptVersion: "fixture", ai: true };
   }
-  const provider: Provider = process.env.AI_PROVIDER === "openai" ? "openai" : "gemini";
+  // 값이 없거나 잘못되면 OpenAI. Gemini 무료 등급으로 실제 대화가 새지 않게 명시했을 때만 Gemini
+  const provider: Provider = process.env.AI_PROVIDER === "gemini" ? "gemini" : "openai";
   const key = provider === "openai" ? process.env.OPENAI_API_KEY : process.env.GEMINI_API_KEY;
   if (!key) throw fail("no_key");
   const model = (provider === "openai" ? process.env.OPENAI_MODEL : process.env.GEMINI_MODEL) || DEFAULT_MODEL[provider];

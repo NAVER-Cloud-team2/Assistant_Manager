@@ -115,6 +115,13 @@ describe("extractEvents · Gemini", () => {
 describe("extractEvents · OpenAI", () => {
   beforeEach(() => vi.stubEnv("AI_PROVIDER", "openai"));
 
+  it("AI_PROVIDER가 없으면 OpenAI를 쓴다", async () => {
+    vi.stubEnv("AI_PROVIDER", "");
+    const fetch = stubFetch(openai(aiEvents));
+    await extractEvents(masked, roster, parsed);
+    expect(String(fetch.mock.calls[0][0])).toBe("https://api.openai.com/v1/chat/completions");
+  });
+
   it("기준 예시 응답을 사건 목록으로 바꾼다", async () => {
     const fetch = stubFetch(openai(aiEvents));
     const r = await extractEvents(masked, roster, parsed);
