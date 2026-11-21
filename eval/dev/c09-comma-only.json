@@ -1,0 +1,159 @@
+{
+  "name": "명확: '원' 없는 쉼표 금액",
+  "eventName": "편의점 야식",
+  "roster": [
+    "윤아",
+    "정우"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "윤아",
+      "text": "택시 12,300 내가 냈어 둘이"
+    },
+    {
+      "no": "02",
+      "speaker": "정우",
+      "text": "편의점 6,700원 내가 냈어 둘이 먹은 거"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "윤아",
+      "amounts": [
+        12300
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "정우",
+      "amounts": [
+        6700
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "윤아",
+      "amount": 12300,
+      "item": "택시",
+      "split": [
+        "윤아",
+        "정우"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "정우",
+      "amount": 6700,
+      "item": "편의점",
+      "split": [
+        "윤아",
+        "정우"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "택시",
+        "payer": "윤아",
+        "grossAmount": 12300,
+        "amount": 12300,
+        "split": [
+          "윤아",
+          "정우"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "편의점",
+        "payer": "정우",
+        "grossAmount": 6700,
+        "amount": 6700,
+        "split": [
+          "윤아",
+          "정우"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "윤아",
+        "paid": 12300,
+        "shares": {
+          "P1": 6150,
+          "P2": 3350
+        },
+        "remainderFrom": [],
+        "total": 9500,
+        "balance": 2800
+      },
+      {
+        "alias": "정우",
+        "paid": 6700,
+        "shares": {
+          "P1": 6150,
+          "P2": 3350
+        },
+        "remainderFrom": [],
+        "total": 9500,
+        "balance": -2800
+      }
+    ],
+    "transfers": [
+      {
+        "from": "정우",
+        "to": "윤아",
+        "amount": 2800
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

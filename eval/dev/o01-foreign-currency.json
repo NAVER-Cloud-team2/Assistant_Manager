@@ -1,0 +1,155 @@
+{
+  "name": "범위 밖: 외화 결제",
+  "eventName": "해외여행 출발",
+  "roster": [
+    "리아",
+    "주원",
+    "하준"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "리아",
+      "text": "공항 라운지 $45 내가 카드로 결제했어 셋이"
+    },
+    {
+      "no": "02",
+      "speaker": "주원",
+      "text": "공항버스 27,000원 내가 냈어 셋"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "리아",
+      "amounts": []
+    },
+    {
+      "no": "02",
+      "speaker": "주원",
+      "amounts": [
+        27000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "out_of_scope",
+      "line": "01",
+      "reason": "foreign_currency"
+    },
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "02",
+      "payer": "주원",
+      "amount": 27000,
+      "item": "공항버스",
+      "split": [
+        "리아",
+        "주원",
+        "하준"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "공항버스",
+        "payer": "주원",
+        "grossAmount": 27000,
+        "amount": 27000,
+        "split": [
+          "리아",
+          "주원",
+          "하준"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [
+      {
+        "line": "01",
+        "reason": "foreign_currency"
+      }
+    ],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "리아",
+        "paid": 0,
+        "shares": {
+          "P1": 9000
+        },
+        "remainderFrom": [],
+        "total": 9000,
+        "balance": -9000
+      },
+      {
+        "alias": "주원",
+        "paid": 27000,
+        "shares": {
+          "P1": 9000
+        },
+        "remainderFrom": [],
+        "total": 9000,
+        "balance": 18000
+      },
+      {
+        "alias": "하준",
+        "paid": 0,
+        "shares": {
+          "P1": 9000
+        },
+        "remainderFrom": [],
+        "total": 9000,
+        "balance": -9000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "리아",
+        "to": "주원",
+        "amount": 9000
+      },
+      {
+        "from": "하준",
+        "to": "주원",
+        "amount": 9000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

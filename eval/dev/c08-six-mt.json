@@ -1,0 +1,294 @@
+{
+  "name": "명확: 여섯 명 MT",
+  "eventName": "여름 MT",
+  "roster": [
+    "태양",
+    "별",
+    "달",
+    "구름",
+    "바다",
+    "하늘"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "태양",
+      "text": "MT 장보기 186,000원 내가 결제 여섯 명 다"
+    },
+    {
+      "no": "02",
+      "speaker": "별",
+      "text": "바베큐 추가 30,000원 내가 냈어 다 같이"
+    },
+    {
+      "no": "03",
+      "speaker": "달",
+      "text": "아침 해장국 54,000원 내가 냈어. 구름이랑 바다는 안 먹었어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "태양",
+      "amounts": [
+        186000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "별",
+      "amounts": [
+        30000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "달",
+      "amounts": [
+        54000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "태양",
+      "amount": 186000,
+      "item": "장보기",
+      "split": [
+        "태양",
+        "별",
+        "달",
+        "구름",
+        "바다",
+        "하늘"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "별",
+      "amount": 30000,
+      "item": "바베큐",
+      "split": [
+        "태양",
+        "별",
+        "달",
+        "구름",
+        "바다",
+        "하늘"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "03",
+      "payer": "달",
+      "amount": 54000,
+      "item": "해장국",
+      "split": [
+        "태양",
+        "별",
+        "달",
+        "하늘"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "장보기",
+        "payer": "태양",
+        "grossAmount": 186000,
+        "amount": 186000,
+        "split": [
+          "태양",
+          "별",
+          "달",
+          "구름",
+          "바다",
+          "하늘"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "바베큐",
+        "payer": "별",
+        "grossAmount": 30000,
+        "amount": 30000,
+        "split": [
+          "태양",
+          "별",
+          "달",
+          "구름",
+          "바다",
+          "하늘"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "해장국",
+        "payer": "달",
+        "grossAmount": 54000,
+        "amount": 54000,
+        "split": [
+          "태양",
+          "별",
+          "달",
+          "하늘"
+        ],
+        "evidence": [
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "태양",
+        "paid": 186000,
+        "shares": {
+          "P1": 31000,
+          "P2": 5000,
+          "P3": 13500
+        },
+        "remainderFrom": [],
+        "total": 49500,
+        "balance": 136500
+      },
+      {
+        "alias": "별",
+        "paid": 30000,
+        "shares": {
+          "P1": 31000,
+          "P2": 5000,
+          "P3": 13500
+        },
+        "remainderFrom": [],
+        "total": 49500,
+        "balance": -19500
+      },
+      {
+        "alias": "달",
+        "paid": 54000,
+        "shares": {
+          "P1": 31000,
+          "P2": 5000,
+          "P3": 13500
+        },
+        "remainderFrom": [],
+        "total": 49500,
+        "balance": 4500
+      },
+      {
+        "alias": "구름",
+        "paid": 0,
+        "shares": {
+          "P1": 31000,
+          "P2": 5000,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 36000,
+        "balance": -36000
+      },
+      {
+        "alias": "바다",
+        "paid": 0,
+        "shares": {
+          "P1": 31000,
+          "P2": 5000,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 36000,
+        "balance": -36000
+      },
+      {
+        "alias": "하늘",
+        "paid": 0,
+        "shares": {
+          "P1": 31000,
+          "P2": 5000,
+          "P3": 13500
+        },
+        "remainderFrom": [],
+        "total": 49500,
+        "balance": -49500
+      }
+    ],
+    "transfers": [
+      {
+        "from": "별",
+        "to": "태양",
+        "amount": 19500
+      },
+      {
+        "from": "구름",
+        "to": "태양",
+        "amount": 36000
+      },
+      {
+        "from": "바다",
+        "to": "태양",
+        "amount": 36000
+      },
+      {
+        "from": "하늘",
+        "to": "태양",
+        "amount": 45000
+      },
+      {
+        "from": "하늘",
+        "to": "달",
+        "amount": 4500
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

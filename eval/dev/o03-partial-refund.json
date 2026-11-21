@@ -1,0 +1,160 @@
+{
+  "name": "범위 밖: 부분 환불",
+  "eventName": "2박 여행",
+  "roster": [
+    "아라",
+    "연우",
+    "해솔"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "아라",
+      "text": "숙소 150,000원 내가 냈어 셋이"
+    },
+    {
+      "no": "02",
+      "speaker": "아라",
+      "text": "숙소 하루 취소해서 50,000원만 환불 받았어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "아라",
+      "amounts": [
+        150000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "아라",
+      "amounts": [
+        50000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "아라",
+      "amount": 150000,
+      "item": "숙소",
+      "split": [
+        "아라",
+        "연우",
+        "해솔"
+      ]
+    },
+    {
+      "type": "refund",
+      "line": "02",
+      "target": "P1",
+      "status": "done",
+      "full": false,
+      "amount": 50000
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "숙소",
+        "payer": "아라",
+        "grossAmount": 150000,
+        "amount": 150000,
+        "split": [
+          "아라",
+          "연우",
+          "해솔"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [
+      {
+        "line": "02",
+        "reason": "partial_refund"
+      }
+    ],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "아라",
+        "paid": 150000,
+        "shares": {
+          "P1": 50000
+        },
+        "remainderFrom": [],
+        "total": 50000,
+        "balance": 100000
+      },
+      {
+        "alias": "연우",
+        "paid": 0,
+        "shares": {
+          "P1": 50000
+        },
+        "remainderFrom": [],
+        "total": 50000,
+        "balance": -50000
+      },
+      {
+        "alias": "해솔",
+        "paid": 0,
+        "shares": {
+          "P1": 50000
+        },
+        "remainderFrom": [],
+        "total": 50000,
+        "balance": -50000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "연우",
+        "to": "아라",
+        "amount": 50000
+      },
+      {
+        "from": "해솔",
+        "to": "아라",
+        "amount": 50000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

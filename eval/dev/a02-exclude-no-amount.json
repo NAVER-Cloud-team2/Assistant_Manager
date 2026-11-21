@@ -1,0 +1,192 @@
+{
+  "name": "모호: 술 안 마심 (금액 없음)",
+  "eventName": "동아리 회식",
+  "roster": [
+    "보라",
+    "초록",
+    "노랑",
+    "파랑"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "보라",
+      "text": "회식 88,000원 내가 냈어 넷이"
+    },
+    {
+      "no": "02",
+      "speaker": "파랑",
+      "text": "나 회식 때 술 안 마셨어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "보라",
+      "amounts": [
+        88000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "파랑",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "보라",
+      "amount": 88000,
+      "item": "회식",
+      "split": [
+        "보라",
+        "초록",
+        "노랑",
+        "파랑"
+      ]
+    },
+    {
+      "type": "exclude",
+      "line": "02",
+      "who": "파랑",
+      "target": "P1",
+      "what": "주류",
+      "amount": null
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "회식",
+        "payer": "보라",
+        "grossAmount": 88000,
+        "amount": 88000,
+        "split": [
+          "보라",
+          "초록",
+          "노랑",
+          "파랑"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [
+      {
+        "id": "Q-split-02",
+        "kind": "split",
+        "line": "02",
+        "prompt": "제외할 항목과 그 금액을 알려 주세요",
+        "options": [
+          {
+            "value": "P1",
+            "label": "회식"
+          }
+        ]
+      }
+    ],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "needs_check"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "보라",
+        "paid": 88000,
+        "shares": {
+          "P1": 17000,
+          "P1-주류": 6667
+        },
+        "remainderFrom": [
+          "P1-주류"
+        ],
+        "total": 23667,
+        "balance": 64333
+      },
+      {
+        "alias": "초록",
+        "paid": 0,
+        "shares": {
+          "P1": 17000,
+          "P1-주류": 6667
+        },
+        "remainderFrom": [
+          "P1-주류"
+        ],
+        "total": 23667,
+        "balance": -23667
+      },
+      {
+        "alias": "노랑",
+        "paid": 0,
+        "shares": {
+          "P1": 17000,
+          "P1-주류": 6666
+        },
+        "remainderFrom": [],
+        "total": 23666,
+        "balance": -23666
+      },
+      {
+        "alias": "파랑",
+        "paid": 0,
+        "shares": {
+          "P1": 17000,
+          "P1-주류": 0
+        },
+        "remainderFrom": [],
+        "total": 17000,
+        "balance": -17000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "초록",
+        "to": "보라",
+        "amount": 23667
+      },
+      {
+        "from": "노랑",
+        "to": "보라",
+        "amount": 23666
+      },
+      {
+        "from": "파랑",
+        "to": "보라",
+        "amount": 17000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

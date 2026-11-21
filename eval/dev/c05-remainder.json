@@ -1,0 +1,200 @@
+{
+  "name": "명확: 나머지 원 배분",
+  "eventName": "시험 끝 피자",
+  "roster": [
+    "준서",
+    "예린",
+    "하람"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "준서",
+      "text": "피자 2판 50,000원 내가 결제 셋이 먹음"
+    },
+    {
+      "no": "02",
+      "speaker": "예린",
+      "text": "콜라 3,100원 내가 샀어 다 같이 마심"
+    },
+    {
+      "no": "03",
+      "speaker": "하람",
+      "text": "다음 주 시험 화이팅"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "준서",
+      "amounts": [
+        50000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "예린",
+      "amounts": [
+        3100
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "하람",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "준서",
+      "amount": 50000,
+      "item": "피자",
+      "split": [
+        "준서",
+        "예린",
+        "하람"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "예린",
+      "amount": 3100,
+      "item": "콜라",
+      "split": [
+        "준서",
+        "예린",
+        "하람"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "03"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "피자",
+        "payer": "준서",
+        "grossAmount": 50000,
+        "amount": 50000,
+        "split": [
+          "준서",
+          "예린",
+          "하람"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "콜라",
+        "payer": "예린",
+        "grossAmount": 3100,
+        "amount": 3100,
+        "split": [
+          "준서",
+          "예린",
+          "하람"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "준서",
+        "paid": 50000,
+        "shares": {
+          "P1": 16667,
+          "P2": 1034
+        },
+        "remainderFrom": [
+          "P1",
+          "P2"
+        ],
+        "total": 17701,
+        "balance": 32299
+      },
+      {
+        "alias": "예린",
+        "paid": 3100,
+        "shares": {
+          "P1": 16667,
+          "P2": 1033
+        },
+        "remainderFrom": [
+          "P1"
+        ],
+        "total": 17700,
+        "balance": -14600
+      },
+      {
+        "alias": "하람",
+        "paid": 0,
+        "shares": {
+          "P1": 16666,
+          "P2": 1033
+        },
+        "remainderFrom": [],
+        "total": 17699,
+        "balance": -17699
+      }
+    ],
+    "transfers": [
+      {
+        "from": "예린",
+        "to": "준서",
+        "amount": 14600
+      },
+      {
+        "from": "하람",
+        "to": "준서",
+        "amount": 17699
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

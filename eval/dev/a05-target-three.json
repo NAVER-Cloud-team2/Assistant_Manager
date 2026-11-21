@@ -1,0 +1,248 @@
+{
+  "name": "모호: 정정 대상 셋",
+  "eventName": "하루 세 끼",
+  "roster": [
+    "마음",
+    "소망"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "마음",
+      "text": "아침 12,000원 내가 냈어 둘이"
+    },
+    {
+      "no": "02",
+      "speaker": "소망",
+      "text": "점심 20,000원 내가 냈어 둘이"
+    },
+    {
+      "no": "03",
+      "speaker": "마음",
+      "text": "저녁 34,000원 내가 냈어 둘이"
+    },
+    {
+      "no": "04",
+      "speaker": "소망",
+      "text": "아까 그거 22,000원이었어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "마음",
+      "amounts": [
+        12000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "소망",
+      "amounts": [
+        20000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "마음",
+      "amounts": [
+        34000
+      ]
+    },
+    {
+      "no": "04",
+      "speaker": "소망",
+      "amounts": [
+        22000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "마음",
+      "amount": 12000,
+      "item": "아침",
+      "split": [
+        "마음",
+        "소망"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "소망",
+      "amount": 20000,
+      "item": "점심",
+      "split": [
+        "마음",
+        "소망"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "03",
+      "payer": "마음",
+      "amount": 34000,
+      "item": "저녁",
+      "split": [
+        "마음",
+        "소망"
+      ]
+    },
+    {
+      "type": "correct",
+      "line": "04",
+      "target": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "set": {
+        "amount": 22000
+      }
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "아침",
+        "payer": "마음",
+        "grossAmount": 12000,
+        "amount": 12000,
+        "split": [
+          "마음",
+          "소망"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "점심",
+        "payer": "소망",
+        "grossAmount": 20000,
+        "amount": 20000,
+        "split": [
+          "마음",
+          "소망"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "저녁",
+        "payer": "마음",
+        "grossAmount": 34000,
+        "amount": 34000,
+        "split": [
+          "마음",
+          "소망"
+        ],
+        "evidence": [
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [
+      {
+        "id": "Q-target-04",
+        "kind": "target",
+        "line": "04",
+        "prompt": "어느 결제 금액을 바꿀까요?",
+        "options": [
+          {
+            "value": "P1",
+            "label": "아침"
+          },
+          {
+            "value": "P2",
+            "label": "점심"
+          },
+          {
+            "value": "P3",
+            "label": "저녁"
+          }
+        ]
+      }
+    ],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate",
+      "04": "needs_check"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "마음",
+        "paid": 46000,
+        "shares": {
+          "P1": 6000,
+          "P2": 11000,
+          "P3": 17000
+        },
+        "remainderFrom": [],
+        "total": 34000,
+        "balance": 12000
+      },
+      {
+        "alias": "소망",
+        "paid": 22000,
+        "shares": {
+          "P1": 6000,
+          "P2": 11000,
+          "P3": 17000
+        },
+        "remainderFrom": [],
+        "total": 34000,
+        "balance": -12000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "소망",
+        "to": "마음",
+        "amount": 12000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

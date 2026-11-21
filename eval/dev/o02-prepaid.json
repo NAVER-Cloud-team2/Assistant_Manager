@@ -1,0 +1,175 @@
+{
+  "name": "범위 밖: 선입금",
+  "eventName": "펜션 MT",
+  "roster": [
+    "수호",
+    "단비",
+    "새봄",
+    "한결"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "수호",
+      "text": "펜션 선입금 100,000원 내가 미리 보냈어"
+    },
+    {
+      "no": "02",
+      "speaker": "단비",
+      "text": "장보기 52,000원 내가 냈어 넷이"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "수호",
+      "amounts": [
+        100000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "단비",
+      "amounts": [
+        52000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "out_of_scope",
+      "line": "01",
+      "reason": "prepaid"
+    },
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "02",
+      "payer": "단비",
+      "amount": 52000,
+      "item": "장보기",
+      "split": [
+        "수호",
+        "단비",
+        "새봄",
+        "한결"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "장보기",
+        "payer": "단비",
+        "grossAmount": 52000,
+        "amount": 52000,
+        "split": [
+          "수호",
+          "단비",
+          "새봄",
+          "한결"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [
+      {
+        "line": "01",
+        "reason": "prepaid"
+      }
+    ],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "수호",
+        "paid": 0,
+        "shares": {
+          "P1": 13000
+        },
+        "remainderFrom": [],
+        "total": 13000,
+        "balance": -13000
+      },
+      {
+        "alias": "단비",
+        "paid": 52000,
+        "shares": {
+          "P1": 13000
+        },
+        "remainderFrom": [],
+        "total": 13000,
+        "balance": 39000
+      },
+      {
+        "alias": "새봄",
+        "paid": 0,
+        "shares": {
+          "P1": 13000
+        },
+        "remainderFrom": [],
+        "total": 13000,
+        "balance": -13000
+      },
+      {
+        "alias": "한결",
+        "paid": 0,
+        "shares": {
+          "P1": 13000
+        },
+        "remainderFrom": [],
+        "total": 13000,
+        "balance": -13000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "수호",
+        "to": "단비",
+        "amount": 13000
+      },
+      {
+        "from": "새봄",
+        "to": "단비",
+        "amount": 13000
+      },
+      {
+        "from": "한결",
+        "to": "단비",
+        "amount": 13000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

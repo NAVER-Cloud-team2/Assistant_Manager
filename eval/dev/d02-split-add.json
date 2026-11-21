@@ -1,0 +1,225 @@
+{
+  "name": "정정: 2차에 한 명 추가",
+  "eventName": "동아리 회식",
+  "roster": [
+    "하늘",
+    "바람",
+    "구슬",
+    "노을"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "하늘",
+      "text": "저녁 72,000원 내가 결제 넷이"
+    },
+    {
+      "no": "02",
+      "speaker": "바람",
+      "text": "2차 40,000원 내가 냈어 하늘 나 구슬 셋"
+    },
+    {
+      "no": "03",
+      "speaker": "노을",
+      "text": "나도 2차 갔잖아"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "하늘",
+      "amounts": [
+        72000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "바람",
+      "amounts": [
+        40000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "노을",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "하늘",
+      "amount": 72000,
+      "item": "저녁",
+      "split": [
+        "하늘",
+        "바람",
+        "구슬",
+        "노을"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "바람",
+      "amount": 40000,
+      "item": "2차",
+      "split": [
+        "하늘",
+        "바람",
+        "구슬"
+      ]
+    },
+    {
+      "type": "correct",
+      "line": "03",
+      "target": "P2",
+      "set": {
+        "split": [
+          "하늘",
+          "바람",
+          "구슬",
+          "노을"
+        ]
+      }
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "저녁",
+        "payer": "하늘",
+        "grossAmount": 72000,
+        "amount": 72000,
+        "split": [
+          "하늘",
+          "바람",
+          "구슬",
+          "노을"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "2차",
+        "payer": "바람",
+        "grossAmount": 40000,
+        "amount": 40000,
+        "split": [
+          "하늘",
+          "바람",
+          "구슬",
+          "노을"
+        ],
+        "evidence": [
+          "02",
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "하늘",
+        "paid": 72000,
+        "shares": {
+          "P1": 18000,
+          "P2": 10000
+        },
+        "remainderFrom": [],
+        "total": 28000,
+        "balance": 44000
+      },
+      {
+        "alias": "바람",
+        "paid": 40000,
+        "shares": {
+          "P1": 18000,
+          "P2": 10000
+        },
+        "remainderFrom": [],
+        "total": 28000,
+        "balance": 12000
+      },
+      {
+        "alias": "구슬",
+        "paid": 0,
+        "shares": {
+          "P1": 18000,
+          "P2": 10000
+        },
+        "remainderFrom": [],
+        "total": 28000,
+        "balance": -28000
+      },
+      {
+        "alias": "노을",
+        "paid": 0,
+        "shares": {
+          "P1": 18000,
+          "P2": 10000
+        },
+        "remainderFrom": [],
+        "total": 28000,
+        "balance": -28000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "구슬",
+        "to": "하늘",
+        "amount": 28000
+      },
+      {
+        "from": "노을",
+        "to": "하늘",
+        "amount": 16000
+      },
+      {
+        "from": "노을",
+        "to": "바람",
+        "amount": 12000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

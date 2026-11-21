@@ -1,0 +1,279 @@
+{
+  "name": "명확: 다섯 명 1차·2차·택시",
+  "eventName": "동아리 개강총회",
+  "roster": [
+    "민호",
+    "수빈",
+    "태오",
+    "유나",
+    "겨울"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "민호",
+      "text": "1차 고깃집 127,000원 내가 결제했어 다섯 명"
+    },
+    {
+      "no": "02",
+      "speaker": "유나",
+      "text": "2차 술집 84,000원 내가 냈어. 민호 수빈 나 셋만 갔지"
+    },
+    {
+      "no": "03",
+      "speaker": "태오",
+      "text": "난 1차만 하고 집 갔어"
+    },
+    {
+      "no": "04",
+      "speaker": "겨울",
+      "text": "택시비 9,800원 내가 냈어 태오랑 같이 탔어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "민호",
+      "amounts": [
+        127000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "유나",
+      "amounts": [
+        84000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "태오",
+      "amounts": []
+    },
+    {
+      "no": "04",
+      "speaker": "겨울",
+      "amounts": [
+        9800
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "민호",
+      "amount": 127000,
+      "item": "1차",
+      "split": [
+        "민호",
+        "수빈",
+        "태오",
+        "유나",
+        "겨울"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "유나",
+      "amount": 84000,
+      "item": "2차",
+      "split": [
+        "민호",
+        "수빈",
+        "유나"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "03"
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "04",
+      "payer": "겨울",
+      "amount": 9800,
+      "item": "택시",
+      "split": [
+        "겨울",
+        "태오"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "1차",
+        "payer": "민호",
+        "grossAmount": 127000,
+        "amount": 127000,
+        "split": [
+          "민호",
+          "수빈",
+          "태오",
+          "유나",
+          "겨울"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "2차",
+        "payer": "유나",
+        "grossAmount": 84000,
+        "amount": 84000,
+        "split": [
+          "민호",
+          "수빈",
+          "유나"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "택시",
+        "payer": "겨울",
+        "grossAmount": 9800,
+        "amount": 9800,
+        "split": [
+          "겨울",
+          "태오"
+        ],
+        "evidence": [
+          "04"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "not_settlement",
+      "04": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "민호",
+        "paid": 127000,
+        "shares": {
+          "P1": 25400,
+          "P2": 28000,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 53400,
+        "balance": 73600
+      },
+      {
+        "alias": "수빈",
+        "paid": 0,
+        "shares": {
+          "P1": 25400,
+          "P2": 28000,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 53400,
+        "balance": -53400
+      },
+      {
+        "alias": "태오",
+        "paid": 0,
+        "shares": {
+          "P1": 25400,
+          "P2": 0,
+          "P3": 4900
+        },
+        "remainderFrom": [],
+        "total": 30300,
+        "balance": -30300
+      },
+      {
+        "alias": "유나",
+        "paid": 84000,
+        "shares": {
+          "P1": 25400,
+          "P2": 28000,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 53400,
+        "balance": 30600
+      },
+      {
+        "alias": "겨울",
+        "paid": 9800,
+        "shares": {
+          "P1": 25400,
+          "P2": 0,
+          "P3": 4900
+        },
+        "remainderFrom": [],
+        "total": 30300,
+        "balance": -20500
+      }
+    ],
+    "transfers": [
+      {
+        "from": "수빈",
+        "to": "민호",
+        "amount": 53400
+      },
+      {
+        "from": "태오",
+        "to": "민호",
+        "amount": 20200
+      },
+      {
+        "from": "태오",
+        "to": "유나",
+        "amount": 10100
+      },
+      {
+        "from": "겨울",
+        "to": "유나",
+        "amount": 20500
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

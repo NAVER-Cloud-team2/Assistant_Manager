@@ -1,0 +1,178 @@
+{
+  "name": "명확: 볼링·음료",
+  "eventName": "볼링 모임",
+  "roster": [
+    "시온",
+    "유진",
+    "마루"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "시온",
+      "text": "볼링 3게임씩 45,000원 내가 결제했어 셋 다"
+    },
+    {
+      "no": "02",
+      "speaker": "마루",
+      "text": "볼링 끝나고 음료 9,000원 내가 냈어 유진이랑 나"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "시온",
+      "amounts": [
+        45000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "마루",
+      "amounts": [
+        9000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "시온",
+      "amount": 45000,
+      "item": "볼링",
+      "split": [
+        "시온",
+        "유진",
+        "마루"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "마루",
+      "amount": 9000,
+      "item": "음료",
+      "split": [
+        "유진",
+        "마루"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "볼링",
+        "payer": "시온",
+        "grossAmount": 45000,
+        "amount": 45000,
+        "split": [
+          "시온",
+          "유진",
+          "마루"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "음료",
+        "payer": "마루",
+        "grossAmount": 9000,
+        "amount": 9000,
+        "split": [
+          "유진",
+          "마루"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "시온",
+        "paid": 45000,
+        "shares": {
+          "P1": 15000,
+          "P2": 0
+        },
+        "remainderFrom": [],
+        "total": 15000,
+        "balance": 30000
+      },
+      {
+        "alias": "유진",
+        "paid": 0,
+        "shares": {
+          "P1": 15000,
+          "P2": 4500
+        },
+        "remainderFrom": [],
+        "total": 19500,
+        "balance": -19500
+      },
+      {
+        "alias": "마루",
+        "paid": 9000,
+        "shares": {
+          "P1": 15000,
+          "P2": 4500
+        },
+        "remainderFrom": [],
+        "total": 19500,
+        "balance": -10500
+      }
+    ],
+    "transfers": [
+      {
+        "from": "유진",
+        "to": "시온",
+        "amount": 19500
+      },
+      {
+        "from": "마루",
+        "to": "시온",
+        "amount": 10500
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

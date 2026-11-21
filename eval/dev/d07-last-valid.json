@@ -1,0 +1,160 @@
+{
+  "name": "정정: 두 번 고친 금액 (마지막 값)",
+  "eventName": "자취방 장보기",
+  "roster": [
+    "나연",
+    "동하"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "나연",
+      "text": "장보기 45,600원 내가 냈어 둘이"
+    },
+    {
+      "no": "02",
+      "speaker": "동하",
+      "text": "장보기 다시 보니 46,500원이야"
+    },
+    {
+      "no": "03",
+      "speaker": "나연",
+      "text": "아니 장보기 최종 46,300원 맞아"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "나연",
+      "amounts": [
+        45600
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "동하",
+      "amounts": [
+        46500
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "나연",
+      "amounts": [
+        46300
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "나연",
+      "amount": 45600,
+      "item": "장보기",
+      "split": [
+        "나연",
+        "동하"
+      ]
+    },
+    {
+      "type": "correct",
+      "line": "02",
+      "target": "P1",
+      "set": {
+        "amount": 46500
+      }
+    },
+    {
+      "type": "correct",
+      "line": "03",
+      "target": "P1",
+      "set": {
+        "amount": 46300
+      }
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "장보기",
+        "payer": "나연",
+        "grossAmount": 46300,
+        "amount": 46300,
+        "split": [
+          "나연",
+          "동하"
+        ],
+        "evidence": [
+          "01",
+          "02",
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "나연",
+        "paid": 46300,
+        "shares": {
+          "P1": 23150
+        },
+        "remainderFrom": [],
+        "total": 23150,
+        "balance": 23150
+      },
+      {
+        "alias": "동하",
+        "paid": 0,
+        "shares": {
+          "P1": 23150
+        },
+        "remainderFrom": [],
+        "total": 23150,
+        "balance": -23150
+      }
+    ],
+    "transfers": [
+      {
+        "from": "동하",
+        "to": "나연",
+        "amount": 23150
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

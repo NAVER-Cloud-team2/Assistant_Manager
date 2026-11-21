@@ -1,0 +1,178 @@
+{
+  "name": "명확: 다른 사람이 결제자를 말함",
+  "eventName": "점심 모임",
+  "roster": [
+    "하진",
+    "로운",
+    "세아"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "로운",
+      "text": "하진이가 점심 42,000원 냈어 셋이 먹었고"
+    },
+    {
+      "no": "02",
+      "speaker": "세아",
+      "text": "디저트 15,000원은 로운이가 냈어. 나랑 로운이만 먹음"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "로운",
+      "amounts": [
+        42000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "세아",
+      "amounts": [
+        15000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "하진",
+      "amount": 42000,
+      "item": "점심",
+      "split": [
+        "하진",
+        "로운",
+        "세아"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "로운",
+      "amount": 15000,
+      "item": "디저트",
+      "split": [
+        "로운",
+        "세아"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "점심",
+        "payer": "하진",
+        "grossAmount": 42000,
+        "amount": 42000,
+        "split": [
+          "하진",
+          "로운",
+          "세아"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "디저트",
+        "payer": "로운",
+        "grossAmount": 15000,
+        "amount": 15000,
+        "split": [
+          "로운",
+          "세아"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "하진",
+        "paid": 42000,
+        "shares": {
+          "P1": 14000,
+          "P2": 0
+        },
+        "remainderFrom": [],
+        "total": 14000,
+        "balance": 28000
+      },
+      {
+        "alias": "로운",
+        "paid": 15000,
+        "shares": {
+          "P1": 14000,
+          "P2": 7500
+        },
+        "remainderFrom": [],
+        "total": 21500,
+        "balance": -6500
+      },
+      {
+        "alias": "세아",
+        "paid": 0,
+        "shares": {
+          "P1": 14000,
+          "P2": 7500
+        },
+        "remainderFrom": [],
+        "total": 21500,
+        "balance": -21500
+      }
+    ],
+    "transfers": [
+      {
+        "from": "로운",
+        "to": "하진",
+        "amount": 6500
+      },
+      {
+        "from": "세아",
+        "to": "하진",
+        "amount": 21500
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

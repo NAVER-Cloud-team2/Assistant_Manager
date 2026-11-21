@@ -1,0 +1,248 @@
+{
+  "name": "명확: 만·천 표기",
+  "eventName": "팀플 뒤풀이",
+  "roster": [
+    "가온",
+    "나래",
+    "다솜",
+    "라희"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "가온",
+      "text": "저녁 8만 4천 원 내가 냈어 넷이"
+    },
+    {
+      "no": "02",
+      "speaker": "나래",
+      "text": "노래방 3만원 내가, 다솜 빼고 셋"
+    },
+    {
+      "no": "03",
+      "speaker": "라희",
+      "text": "아이스크림 4,400원 내가 샀어 다들 하나씩"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "가온",
+      "amounts": [
+        84000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "나래",
+      "amounts": [
+        30000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "라희",
+      "amounts": [
+        4400
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "가온",
+      "amount": 84000,
+      "item": "저녁",
+      "split": [
+        "가온",
+        "나래",
+        "다솜",
+        "라희"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "나래",
+      "amount": 30000,
+      "item": "노래방",
+      "split": [
+        "가온",
+        "나래",
+        "라희"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "03",
+      "payer": "라희",
+      "amount": 4400,
+      "item": "아이스크림",
+      "split": [
+        "가온",
+        "나래",
+        "다솜",
+        "라희"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "저녁",
+        "payer": "가온",
+        "grossAmount": 84000,
+        "amount": 84000,
+        "split": [
+          "가온",
+          "나래",
+          "다솜",
+          "라희"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "노래방",
+        "payer": "나래",
+        "grossAmount": 30000,
+        "amount": 30000,
+        "split": [
+          "가온",
+          "나래",
+          "라희"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "아이스크림",
+        "payer": "라희",
+        "grossAmount": 4400,
+        "amount": 4400,
+        "split": [
+          "가온",
+          "나래",
+          "다솜",
+          "라희"
+        ],
+        "evidence": [
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "가온",
+        "paid": 84000,
+        "shares": {
+          "P1": 21000,
+          "P2": 10000,
+          "P3": 1100
+        },
+        "remainderFrom": [],
+        "total": 32100,
+        "balance": 51900
+      },
+      {
+        "alias": "나래",
+        "paid": 30000,
+        "shares": {
+          "P1": 21000,
+          "P2": 10000,
+          "P3": 1100
+        },
+        "remainderFrom": [],
+        "total": 32100,
+        "balance": -2100
+      },
+      {
+        "alias": "다솜",
+        "paid": 0,
+        "shares": {
+          "P1": 21000,
+          "P2": 0,
+          "P3": 1100
+        },
+        "remainderFrom": [],
+        "total": 22100,
+        "balance": -22100
+      },
+      {
+        "alias": "라희",
+        "paid": 4400,
+        "shares": {
+          "P1": 21000,
+          "P2": 10000,
+          "P3": 1100
+        },
+        "remainderFrom": [],
+        "total": 32100,
+        "balance": -27700
+      }
+    ],
+    "transfers": [
+      {
+        "from": "나래",
+        "to": "가온",
+        "amount": 2100
+      },
+      {
+        "from": "다솜",
+        "to": "가온",
+        "amount": 22100
+      },
+      {
+        "from": "라희",
+        "to": "가온",
+        "amount": 27700
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}
