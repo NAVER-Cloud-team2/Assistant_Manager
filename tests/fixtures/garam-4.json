@@ -1,0 +1,78 @@
+{
+  "name": "기준 예시: 저녁 정정 · 2차 불참 · 택시 환불 (구현계획서 부록)",
+  "eventName": "동아리 뒤풀이",
+  "roster": ["가람", "보람", "다온", "라온"],
+  "raw": "[김가람] [오후 9:12] 저녁 네 명 52,001원 내가 냈어\n[이보람] [오후 11:40] 2차 30,002원 내가 냈어. 가람·나·다온 셋이야\n[김가람] [오후 11:52] 저녁 영수증 다시 보니 48,001원이야\n[박다온] [오전 12:30] 가람이랑 탄 택시 12,000원 내가 결제했어\n[최라온] [오전 12:31] 다들 조심히 들어가! 내 번호 010-1234-5678\n[박다온] [오전 10:05] 그 택시비 전액 환불 들어왔어",
+  "speakerMap": { "김가람": "가람", "이보람": "보람", "박다온": "다온", "최라온": "라온" },
+  "masked": [
+    { "no": "01", "speaker": "가람", "text": "저녁 네 명 52,001원 내가 냈어" },
+    { "no": "02", "speaker": "보람", "text": "2차 30,002원 내가 냈어. 가람·나·다온 셋이야" },
+    { "no": "03", "speaker": "가람", "text": "저녁 영수증 다시 보니 48,001원이야" },
+    { "no": "04", "speaker": "다온", "text": "가람이랑 탄 택시 12,000원 내가 결제했어" },
+    { "no": "05", "speaker": "라온", "text": "다들 조심히 들어가! 내 번호 [전화번호]" },
+    { "no": "06", "speaker": "다온", "text": "그 택시비 전액 환불 들어왔어" }
+  ],
+  "parsed": [
+    { "no": "01", "speaker": "가람", "amounts": [52001] },
+    { "no": "02", "speaker": "보람", "amounts": [30002] },
+    { "no": "03", "speaker": "가람", "amounts": [48001] },
+    { "no": "04", "speaker": "다온", "amounts": [12000] },
+    { "no": "05", "speaker": "라온", "amounts": [] },
+    { "no": "06", "speaker": "다온", "amounts": [] }
+  ],
+  "events": [
+    { "type": "payment", "id": "P1", "line": "01", "payer": "가람", "amount": 52001, "item": "저녁", "split": ["가람", "보람", "다온", "라온"] },
+    { "type": "payment", "id": "P2", "line": "02", "payer": "보람", "amount": 30002, "item": "2차", "split": ["가람", "보람", "다온"] },
+    { "type": "correct", "line": "03", "target": "P1", "set": { "amount": 48001 } },
+    { "type": "payment", "id": "P3", "line": "04", "payer": "다온", "amount": 12000, "item": "택시", "split": ["다온", "가람"] },
+    { "type": "not_settlement", "line": "05" },
+    { "type": "refund", "line": "06", "target": "P3", "status": "done", "full": true }
+  ],
+  "resolution": {
+    "items": [
+      { "id": "P1", "name": "저녁", "payer": "가람", "grossAmount": 48001, "amount": 48001, "split": ["가람", "보람", "다온", "라온"], "evidence": ["01", "03"], "confirmations": [], "status": "candidate" },
+      { "id": "P2", "name": "2차", "payer": "보람", "grossAmount": 30002, "amount": 30002, "split": ["가람", "보람", "다온"], "evidence": ["02"], "confirmations": [], "status": "candidate" },
+      { "id": "P3", "name": "택시", "payer": "다온", "grossAmount": 12000, "amount": 0, "split": ["다온", "가람"], "evidence": ["04", "06"], "confirmations": [], "status": "candidate" }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": { "01": "candidate", "02": "candidate", "03": "candidate", "04": "candidate", "05": "not_settlement", "06": "candidate" }
+  },
+  "settlement": {
+    "people": [
+      { "alias": "가람", "paid": 48001, "shares": { "P1": 12001, "P2": 10001, "P3": 0 }, "remainderFrom": ["P1", "P2"], "total": 22002, "balance": 25999 },
+      { "alias": "보람", "paid": 30002, "shares": { "P1": 12000, "P2": 10001, "P3": 0 }, "remainderFrom": ["P2"], "total": 22001, "balance": 8001 },
+      { "alias": "다온", "paid": 0, "shares": { "P1": 12000, "P2": 10000, "P3": 0 }, "remainderFrom": [], "total": 22000, "balance": -22000 },
+      { "alias": "라온", "paid": 0, "shares": { "P1": 12000, "P2": 0, "P3": 0 }, "remainderFrom": [], "total": 12000, "balance": -12000 }
+    ],
+    "transfers": [
+      { "from": "다온", "to": "가람", "amount": 22000 },
+      { "from": "라온", "to": "가람", "amount": 3999 },
+      { "from": "라온", "to": "보람", "amount": 8001 }
+    ],
+    "checks": [
+      { "name": "항목별 부담 합 = 항목 금액", "ok": true },
+      { "name": "전체 부담 합 = 전체 순결제액", "ok": true },
+      { "name": "잔액 합 = 0", "ok": true },
+      { "name": "송금 반영 후 모두 0", "ok": true },
+      { "name": "모든 금액이 정수", "ok": true }
+    ]
+  },
+  "variants": {
+    "ambiguousTarget": {
+      "description": "03줄이 대상 없이 금액만 말하면 P1·P2 중 무엇을 고치는지 물어야 한다",
+      "replaceLine": { "no": "03", "speaker": "가람", "text": "아까 4만 8천 원이야" },
+      "expectQuestion": { "kind": "target", "line": "03", "optionValues": ["P1", "P2"] },
+      "expectPublishable": false
+    },
+    "version2": {
+      "description": "1판 발행 뒤 저녁 금액 재정정, 이전 공유 여부 '있음' → 송금안 없이 변동액만",
+      "addLine": { "no": "07", "speaker": "가람", "text": "저녁 사실 46,001원이었어" },
+      "priorShared": "있음",
+      "balances": { "가람": 24499, "보람": 8501, "다온": -21500, "라온": -11500 },
+      "deltas": { "가람": -1500, "보람": 500, "다온": 500, "라온": 500 },
+      "transfers": null,
+      "messageFirstLine": "[1판을 대체하는 2판]"
+    }
+  }
+}

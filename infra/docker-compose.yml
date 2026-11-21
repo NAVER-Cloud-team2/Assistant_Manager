@@ -1,0 +1,19 @@
+# 로컬에서 운영과 같은 이미지로 띄워 보기 (선택). 평소 개발은 npm run dev로 충분하다.
+#   docker compose -f infra/docker-compose.yml up --build
+# RedisStore를 구현한 뒤에는 app의 STORE를 redis로 바꿔 로컬 redis로 시험한다.
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      MOCK_AI: "1"
+      STORE: memory
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - redis
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]

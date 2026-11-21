@@ -1,0 +1,32 @@
+/* 최소 기본값 — 디자인은 C가 정한다 */
+:root {
+  color-scheme: light;
+  --bg: #f5f4ff;
+  --fg: #16133a;
+  --muted: #6b6890;
+  --accent: #4c3ff0;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  line-height: 1.6;
+}
+.placeholder {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+.placeholder .code {
+  color: var(--accent);
+  font-weight: 600;
+  margin: 0;
+}
+.placeholder .hint {
+  color: var(--muted);
+  font-size: 14px;
+}

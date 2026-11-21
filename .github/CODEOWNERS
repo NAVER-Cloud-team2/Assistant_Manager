@@ -1,0 +1,37 @@
+# 담당 폴더별 자동 리뷰어 지정.
+# 사용법: 아래 주석의 <A>~<D>를 각자 GitHub 아이디로 바꾸고 줄 앞의 '#'을 지운다.
+# (존재하지 않는 아이디가 있으면 GitHub가 이 파일을 오류로 표시한다)
+
+# 합의 파일 — 4명 모두 리뷰
+# /lib/types.ts        <A> <B> <C> <D>
+# /lib/api.ts          <A> <B> <C> <D>
+# /lib/fixture.ts      <A> <B> <C> <D>
+# /tests/fixtures/     <A> <B> <C> <D>
+# /package.json        <A> <B> <C> <D>
+
+# A 계산·정리
+# /lib/calc.ts         <A>
+# /lib/transfer.ts     <A>
+# /lib/resolve.ts      <A>
+# /lib/version.ts      <A>
+
+# B AI·파서
+# /lib/parse.ts        <B>
+# /lib/extract.ts      <B>
+# /eval/               <B>
+
+# C 총무 화면
+# /app/page.tsx        <C>
+# /app/m/              <C>
+# /components/         <C>
+# /lib/mask.ts         <C>
+
+# D 서버·결과·인프라
+# /app/api/            <D>
+# /app/r/              <D>
+# /lib/store.ts        <D>
+# /lib/crypto.ts       <D>
+# /lib/token.ts        <D>
+# /lib/log.ts          <D>
+# /infra/              <D>
+# /.github/            <D>
