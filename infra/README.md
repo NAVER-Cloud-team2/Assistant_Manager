@@ -7,7 +7,7 @@
 | 항목 | 값 |
 | --- | --- |
 | 서버 | 팀장이 공유한 네이버 클라우드 서버 (Ubuntu 24.04, **vCPU 4**, 메모리 15GB) |
-| 주소 | **https://nc776.duckdns.org** (DuckDNS) |
+| 주소 | **https://assistant-manager.duckdns.org** (DuckDNS) |
 | 웹 서버·HTTPS | **Caddy** (서버에 이미 설치됨, 인증서 자동 발급·갱신). Nginx·certbot은 쓰지 않는다 |
 | 앱 | Docker 컨테이너 `assistant-manager`, `127.0.0.1:3000` (외부에 직접 열지 않음) |
 | 배포 | 서버에서 직접 빌드: `/srv/assistant-manager/deploy.sh --build` (아래 "배포") |
@@ -73,7 +73,7 @@
 `/etc/caddy/Caddyfile`:
 
 ```
-nc776.duckdns.org {
+assistant-manager.duckdns.org {
 	reverse_proxy 127.0.0.1:3000
 }
 ```
@@ -94,8 +94,8 @@ systemctl reload caddy
 
 ```bash
 docker ps --format '{{.Names}}  {{.Image}}  {{.Status}}'
-curl -s -o /dev/null -w 'https 홈 → HTTP %{http_code}\n' https://nc776.duckdns.org/
-curl -sI https://nc776.duckdns.org/r/test | grep -iE '^(HTTP|x-robots-tag|referrer-policy|cache-control)'   # 404 + 보안 헤더
+curl -s -o /dev/null -w 'https 홈 → HTTP %{http_code}\n' https://assistant-manager.duckdns.org/
+curl -sI https://assistant-manager.duckdns.org/r/test | grep -iE '^(HTTP|x-robots-tag|referrer-policy|cache-control)'   # 404 + 보안 헤더
 ```
 
 ### 유출 시험 (구현계획서 9장)
