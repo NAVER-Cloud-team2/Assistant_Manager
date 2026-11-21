@@ -1,423 +1,193 @@
-/* S3 검토 — 담당: C (globals.css와 겹치지 않게 이 파일에만 둔다) */
-.board {
+/* S3 검토 — 담당: C (공통 모양은 app/globals.css, 이 화면에만 쓰는 것만 여기 둔다) */
+.verdict {
   display: grid;
-  gap: 16px;
+  gap: 6px;
 }
-.board h2 {
-  font-size: 17px;
-  margin: 8px 0 10px;
-}
-.badge {
-  justify-self: start;
-  margin: 0;
-  font-size: 13px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: #ebe8ff;
-  color: var(--accent);
-}
-.banner {
-  border-radius: 12px;
-  padding: 12px 16px;
-  border: 1px solid;
-}
-.banner p,
-.banner ul {
-  margin: 4px 0 0;
-  font-size: 14px;
-}
-.banner ul {
-  padding-left: 18px;
-}
-.ok {
-  background: #e9f7f0;
-  border-color: #9fd8bd;
-}
-.warn {
-  background: #fff6e5;
-  border-color: #f0c46b;
-}
-.error,
-.fieldError {
-  margin: 0;
-  padding: 8px 12px;
-  background: #fdeceb;
-  border-radius: 8px;
-  color: #a1281f;
-  font-size: 14px;
-}
-.questions {
-  display: grid;
-  gap: 10px;
-}
-.qcard {
-  background: #fff;
-  border: 2px solid #f0c46b;
-  border-radius: 12px;
-  padding: 12px 14px;
-  display: grid;
-  gap: 8px;
-}
-.qkind {
-  margin: 0;
-  font-size: 12px;
-  color: #8a5a00;
-  font-weight: 600;
-}
-.quote {
-  margin: 0;
-  padding: 8px 10px;
-  background: var(--bg);
-  border-radius: 8px;
-  font-size: 14px;
-}
-.prompt {
-  margin: 0;
-  font-weight: 600;
-}
-.options,
-.chips {
+.next {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 4px;
+}
+
+/* 질문 한 건 */
+.q {
+  display: grid;
+  gap: 8px;
+  padding-top: 13px;
+  padding-bottom: 16px;
+}
+.prompt {
+  font-weight: 700;
+}
+.options {
+  display: grid;
   gap: 8px;
 }
-.options label,
-.chips label {
-  display: inline-flex;
-  align-items: center;
+.amount {
+  display: grid;
   gap: 6px;
+}
+/* 대화에 나온 금액 고르기 */
+.picks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.pick {
   min-height: 44px;
   padding: 0 14px;
-  border: 1px solid #d6d3ef;
-  border-radius: 999px;
-  background: #fff;
-  font-size: 15px;
-}
-.options input,
-.chips input {
-  accent-color: var(--accent);
-}
-.picked {
-  border-color: var(--accent) !important;
-  background: #f1efff !important;
-}
-.amount,
-.manual label {
-  display: grid;
-  gap: 4px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--field);
   font-size: 14px;
-}
-.amount input,
-.manual input,
-.manual select {
-  font: inherit;
-  font-size: 16px;
-  padding: 10px 12px;
-  border: 1px solid #d6d3ef;
-  border-radius: 10px;
-  background: #fff;
-  color: var(--fg);
-  min-height: 44px;
-}
-.lines {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-.line {
-  background: #fff;
-  border: 1px solid #e2e0f5;
-  border-left-width: 4px;
-  border-radius: 10px;
-  padding: 8px 12px;
-}
-.candidate {
-  border-left-color: var(--accent);
-}
-.needsCheck {
-  border-left-color: #e0a100;
-}
-.notSettlement {
-  border-left-color: #c8c6dc;
-  background: #faf9ff;
-}
-.notSettlement .text {
-  color: var(--muted);
-}
-.lineHead {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 14px;
-}
-.no {
-  color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* 대화 한 줄: 왼쪽에 발언, 오른쪽에 그 줄에 할 수 있는 일 */
+.line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  /* 대화가 300줄까지 올 수 있다: 화면 밖의 줄은 그리지 않는다 */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 76px;
+}
+.said {
+  min-width: 0;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  font-size: 14px;
 }
 .who {
   font-weight: 600;
 }
 .status {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--muted);
-}
-.needsCheck .status {
-  color: #8a5a00;
-  font-weight: 600;
+  font-size: 13px;
+  color: var(--pencil);
 }
 .text {
-  margin: 2px 0 0;
-  font-size: 15px;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
-}
-.tag {
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: #ebe8ff;
-  color: var(--accent);
-}
-.tagWarn {
-  background: #fff6e5;
-  color: #8a5a00;
-}
-.lineActions {
-  display: flex;
-  gap: 12px;
-  margin-top: 2px;
-}
-.lineActions button,
-.confirmed button {
-  border: 0;
-  background: none;
-  padding: 8px 0;
-  color: var(--accent);
-  font: inherit;
+  gap: 4px 14px;
+  margin-top: 4px;
   font-size: 13px;
 }
-.confirmed button {
-  flex: none;
-  white-space: nowrap;
-}
-.lineActions button:disabled,
-.confirmed button:disabled {
-  opacity: 0.5;
-}
-.confirmed {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  background: #fff;
-  border: 1px solid #e2e0f5;
-  border-radius: 12px;
-}
-.confirmed li {
+/* 이 줄에서 읽어 낸 항목 하나: 이름·금액, 결제한 사람·나눈 사람, 고치기 */
+.item {
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
+  flex-wrap: wrap;
   align-items: center;
-  padding: 8px 14px;
-  font-size: 14px;
+  gap: 0 10px;
+  font-size: 13px;
 }
-.confirmed li + li {
-  border-top: 1px solid #e2e0f5;
+.itemInfo {
+  color: var(--pencil);
 }
+/* 줄 오른쪽의 버튼들 (놓친 금액 줄은 두 개) */
+.actions {
+  display: grid;
+  justify-items: end;
+}
+.needsCheck .status {
+  color: var(--ink);
+  font-weight: 600;
+}
+.notSettlement .who,
+.notSettlement .text {
+  color: var(--pencil);
+  font-weight: 400;
+}
+/* 확인이 필요한 줄에 형광펜이 한 번 그어진다 */
+.sweep {
+  background-repeat: no-repeat;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sweep {
+    animation: sweep 420ms var(--ease-out) both;
+  }
+}
+@keyframes sweep {
+  from {
+    background-size: 0% 100%;
+  }
+  to {
+    background-size: 100% 100%;
+  }
+}
+
+/* 직접 항목 추가 */
 .manual {
-  background: #fff;
-  border: 1px solid #e2e0f5;
-  border-radius: 12px;
-  padding: 12px 16px;
+  scroll-margin-top: 12px;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
+  background: var(--paper-2);
+}
+.formTitle {
+  font-size: 16px;
+  line-height: 1.4;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--field);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+.chip input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--blue);
+}
+.chipOn {
+  border-color: var(--blue);
+  background: var(--blue-wash);
+  box-shadow: inset 0 0 0 1px var(--blue);
+}
+.chip:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.chip input:focus-visible {
+  outline: none;
+}
+/* 일부 금액을 따로 나누기: 안쪽으로 들여 쓴 묶음 */
+.part {
   display: grid;
   gap: 12px;
+  padding-left: 12px;
+  border-left: 3px double var(--rule-strong);
 }
-.manual h2 {
-  margin: 0;
-}
-.manual fieldset {
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-.manual legend {
+.partSum {
+  white-space: normal;
   font-size: 14px;
-  margin-bottom: 6px;
-  padding: 0;
 }
 .formActions {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 8px;
-}
-.primary,
-.secondary {
-  min-height: 48px;
-  border-radius: 12px;
-  font: inherit;
-  font-weight: 600;
-  font-size: 16px;
-}
-.primary {
-  border: 0;
-  background: var(--accent);
-  color: #fff;
-}
-.primary:disabled {
-  opacity: 0.6;
-}
-.secondary {
-  border: 1px solid var(--accent);
-  background: #fff;
-  color: var(--accent);
-}
-.footer {
-  margin: 4px 0 0;
-  text-align: right;
-}
-
-/* 질문 카드: 후보 결제별 근거 줄 (발표 10쪽) */
-.optionCards {
-  display: grid;
-  gap: 8px;
-}
-.optionCards label {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: start;
-  gap: 4px 10px;
-  padding: 10px 12px;
-  border: 1px solid #d6d3ef;
-  border-radius: 12px;
-  background: #fff;
-  font-size: 15px;
-}
-.optionCards input {
-  margin-top: 4px;
-  accent-color: var(--accent);
-}
-.optionLabel {
-  font-weight: 600;
-}
-.optionQuotes {
-  grid-column: 2;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 4px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.optionQuotes b {
-  color: var(--fg);
-}
-
-/* 항목 꼬리표: 금액·결제자·분담자 + 고치기 */
-.itemTag {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 8px;
-  font-size: 12px;
-  padding: 4px 4px 4px 10px;
-  border-radius: 8px;
-  background: #ebe8ff;
-  color: #2c2480;
-}
-.itemTag button {
-  border: 1px solid var(--accent);
-  background: #fff;
-  color: var(--accent);
-  font: inherit;
-  font-weight: 600;
-  border-radius: 6px;
-  padding: 4px 10px;
-  min-height: 32px;
-}
-.formNote {
-  margin: 0;
-  padding: 8px 10px;
-  background: #fff6e5;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #8a5a00;
-}
-.partToggle {
-  display: flex !important;
-  grid-template-columns: none;
-  align-items: center;
-  gap: 8px !important;
-  font-size: 14px;
-}
-.partToggle input {
-  width: 20px;
-  height: 20px;
-  min-height: 0 !important;
-  accent-color: var(--accent);
-}
-.partBox {
-  display: grid;
-  gap: 10px;
-  padding: 12px;
-  background: var(--bg);
-  border-radius: 10px;
-}
-.partSum {
-  margin: 0;
-  font-size: 13px;
-  color: #0f7b52;
-  font-weight: 600;
-}
-
-/* 폼 안의 이름 고르기: 체크 상자와 이름을 한 줄로 (입력칸 공통 스타일이 체크 상자에 먹지 않게) */
-.manual .chips label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-}
-.manual .chips input,
-.manual .partToggle input {
-  width: 18px;
-  height: 18px;
-  min-height: 0;
-  padding: 0;
-  margin: 0;
-  border: 0;
-}
-
-.hintSmall {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.tagNote {
-  font-style: normal;
-  font-size: 11px;
-  color: var(--muted);
-  padding-right: 6px;
-}
-.amountPicks {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-.amountPicks button {
-  border: 1px solid #d6d3ef;
-  background: #fff;
-  color: var(--fg);
-  font: inherit;
-  font-size: 13px;
-  border-radius: 999px;
-  padding: 6px 12px;
-  min-height: 36px;
 }

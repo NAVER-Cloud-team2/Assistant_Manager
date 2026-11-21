@@ -1,245 +1,53 @@
-/* S5 확정·발행 — 담당: C (globals.css와 겹치지 않게 이 파일에만 둔다) */
-.panel {
-  display: grid;
-  gap: 14px;
+/* S5 확정·발행 — 담당: C (공통 모양은 app/globals.css, 이 화면에만 쓰는 것만 여기 둔다) */
+.legend {
+  padding-top: 14px;
+  font-weight: 700;
 }
-.card {
-  background: #fff;
-  border: 1px solid #e2e0f5;
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: grid;
-  gap: 12px;
-}
-.card h2 {
-  margin: 0;
-  font-size: 18px;
-}
-.warnCard {
-  background: #fff6e5;
-  border-color: #f0c46b;
-}
-.when {
-  display: block;
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--muted);
-}
-.hint,
-.note {
-  margin: 0;
-  font-size: 14px;
-  color: var(--muted);
-}
-.note {
-  padding: 8px 10px;
-  background: #fff6e5;
-  border-radius: 8px;
-  color: #8a5a00;
-}
-.error {
-  margin: 0;
-  padding: 10px 12px;
-  background: #fdeceb;
-  border: 1px solid #f2b8b3;
-  border-radius: 10px;
-  color: #a1281f;
-  font-size: 14px;
-}
-.prior {
-  border: 0;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-.prior legend {
-  font-weight: 600;
-  margin-bottom: 8px;
-  padding: 0;
-}
-.prior label {
+/* 지금 공유 중인 판: 왼쪽에 판 이름과 발행 시각, 오른쪽에 도장 */
+.current {
   display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  padding: 10px 12px;
-  border: 1px solid #d6d3ef;
-  border-radius: 10px;
-  min-height: 48px;
-}
-.prior input {
-  margin-top: 4px;
-  accent-color: var(--accent);
-}
-.prior span {
-  display: grid;
-}
-.prior small {
-  color: var(--muted);
-  font-size: 13px;
-}
-.picked {
-  border-color: var(--accent) !important;
-  background: #f1efff;
-}
-.primary,
-.secondary,
-.dangerBtn {
-  display: block;
-  width: 100%;
-  min-height: 48px;
-  border-radius: 12px;
-  font: inherit;
-  font-weight: 600;
-  font-size: 16px;
-  text-align: center;
-  text-decoration: none;
-  padding: 12px;
-}
-.primary {
-  border: 0;
-  background: var(--accent);
-  color: #fff;
-}
-.primary:disabled {
-  opacity: 0.55;
-}
-.secondary {
-  border: 1px solid var(--accent);
-  background: #fff;
-  color: var(--accent);
-}
-.diff {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-}
-.diff caption {
-  text-align: left;
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-.diff th,
-.diff td {
-  padding: 8px 4px;
-  border-bottom: 1px solid #e2e0f5;
-  text-align: right;
-  white-space: nowrap;
-}
-.diff th:first-child {
-  text-align: left;
-}
-.diff thead th {
-  color: var(--muted);
-  font-weight: 500;
-}
-.plus {
-  color: #0f7b52;
-}
-.minus {
-  color: #c2352b;
-}
-.transfers {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border: 1px solid #e2e0f5;
-  border-radius: 10px;
-}
-.transfers li {
-  display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  font-variant-numeric: tabular-nums;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  padding-bottom: 10px;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
 }
-.transfers li + li {
-  border-top: 1px solid #e2e0f5;
-}
-.linkFix {
-  padding: 10px 12px;
-  background: #fff6e5;
-  border-radius: 10px;
-  font-size: 14px;
-}
-.linkFix p {
-  margin: 0 0 8px;
+.h {
+  font-size: 18px;
+  line-height: 1.35;
 }
 .linkRow {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
+  margin-top: 8px;
 }
-.linkRow input {
-  font: inherit;
-  font-size: 16px;
-  padding: 10px;
-  border: 1px solid #d6d3ef;
-  border-radius: 10px;
-  min-width: 0;
+.message {
+  background-color: var(--paper-2);
+  font-size: 15px;
+  resize: none;
 }
-.linkRow .secondary {
-  width: auto;
-  padding: 0 16px;
-}
-.msgLabel {
-  display: grid;
-  gap: 6px;
+.resultLink {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  min-height: 44px;
   font-size: 14px;
   font-weight: 600;
 }
-.message {
-  font: inherit;
-  font-size: 15px;
-  font-weight: 400;
-  padding: 12px;
-  border: 1px solid #d6d3ef;
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--fg);
-  resize: none;
-  width: 100%;
-}
-.resultLink {
-  justify-self: center;
-  font-size: 14px;
-}
 .danger {
-  margin-top: 12px;
+  padding-top: 20px;
   text-align: center;
 }
-.dangerLink {
-  border: 0;
-  background: none;
-  color: #c2352b;
-  font: inherit;
-  font-size: 14px;
-  text-decoration: underline;
-  padding: 10px;
-}
-.confirmBox {
+.danger > div {
   text-align: left;
-  background: #fdeceb;
-  border: 1px solid #f2b8b3;
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-size: 14px;
-}
-.confirmBox p {
-  margin: 0 0 10px;
 }
 .confirmRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-}
-.dangerBtn {
-  border: 0;
-  background: #c2352b;
-  color: #fff;
-}
-.dangerBtn:disabled,
-.secondary:disabled {
-  opacity: 0.55;
+  margin-top: 10px;
 }

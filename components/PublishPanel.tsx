@@ -10,8 +10,9 @@ import { useEffect, useState } from "react";
 import { ADMIN_HEADER, type ApiError, type PublishRequest, type PublishResponse } from "@/lib/api";
 import type { PriorShared, Version } from "@/lib/types";
 import { RESULT_URL_PLACEHOLDER } from "@/lib/version";
-import { signedWon, won } from "./format";
+import { dateTime, signedNum, won } from "./format";
 import s from "./PublishPanel.module.css";
+import { Seal } from "./Seal";
 
 const RESULT_KEY = (eventId: string) => `daechong:result:${eventId}`;
 const RESULT_TOKEN_RE = /\/r\/([A-Za-z0-9_-]{16,})/;
@@ -112,7 +113,7 @@ export function PublishPanel({
     }
   }
 
-  function useLink() {
+  function applyLink() {
     const m = RESULT_TOKEN_RE.exec(linkInput.trim());
     if (!m) return setError("결과 링크(…/r/…)를 그대로 붙여 주세요.");
     setError(null);
@@ -142,10 +143,12 @@ export function PublishPanel({
 
   if (deleted) {
     return (
-      <section className={s.card}>
-        <h2>모두 지웠어요</h2>
-        <p className={s.hint}>붙여넣은 대화, 근거, 발행한 판, 결과 링크가 모두 지워졌어요. 결과 링크도 더 이상 열리지 않아요.</p>
-        <Link className={s.primary} href="/">
+      <section className="blk stack">
+        <p>
+          <b>모두 지웠어요.</b>
+        </p>
+        <p className="note">붙여넣은 대화, 근거, 발행한 판, 결과 링크가 모두 지워졌어요. 결과 링크도 더 이상 열리지 않아요.</p>
+        <Link className="btn wide" href="/">
           새 행사 만들기
         </Link>
       </section>
@@ -155,156 +158,194 @@ export function PublishPanel({
   const message = version ? fillMessage(version.message, resultUrl) : "";
 
   return (
-    <div className={s.panel}>
+    <>
       {error && (
-        <p className={s.error} role="alert">
-          {error}
-        </p>
+        <div className="blk tip">
+          <p className="alert" role="alert">
+            {error}
+          </p>
+        </div>
       )}
 
       {/* 발행 */}
       {!hasDraft ? (
-        <section className={s.card}>
-          <h2>아직 정산표가 없어요</h2>
-          <p className={s.hint}>대화를 붙여넣고 검토를 마치면 여기서 발행할 수 있어요.</p>
-          <Link href={`/m/${token}/paste`}>대화 붙여넣기</Link>
+        <section className="blk stack">
+          <p>
+            <b>아직 정산표가 없어요.</b>
+          </p>
+          <p className="note">대화를 붙여넣고 검토를 마치면 여기서 발행할 수 있어요.</p>
+          <Link className="btn wide" href={`/m/${token}/paste`}>
+            대화 붙여넣기
+          </Link>
         </section>
       ) : !publishable ? (
-        <section className={`${s.card} ${s.warnCard}`}>
-          <h2>아직 발행할 수 없어요</h2>
-          <p className={s.hint}>답하지 않은 질문이나 수동 정산이 필요한 항목이 남아 있어요.</p>
-          <Link href={`/m/${token}`}>검토 화면으로</Link>
+        <section className="blk stack">
+          <p>
+            <b>아직 발행할 수 없어요.</b>
+          </p>
+          <p className="note">
+            <span className="mark">답하지 않은 질문이나 수동 정산이 필요한 항목</span>이 남아 있어요.
+          </p>
+          <Link className="btn wide" href={`/m/${token}`}>
+            검토 화면으로
+          </Link>
         </section>
       ) : (
-        <section className={s.card}>
-          <h2>{nextN}판 발행</h2>
-          <fieldset className={s.prior}>
-            <legend>이전에 정산을 공유하거나 이미 송금한 사람이 있나요?</legend>
+        <section aria-labelledby="publish-next">
+          <h2 className="blk sub" id="publish-next">
+            {nextN}판 발행
+          </h2>
+          <fieldset className="blk stack">
+            <legend className={s.legend}>이전에 정산을 공유하거나 이미 송금한 사람이 있나요?</legend>
             {PRIOR.map((p) => (
-              <label key={p.value} className={prior === p.value ? s.picked : undefined}>
-                <input type="radio" name="prior" checked={prior === p.value} onChange={() => setPrior(p.value)} />
+              <label key={p.value} className={prior === p.value ? "opt picked" : "opt"}>
+                <input type="radio" name="prior" value={p.value} checked={prior === p.value} onChange={() => setPrior(p.value)} />
                 <span>
                   <b>{p.label}</b>
                   <small>{p.hint}</small>
                 </span>
               </label>
             ))}
+            <button type="button" className="btn wide" onClick={publish} disabled={!prior || busy}>
+              {busy ? "발행하는 중…" : prior ? `${nextN}판 발행하기` : "위에서 하나를 골라 주세요"}
+            </button>
+            {version && <p className="note">발행하면 결과 링크는 그대로이고, 모임원에게는 {nextN}판이 보여요.</p>}
           </fieldset>
-          <button type="button" className={s.primary} onClick={publish} disabled={!prior || busy}>
-            {busy ? "발행하는 중…" : prior ? `${nextN}판 발행하기` : "위에서 하나를 골라 주세요"}
-          </button>
-          {version && <p className={s.hint}>발행하면 결과 링크는 그대로이고, 모임원에게는 {nextN}판이 보여요.</p>}
         </section>
       )}
 
       {/* 발행된 판 */}
       {version && (
-        <section className={s.card}>
-          <h2>
-            {justPublished ? `${version.n}판을 발행했어요` : `지금 공유 중: ${version.n}판`}
-            <small className={s.when}>{new Date(version.publishedAt).toLocaleString("ko-KR")}</small>
-          </h2>
+        <section aria-labelledby="publish-current">
+          <div className={`blk ${s.current}`}>
+            <div>
+              <h2 className={s.h} id="publish-current" aria-live="polite">
+                {justPublished ? `${version.n}판을 발행했어요` : `지금 공유 중: ${version.n}판`}
+              </h2>
+              <p className="note">{dateTime(version.publishedAt)}</p>
+            </div>
+            <Seal key={version.n} version={version.n} size={92} stamp={justPublished} />
+          </div>
 
           {version.diff && version.diff.length > 0 && (
-            <table className={s.diff}>
-              <caption>{version.n - 1}판보다 바뀐 금액</caption>
-              <thead>
-                <tr>
-                  <th scope="col">참여자</th>
-                  <th scope="col">{version.n - 1}판</th>
-                  <th scope="col">{version.n}판</th>
-                  <th scope="col">변동</th>
-                </tr>
-              </thead>
-              <tbody>
-                {version.diff.map((d) => (
-                  <tr key={d.alias}>
-                    <th scope="row">{d.alias}</th>
-                    <td>{signedWon(d.before)}</td>
-                    <td>{signedWon(d.after)}</td>
-                    <td className={d.delta > 0 ? s.plus : d.delta < 0 ? s.minus : undefined}>{signedWon(d.delta)}</td>
+            <div className="tablewrap">
+              <table className="ledger">
+                <caption>{version.n - 1}판보다 바뀐 금액 · 단위 원</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">참여자</th>
+                    <th scope="col">{version.n - 1}판</th>
+                    <th scope="col">{version.n}판</th>
+                    <th scope="col">변동</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {version.diff.map((d) => (
+                    <tr key={d.alias}>
+                      <th scope="row">{d.alias}</th>
+                      <td>{signedNum(d.before)}</td>
+                      <td>{signedNum(d.after)}</td>
+                      <td className={d.delta > 0 ? "recv" : d.delta < 0 ? "send" : undefined}>{signedNum(d.delta)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
 
           {version.transfers ? (
-            <ul className={s.transfers}>
+            <ul>
               {version.transfers.map((t, i) => (
-                <li key={i}>
+                <li key={i} className="row split">
                   <span>
                     {t.from} → {t.to}
                   </span>
-                  <b>{won(t.amount)}</b>
+                  <b className="num">{won(t.amount)}</b>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className={s.note}>
-              {version.n === 1
-                ? "이미 공유했거나 잘 모른다고 해서, 송금안 대신 사람별 받을 돈·보낼 돈만 넣었어요."
-                : "이미 공유했거나 잘 모른다고 해서, 다시 송금하라는 안내 없이 바뀐 금액만 넣었어요."}
-            </p>
-          )}
-
-          {!resultUrl && (
-            <div className={s.linkFix}>
-              <p>
-                이 기기에서는 결과 링크를 찾지 못했어요. 행사를 만들 때 받은 <b>결과 링크</b>를 붙여 주세요.
+            <div className="blk tip">
+              <p className="caution">
+                {version.n === 1
+                  ? "이미 공유했거나 잘 모른다고 해서, 송금안 대신 사람별 받을 돈·보낼 돈만 넣었어요."
+                  : "이미 공유했거나 잘 모른다고 해서, 다시 송금하라는 안내 없이 바뀐 금액만 넣었어요."}
               </p>
-              <div className={s.linkRow}>
-                <input
-                  value={linkInput}
-                  onChange={(e) => setLinkInput(e.target.value)}
-                  placeholder="https://…/r/…"
-                  autoComplete="off"
-                  inputMode="url"
-                />
-                <button type="button" className={s.secondary} onClick={useLink}>
-                  넣기
-                </button>
-              </div>
             </div>
           )}
 
-          <label className={s.msgLabel}>
-            <span>단톡에 붙여 넣을 문구</span>
-            <textarea className={s.message} value={message} readOnly rows={Math.min(14, message.split("\n").length + 3)} />
-          </label>
-          <button type="button" className={s.primary} onClick={() => copy(message)}>
-            {copied ? "복사했어요" : "문구 복사"}
-          </button>
-          {resultUrl && (
-            <a className={s.resultLink} href={resultUrl} target="_blank" rel="noreferrer">
-              결과 페이지 열어 보기 ↗
-            </a>
-          )}
+          <div className="blk stack">
+            {!resultUrl && (
+              <div className="caution">
+                <p>
+                  이 기기에서는 결과 링크를 찾지 못했어요. 행사를 만들 때 받은 <b>결과 링크</b>를 붙여 주세요.
+                </p>
+                <div className={s.linkRow}>
+                  <input
+                    className="input"
+                    name="result-link"
+                    aria-label="결과 링크"
+                    value={linkInput}
+                    onChange={(e) => setLinkInput(e.target.value)}
+                    placeholder="https://…/r/…"
+                    autoComplete="off"
+                    inputMode="url"
+                    spellCheck={false}
+                  />
+                  <button type="button" className="btn ghost" onClick={applyLink}>
+                    넣기
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <label>
+              <span className="label">단톡에 붙여 넣을 문구</span>
+              <textarea
+                className={`textarea ${s.message}`}
+                name="message"
+                value={message}
+                readOnly
+                rows={Math.min(14, message.split("\n").length + 3)}
+              />
+            </label>
+            <button type="button" className="btn wide" onClick={() => copy(message)}>
+              {copied ? "복사했어요" : "문구 복사"}
+            </button>
+            <span className="sr" role="status">
+              {copied ? "문구를 복사했어요" : ""}
+            </span>
+            {resultUrl && (
+              <a className={s.resultLink} href={resultUrl} target="_blank" rel="noreferrer">
+                결과 페이지 열어 보기<span className="sr"> (새 창)</span>
+              </a>
+            )}
+          </div>
         </section>
       )}
 
       {/* 모두 지우기 */}
-      <section className={s.danger}>
+      <section className={`blk ${s.danger}`}>
         {!confirmDelete ? (
-          <button type="button" className={s.dangerLink} onClick={() => setConfirmDelete(true)}>
+          <button type="button" className="textbtn danger" onClick={() => setConfirmDelete(true)}>
             모두 지우기
           </button>
         ) : (
-          <div className={s.confirmBox}>
+          <div className="alert" role="group" aria-label="모두 지우기 확인">
             <p>
               <b>정말 지울까요?</b> 붙여넣은 대화, 근거, 발행한 판, 결과 링크가 바로 지워지고 되돌릴 수 없어요.
             </p>
             <div className={s.confirmRow}>
-              <button type="button" className={s.secondary} onClick={() => setConfirmDelete(false)} disabled={busy}>
+              <button type="button" className="btn ghost" onClick={() => setConfirmDelete(false)} disabled={busy}>
                 취소
               </button>
-              <button type="button" className={s.dangerBtn} onClick={removeAll} disabled={busy}>
+              <button type="button" className="btn danger" onClick={removeAll} disabled={busy}>
                 {busy ? "지우는 중…" : "모두 지우기"}
               </button>
             </div>
           </div>
         )}
       </section>
-    </div>
+    </>
   );
 }

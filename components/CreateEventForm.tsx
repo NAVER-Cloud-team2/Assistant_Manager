@@ -3,10 +3,12 @@
 /**
  * S1 행사 만들기 폼 — 담당: C
  * 행사 이름 + 참여자 별칭(순서 고정) → POST /api/events → 관리 링크 안내
+ * 여백의 번호는 명단 순서다(나누어떨어지지 않는 1원이 붙는 순서).
  */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ApiError, CreateEventRequest, CreateEventResponse } from "@/lib/api";
 import s from "./CreateEventForm.module.css";
+import { IconCross, IconDown, IconUp } from "./icons";
 
 export const MIN_PEOPLE = 2;
 export const MAX_PEOPLE = 10;
@@ -53,6 +55,7 @@ export function CreateEventForm() {
   const [busy, setBusy] = useState(false);
   const [created, setCreated] = useState<CreateEventResponse | null>(null);
   const [copied, setCopied] = useState<"admin" | "result" | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // 고치기 시작하면 지난 오류 안내는 지운다 (다시 누르면 새로 검사)
   const setAlias = (i: number, v: string) => {
@@ -75,7 +78,12 @@ export function CreateEventForm() {
     if (busy) return;
     const errs = validate(name, roster);
     setErrors(errs);
-    if (errs.length > 0) return;
+    if (errs.length > 0) {
+      // 고칠 칸으로 바로 옮긴다: 이름이 문제면 이름, 아니면 첫 참여자 칸
+      const nameBad = !name.trim() || name.trim().length > MAX_NAME;
+      formRef.current?.querySelector<HTMLInputElement>(nameBad ? "#event-name" : 'input[name="alias-0"]')?.focus();
+      return;
+    }
 
     const body: CreateEventRequest = {
       name: name.trim(),
@@ -110,113 +118,129 @@ export function CreateEventForm() {
       if (await copyText(text)) setCopied(which);
     };
     return (
-      <section className={s.done} aria-live="polite">
-        <h2>행사를 만들었어요</h2>
+      <div aria-live="polite">
+        <h2 className="blk sub">행사를 만들었어요</h2>
 
-        <div className={s.linkBox}>
-          <p className={s.label}>관리 링크 · 총무 전용</p>
+        <div className={`row ${s.link}`}>
+          <p className="label">관리 링크 · 총무 전용</p>
           <p className={s.url}>{adminUrl}</p>
-          <button type="button" className={s.secondary} onClick={() => copy("admin", adminUrl)}>
+          <button type="button" className="btn ghost" onClick={() => copy("admin", adminUrl)}>
             {copied === "admin" ? "복사했어요" : "관리 링크 복사"}
           </button>
-          <ul className={s.warn}>
+          <ul className={`caution ${s.warn}`}>
             <li>이 링크로만 다시 들어올 수 있어요. 메모나 나에게 보내기로 꼭 저장해 두세요.</li>
             <li>다른 사람에게 보내지 마세요. 링크가 있으면 누구나 정산을 고칠 수 있어요.</li>
           </ul>
         </div>
 
-        <div className={s.linkBox}>
-          <p className={s.label}>결과 링크 · 모임원용 (발행한 뒤에 열려요)</p>
+        <div className={`row ${s.link}`}>
+          <p className="label">결과 링크 · 모임원용 (발행한 뒤에 열려요)</p>
           <p className={s.url}>{resultUrl}</p>
-          <button type="button" className={s.secondary} onClick={() => copy("result", resultUrl)}>
+          <button type="button" className="btn ghost" onClick={() => copy("result", resultUrl)}>
             {copied === "result" ? "복사했어요" : "결과 링크 복사"}
           </button>
         </div>
 
-        <a className={s.primary} href={`/m/${created.adminToken}/paste`}>
-          대화 붙여넣기로 가기
-        </a>
-      </section>
+        <div className="blk stack">
+          <a className="btn wide" href={`/m/${created.adminToken}/paste`}>
+            대화 붙여넣기로 가기
+          </a>
+        </div>
+      </div>
     );
   }
 
   const filledCount = roster.filter((a) => a.trim()).length;
 
   return (
-    <form className={s.form} onSubmit={submit} noValidate>
-      <label className={s.field}>
-        <span>행사 이름</span>
+    <form onSubmit={submit} noValidate ref={formRef}>
+      <h2 className="blk sub">행사 만들기</h2>
+      <div className="row">
+        <label className="label" htmlFor="event-name">
+          행사 이름
+        </label>
         <input
+          id="event-name"
+          name="event-name"
+          className="input"
           value={name}
           onChange={(e) => {
             setErrors([]);
             setName(e.target.value);
           }}
-          placeholder="예: 동아리 뒤풀이"
+          placeholder="예: 동아리 뒤풀이…"
           maxLength={MAX_NAME}
           autoComplete="off"
         />
-      </label>
+      </div>
 
-      <fieldset className={s.field}>
-        <legend>참여자 ({filledCount}명)</legend>
-        <p className={s.hint}>
-          결과 링크에 보일 이름이에요. 실명 대신 별칭도 괜찮아요.
-          <br />
-          나누어떨어지지 않는 1원은 <strong>이 순서대로</strong> 앞사람부터 붙어요.
+      <div role="group" aria-labelledby="roster-title">
+        <h3 className={`blk ${s.group}`} id="roster-title">
+          참여자<span className="unit">{filledCount}명</span>
+        </h3>
+        <p className="blk note tip">
+          결과 링크에 보일 이름이에요. 실명 대신 별칭도 괜찮아요. 나누어떨어지지 않는 1원은 <strong>이 순서대로</strong> 앞사람부터
+          붙어요.
         </p>
-        <ol className={s.roster}>
+        <ol>
           {roster.map((alias, i) => (
-            <li key={i}>
-              <span className={s.order}>{i + 1}</span>
+            <li key={i} className={`row ${s.person}`}>
+              <span className="no">{i + 1}</span>
               <input
+                className="input"
+                name={`alias-${i}`}
                 value={alias}
                 onChange={(e) => setAlias(i, e.target.value)}
-                placeholder={`참여자 ${i + 1}`}
+                placeholder={`참여자 ${i + 1}…`}
                 maxLength={MAX_ALIAS}
                 aria-label={`참여자 ${i + 1} 별칭`}
                 autoComplete="off"
               />
-              <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label={`${i + 1}번을 위로`}>
-                ↑
+              <button type="button" className="iconbtn" onClick={() => move(i, -1)} disabled={i === 0} aria-label={`${i + 1}번을 위로`}>
+                <IconUp />
               </button>
               <button
                 type="button"
+                className="iconbtn"
                 onClick={() => move(i, 1)}
                 disabled={i === roster.length - 1}
                 aria-label={`${i + 1}번을 아래로`}
               >
-                ↓
+                <IconDown />
               </button>
               <button
                 type="button"
+                className="iconbtn"
                 onClick={() => remove(i)}
                 disabled={roster.length <= MIN_PEOPLE}
                 aria-label={`${i + 1}번 빼기`}
               >
-                ✕
+                <IconCross />
               </button>
             </li>
           ))}
         </ol>
         {roster.length < MAX_PEOPLE && (
-          <button type="button" className={s.add} onClick={add}>
-            + 참여자 추가
-          </button>
+          <div className="blk">
+            <button type="button" className="textbtn" onClick={add}>
+              참여자 추가
+            </button>
+          </div>
         )}
-      </fieldset>
+      </div>
 
-      {errors.length > 0 && (
-        <ul className={s.errors} role="alert">
-          {errors.map((m) => (
-            <li key={m}>{m}</li>
-          ))}
-        </ul>
-      )}
-
-      <button type="submit" className={s.primary} disabled={busy}>
-        {busy ? "만드는 중…" : "행사 만들기"}
-      </button>
+      <div className="blk stack">
+        {errors.length > 0 && (
+          <ul className={`alert ${s.errors}`} role="alert">
+            {errors.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
+          </ul>
+        )}
+        <button type="submit" className="btn wide" disabled={busy}>
+          {busy ? "만드는 중…" : "행사 만들기"}
+        </button>
+      </div>
     </form>
   );
 }

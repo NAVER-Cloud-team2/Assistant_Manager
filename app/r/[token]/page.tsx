@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { loadResult } from "@/app/api/_lib/result";
+import { IconChevron } from "@/components/icons";
+import { Seal } from "@/components/Seal";
 import type { ResultView } from "@/lib/types";
 import styles from "./page.module.css";
 
 /**
  * S6 결과 페이지 — 담당: D. 모임원용, 읽기 전용. 원 발언은 절대 보이지 않는다.
  * 데이터는 ResultView(별칭·항목·금액·버전)만 쓴다. 토큰은 화면·로그에 남기지 않는다.
+ * 판 번호는 오른쪽 위 확정 도장(components/Seal)에 찍는다.
  */
 export const metadata: Metadata = {
   title: "대리총무 · 정산 결과",
@@ -30,6 +33,8 @@ function balanceText(balance: number): string {
   if (balance < 0) return `${won(balance)} 보낼 돈`;
   return "정산 끝";
 }
+/** 받을 돈은 파랑, 보낼 돈은 빨강 (app/globals.css). 글자로도 구분되므로 색은 보조다 */
+const tone = (n: number) => (n > 0 ? "recv" : n < 0 ? "send" : "");
 
 /** 이전 공유 '있음/모름'이라 송금안을 싣지 않을 때. 변동액 표가 있는 판(2판~)과 없는 판(1판)의 안내를 나눈다. */
 function noTransferText(hasDiff: boolean): string {
@@ -45,9 +50,9 @@ export default async function ResultPage({ params }: { params: Promise<{ token: 
   if (r.status === "not_found") notFound();
   if (r.status === "unpublished") {
     return (
-      <main className={styles.page}>
-        <h1 className={styles.title}>아직 발행된 정산이 없어요</h1>
-        <p className={styles.muted}>총무가 정산을 확정하면 이 링크에서 볼 수 있어요.</p>
+      <main className={`page ${styles.result} ${styles.empty}`} id="main">
+        <h1 className="title">아직 발행된 정산이 없어요</h1>
+        <p className="note">총무가 정산을 확정하면 이 링크에서 볼 수 있어요.</p>
       </main>
     );
   }
@@ -57,20 +62,20 @@ export default async function ResultPage({ params }: { params: Promise<{ token: 
 function ResultBody({ view }: { view: ResultView }) {
   const { eventName, version, replaces, people, transfers, diff, expiresAt } = view;
   return (
-    <main className={styles.page}>
+    <main className={`page ${styles.result}`} id="main">
       <header className={styles.header}>
-        <p className={styles.kicker}>대리총무 정산 결과</p>
-        <h1 className={styles.title}>{eventName}</h1>
-        <p className={styles.meta}>
-          <span className={styles.badge} data-testid="version">
-            {version}판
-          </span>
-          <span>{dateKo.format(new Date(expiresAt))}까지 볼 수 있어요</span>
-        </p>
+        <div>
+          <p className="event">대리총무 정산 결과</p>
+          <h1 className="title">{eventName}</h1>
+          <p className={`note ${styles.until}`}>
+            <span>{dateKo.format(new Date(expiresAt))}까지 볼 수 있어요</span>
+          </p>
+        </div>
+        <Seal version={version} />
       </header>
 
       {replaces !== null && (
-        <section className={styles.notice} aria-label="판 교체 안내">
+        <section className={`caution ${styles.notice}`} aria-label="판 교체 안내">
           <strong>
             {replaces}판을 대체하는 {version}판
           </strong>
@@ -79,9 +84,11 @@ function ResultBody({ view }: { view: ResultView }) {
       )}
 
       {diff && diff.length > 0 && (
-        <section className={styles.section} aria-labelledby="diff-title">
-          <h2 id="diff-title">{replaces ?? version - 1}판 대비 변동</h2>
-          <table className={styles.table}>
+        <section aria-labelledby="diff-title">
+          <h2 className={styles.sub} id="diff-title">
+            {replaces ?? version - 1}판 대비 변동
+          </h2>
+          <table className="ledger">
             <thead>
               <tr>
                 <th scope="col">이름</th>
@@ -96,19 +103,21 @@ function ResultBody({ view }: { view: ResultView }) {
                   <th scope="row">{d.alias}</th>
                   <td>{signed(d.before)}</td>
                   <td>{signed(d.after)}</td>
-                  <td className={d.delta === 0 ? styles.muted : styles.strong}>{signedWon(d.delta)}</td>
+                  <td className={d.delta === 0 ? styles.same : `${styles.changed} ${tone(d.delta)}`}>{signedWon(d.delta)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <p className={styles.hint}>받을 돈은 +, 보낼 돈은 - 로 표시해요.</p>
+          <p className={`note ${styles.tip}`}>받을 돈은 +, 보낼 돈은 - 로 표시해요.</p>
         </section>
       )}
 
-      <section className={styles.section} aria-labelledby="people-title">
-        <h2 id="people-title">사람별 부담</h2>
-        <p className={styles.hint}>이름을 누르면 항목별 계산 이유가 보여요.</p>
-        <ul className={styles.people}>
+      <section aria-labelledby="people-title">
+        <h2 className={styles.sub} id="people-title">
+          사람별 부담
+        </h2>
+        <p className={`note ${styles.tip}`}>이름을 누르면 항목별 계산 이유가 보여요.</p>
+        <ul>
           {people.map((p) => {
             const joined = p.lines.filter((l) => l.reason !== "참여 안 함");
             const skipped = p.lines.filter((l) => l.reason === "참여 안 함");
@@ -116,21 +125,24 @@ function ResultBody({ view }: { view: ResultView }) {
               <li key={p.alias}>
                 <details className={styles.person}>
                   <summary>
-                    <span className={styles.alias}>{p.alias}</span>
+                    <span className={styles.lead}>
+                      <span className={styles.alias}>{p.alias}</span>
+                      <span className={`${styles.balance} ${tone(p.balance)}`}>{balanceText(p.balance)}</span>
+                    </span>
                     <span className={styles.total}>{won(p.total)}</span>
-                    <span className={styles.balance}>{balanceText(p.balance)}</span>
+                    <IconChevron className="chev" />
                   </summary>
                   <ul className={styles.lines}>
                     {joined.map((l) => (
                       <li key={l.item}>
-                        <span className={styles.item}>{l.item}</span>
+                        <span>{l.item}</span>
                         <span className={styles.amount}>{won(l.amount)}</span>
                         <span className={styles.reason}>{l.reason}</span>
                       </li>
                     ))}
                   </ul>
                   {skipped.length > 0 && (
-                    <p className={styles.hint}>참여 안 함: {skipped.map((l) => l.item).join(", ")}</p>
+                    <p className={`note ${styles.skipped}`}>참여 안 함: {skipped.map((l) => l.item).join(", ")}</p>
                   )}
                 </details>
               </li>
@@ -139,16 +151,18 @@ function ResultBody({ view }: { view: ResultView }) {
         </ul>
       </section>
 
-      <section className={styles.section} aria-labelledby="transfer-title">
-        <h2 id="transfer-title">송금 안내</h2>
+      <section aria-labelledby="transfer-title">
+        <h2 className={styles.sub} id="transfer-title">
+          송금 안내
+        </h2>
         {transfers === null ? (
-          <p className={styles.muted}>{noTransferText(Boolean(diff && diff.length > 0))}</p>
+          <p className={`note ${styles.tip}`}>{noTransferText(Boolean(diff && diff.length > 0))}</p>
         ) : transfers.length === 0 ? (
-          <p className={styles.muted}>주고받을 돈이 없어요.</p>
+          <p className={`note ${styles.tip}`}>주고받을 돈이 없어요.</p>
         ) : (
-          <ul className={styles.transfers}>
+          <ul>
             {transfers.map((t) => (
-              <li key={`${t.from}-${t.to}`}>
+              <li key={`${t.from}-${t.to}`} className={styles.transfer}>
                 <span>
                   {t.from} → {t.to}
                 </span>

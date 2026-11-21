@@ -1,0 +1,35 @@
+/* 확정 도장 — 담당: C */
+.seal {
+  display: block;
+  flex: none;
+  color: var(--seal);
+  transform: rotate(-7deg);
+  mix-blend-mode: multiply;
+}
+/* 위에서 내려와 찍힌다. 발행한 순간에만 쓴다 */
+.stamp {
+  animation: stamp 380ms var(--ease-out) both;
+}
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-13deg) scale(1.4);
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-7deg) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp {
+    animation: appear 200ms ease both;
+  }
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+  }
+}

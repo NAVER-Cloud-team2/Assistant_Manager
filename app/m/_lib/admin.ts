@@ -5,6 +5,7 @@
  */
 import { findEventIdByAdminToken } from "@/app/api/_lib/auth";
 import { loadDraft } from "@/app/api/_lib/pipeline";
+import type { StepState } from "@/components/StepNav";
 import { getStore, keys } from "@/lib/store";
 import type { Draft, EventMeta } from "@/lib/types";
 
@@ -21,4 +22,17 @@ export async function loadAdminView(token: string): Promise<AdminView | null> {
   const meta = await getStore().get<EventMeta>(keys.event(eventId));
   if (!meta) return null;
   return { meta, draft: await loadDraft(meta) };
+}
+
+/** 단계 메뉴(StepNav)에 찍을 상태 */
+export async function loadStepState(view: AdminView): Promise<StepState> {
+  const d = view.draft;
+  // 질문은 questions로 센다. 같은 질문이 blockers에도 실려 오면 두 번 세지 않게 뺀다
+  const blocked = d ? d.resolution.blockers.filter((b) => b.reason !== "unresolved_question").length : 0;
+  return {
+    pasted: d !== null,
+    todo: d ? d.resolution.questions.length + blocked : 0,
+    publishable: d?.publishable ?? false,
+    published: (await getStore().get<number>(keys.latestVersion(view.meta.id))) ?? null,
+  };
 }
