@@ -15,8 +15,4 @@ export const env = {
   get openaiModel(): string {
     return process.env.OPENAI_MODEL?.trim() ?? "";
   },
-  /** @deprecated CLOVA Studio에서 OpenAI로 바뀌었다. env.openaiModel을 쓴다. B의 extract가 옮겨 가면 지운다. */
-  get clovaModel(): string {
-    return process.env.CLOVA_MODEL || "HCX-007";
-  },
 };
