@@ -1,7 +1,7 @@
 /** 보내기 전 가림 테스트 — 담당: C. 구현하면서 it.skip을 it로 바꾼다. */
 import { describe, expect, it } from "vitest";
 import { garam4 } from "@/lib/fixture";
-import { listSpeakers, maskExcerpt, maskMessages, parseMessages, unmappedSpeakers } from "@/lib/mask";
+import { listSpeakers, maskExcerpt, maskMessages, parseMessages, suggestSpeakerMap, unmappedSpeakers } from "@/lib/mask";
 
 describe("maskExcerpt", () => {
   it("기준 예시: 실명·전화번호가 사라지고 줄 번호가 붙는다", () => {
@@ -94,5 +94,16 @@ describe("maskExcerpt — 추가", () => {
 describe("unmappedSpeakers", () => {
   it("연결 안 된 화자 목록", () => {
     expect(unmappedSpeakers(garam4.raw, { 김가람: "가람" })).toEqual(["이보람", "박다온", "최라온"]);
+  });
+});
+
+describe("suggestSpeakerMap", () => {
+  it("기준 예시: 성을 뺀 이름이 별칭이면 연결", () => {
+    expect(suggestSpeakerMap(listSpeakers(garam4.raw), garam4.roster)).toEqual(garam4.speakerMap);
+  });
+
+  it("같은 이름이 우선, 애매하면 연결하지 않음", () => {
+    expect(suggestSpeakerMap(["가람", "김민", "엄마"], ["가람", "민", "김가람"])).toEqual({ 가람: "가람" });
+    expect(suggestSpeakerMap(["박하나"], ["하나", "박하나"])).toEqual({ 박하나: "박하나" });
   });
 });
