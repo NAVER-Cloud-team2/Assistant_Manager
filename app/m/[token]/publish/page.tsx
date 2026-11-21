@@ -1,17 +1,40 @@
-import { Placeholder } from "@/components/Placeholder";
+import Link from "next/link";
+import { AdminNav } from "@/components/AdminNav";
+import { PublishPanel } from "@/components/PublishPanel";
+import { loadAdminView } from "../../_lib/admin";
+import { loadLatestVersion } from "../../_lib/versions";
 
 /** S5 확정·발행 — 담당: C */
-export default function PublishPage() {
+export const dynamic = "force-dynamic";
+
+export default async function PublishPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
+  const view = await loadAdminView(token);
+
+  if (!view) {
+    return (
+      <main className="page">
+        <h1>링크를 찾을 수 없어요</h1>
+        <p>관리 링크가 맞지 않거나, 행사가 지워졌어요.</p>
+        <Link href="/">새 행사 만들기</Link>
+      </main>
+    );
+  }
+
   return (
-    <Placeholder
-      code="S5"
-      title="확정·발행"
-      owner="C"
-      todo={[
-        "“이전에 공유하거나 송금한 사람이 있나요?” 없음·있음·모름",
-        "POST /api/events/{id}/publish → version.message의 {{RESULT_URL}}을 실제 결과 링크로 바꿔 복사",
-        "2판부터 변동액 표, ‘모두 지우기’ (DELETE /api/events/{id})",
-      ]}
-    />
+    <main className="page">
+      <AdminNav token={token} current="publish" />
+      <header>
+        <p className="eyebrow">{view.meta.name}</p>
+        <h1>확정·발행</h1>
+      </header>
+      <PublishPanel
+        token={token}
+        eventId={view.meta.id}
+        hasDraft={view.draft !== null}
+        publishable={view.draft?.publishable ?? false}
+        latest={await loadLatestVersion(view.meta.id)}
+      />
+    </main>
   );
 }
