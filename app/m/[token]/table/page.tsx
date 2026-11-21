@@ -1,17 +1,41 @@
-import { Placeholder } from "@/components/Placeholder";
+import Link from "next/link";
+import { AdminNav } from "@/components/AdminNav";
+import { SettlementView } from "@/components/SettlementView";
+import { loadAdminView } from "../../_lib/admin";
 
 /** S4 정산표 — 담당: C */
-export default function TablePage() {
+export const dynamic = "force-dynamic";
+
+export default async function TablePage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
+  const view = await loadAdminView(token);
+
+  if (!view) {
+    return (
+      <main className="page">
+        <h1>링크를 찾을 수 없어요</h1>
+        <p>관리 링크가 맞지 않거나, 행사가 지워졌어요.</p>
+        <Link href="/">새 행사 만들기</Link>
+      </main>
+    );
+  }
+
   return (
-    <Placeholder
-      code="S4"
-      title="정산표"
-      owner="C"
-      todo={[
-        "사람별 순결제액·항목별 부담·총부담·잔액 (draft.settlement)",
-        "금액을 누르면 항목·참여자·원 발언·정정 발언·총무 확인값 (item.evidence → lines)",
-        "나머지 1원 받은 사람 표시 (remainderFrom)",
-      ]}
-    />
+    <main className="page">
+      <AdminNav token={token} current="table" />
+      <header>
+        <p className="eyebrow">{view.meta.name}</p>
+        <h1>정산표</h1>
+      </header>
+      {view.draft ? (
+        <SettlementView draft={view.draft} />
+      ) : (
+        <section className="notice">
+          <strong>붙여넣은 대화가 없어요</strong>
+          <p>대화를 붙여넣지 않았거나, 마지막 수정 후 7일이 지나 지워졌어요.</p>
+          <Link href={`/m/${token}/paste`}>대화 붙여넣기</Link>
+        </section>
+      )}
+    </main>
   );
 }
