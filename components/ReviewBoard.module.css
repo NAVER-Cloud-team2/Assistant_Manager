@@ -398,3 +398,26 @@
   font-size: 12px;
   color: var(--muted);
 }
+
+.tagNote {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--muted);
+  padding-right: 6px;
+}
+.amountPicks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.amountPicks button {
+  border: 1px solid #d6d3ef;
+  background: #fff;
+  color: var(--fg);
+  font: inherit;
+  font-size: 13px;
+  border-radius: 999px;
+  padding: 6px 12px;
+  min-height: 36px;
+}

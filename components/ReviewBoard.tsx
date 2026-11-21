@@ -184,6 +184,19 @@ export function ReviewBoard({
     return save({ ...confirm, manualItems, lineOverrides });
   };
   const removeManual = (i: number) => save({ ...confirm, manualItems: confirm.manualItems.filter((_, j) => j !== i) });
+  /** 이 줄을 근거로 한 직접 입력 항목 (항목 고치기로 만든 대체 항목) */
+  const manualOnLine = (no: string) => confirm.manualItems.filter((m) => m.lines.includes(no));
+  /**
+   * 고친 줄 되돌리기: 그 줄을 근거로 한 직접 입력 항목과, 그 항목들이 정산 외로 돌린 줄을 함께 되돌린다.
+   * (AI 항목만 되살아나고 고친 항목이 남아 두 번 계산되는 일을 막는다)
+   */
+  const revertFix = (no: string) => {
+    const replaced = manualOnLine(no);
+    const lines = new Set([no, ...replaced.flatMap((m) => m.lines)]);
+    const lineOverrides: Overrides = { ...confirm.lineOverrides };
+    for (const l of lines) delete lineOverrides[l];
+    return save({ ...confirm, manualItems: confirm.manualItems.filter((m) => !replaced.includes(m)), lineOverrides });
+  };
   const setOverride = (no: string, v: "candidate" | "not_settlement" | null) => {
     const next: Overrides = { ...confirm.lineOverrides };
     if (v) next[no] = v;
@@ -221,7 +234,7 @@ export function ReviewBoard({
       n: (p?.n ?? 0) + 1,
       line: lines[0] ?? "",
       payer: it.payer,
-      amount: it.grossAmount,
+      amount: it.amount,
       partLine: missedLines[0] ?? "",
       fix: { itemName: it.name, name: it.name, split: it.split, lines, alsoRemoved, manualIndex },
     }));
@@ -261,7 +274,7 @@ export function ReviewBoard({
         <section className={`${s.banner} ${s.warn}`}>
           <strong>금액이 있는데 반영되지 않은 줄이 있어요</strong>
           <p>
-            {missedLines.join(", ")}줄 · AI가 놓쳤을 수 있어요. 그 줄의 ‘이 줄로 항목 추가’나, 관련 항목의 ‘고치기’로 반영해 주세요.
+            {missedLines.join(", ")}줄 · AI가 놓쳤을 수 있어요. 그 줄의 ‘이 줄로 항목 추가’나 관련 항목의 ‘고치기’로 반영하고, 정산과 무관한 줄이면 ‘정산과 무관해요’를 눌러 주세요.
           </p>
         </section>
       )}
@@ -307,7 +320,7 @@ export function ReviewBoard({
                 q={q}
                 line={draft.lines.find((l) => l.no === q.line)}
                 optionEvidence={optionEvidence(q)}
-                suggestedAmount={amountsByLine.get(q.line)?.[0]}
+                lineAmounts={amountsByLine.get(q.line) ?? []}
                 busy={busy}
                 onAnswer={answer}
               />
@@ -343,9 +356,13 @@ export function ReviewBoard({
                         <span>
                           <b>{it.name}</b> {won(it.amount)} · {it.payer} 결제 · {it.split.length}명({it.split.join("·")})
                         </span>
-                        <button type="button" disabled={busy} onClick={() => fixItem(it)} aria-label={`${it.name} 항목 고치기`}>
-                          고치기
-                        </button>
+                        {it.amount > 0 ? (
+                          <button type="button" disabled={busy} onClick={() => fixItem(it)} aria-label={`${it.name} 항목 고치기`}>
+                            고치기
+                          </button>
+                        ) : (
+                          <em className={s.tagNote}>환불돼 부담 없음</em>
+                        )}
                       </span>
                     ))}
                     {missed && (
@@ -362,11 +379,24 @@ export function ReviewBoard({
                   </div>
                 )}
                 <div className={s.lineActions}>
-                  {ov ? (
+                  {ov && manualOnLine(l.no).length > 0 ? (
+                    <button type="button" disabled={busy} onClick={() => revertFix(l.no)}>
+                      고친 값 취소하고 AI 판단으로
+                    </button>
+                  ) : ov ? (
                     <button type="button" disabled={busy} onClick={() => setOverride(l.no, null)}>
                       처음 판단으로 되돌리기
                     </button>
-                  ) : st === "not_settlement" || missed ? (
+                  ) : missed ? (
+                    <>
+                      <button type="button" disabled={busy} onClick={() => addFromLine(l.no, l.speaker)}>
+                        이 줄로 항목 추가
+                      </button>
+                      <button type="button" disabled={busy} onClick={() => setOverride(l.no, "not_settlement")}>
+                        정산과 무관해요
+                      </button>
+                    </>
+                  ) : st === "not_settlement" ? (
                     <button type="button" disabled={busy} onClick={() => addFromLine(l.no, l.speaker)}>
                       이 줄로 항목 추가
                     </button>
@@ -439,7 +469,7 @@ function QuestionCard({
   q,
   line,
   optionEvidence,
-  suggestedAmount,
+  lineAmounts,
   busy,
   onAnswer,
 }: {
@@ -447,16 +477,18 @@ function QuestionCard({
   line?: { no: string; speaker: string | null; text: string };
   /** 선택지 값 → 그 후보 결제의 근거 줄 */
   optionEvidence: Record<string, QuoteLine[]>;
-  /** 질문 줄에서 규칙 파서가 읽은 금액 (Q-분리 금액 칸에 미리 채움) */
-  suggestedAmount?: number;
+  /** 질문 줄에서 규칙 파서가 읽은 금액들. 하나면 Q-분리 금액 칸에 미리 채우고, 여러 개면 골라 넣게 한다 */
+  lineAmounts: number[];
   busy: boolean;
   onAnswer: (a: Answer) => Promise<boolean>;
 }) {
   const withEvidence = q.options.some((o) => (optionEvidence[o.value]?.length ?? 0) > 0);
   // Q-분리이고 같은 줄에 금액이 있으면(예: "술값은 31,000원") 그 금액을 골라 둔 채로 연다. 총무는 확인만 누르면 된다
-  const prefilled = q.kind === "split" && suggestedAmount !== undefined && q.options.some((o) => o.value === "split");
+  // 금액이 여러 개인 줄(예: "저녁 129,503원 중 술값 31,000원")은 어느 것인지 알 수 없어 미리 채우지 않는다
+  const canSplit = q.kind === "split" && q.options.some((o) => o.value === "split");
+  const prefilled = canSplit && lineAmounts.length === 1;
   const [value, setValue] = useState(prefilled ? "split" : "");
-  const [amount, setAmount] = useState(prefilled ? suggestedAmount!.toLocaleString("ko-KR") : "");
+  const [amount, setAmount] = useState(prefilled ? lineAmounts[0].toLocaleString("ko-KR") : "");
   const [err, setErr] = useState<string | null>(null);
   // Q-분리는 '금액을 입력해 따로 나누기'(value "split")를 골랐을 때만 금액이 필요하다 (A의 resolve.ts 답 형식)
   const needsAmount = q.kind === "split" && value === "split";
@@ -506,6 +538,16 @@ function QuestionCard({
           <span>뺄 금액</span>
           <input inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="예: 12,000" />
           {prefilled && <small className={s.hintSmall}>대화에서 읽은 금액을 넣어 뒀어요. 다르면 고쳐 주세요.</small>}
+          {canSplit && lineAmounts.length > 1 && (
+            <span className={s.amountPicks}>
+              <small className={s.hintSmall}>대화에 나온 금액:</small>
+              {lineAmounts.map((a) => (
+                <button key={a} type="button" onClick={() => setAmount(a.toLocaleString("ko-KR"))}>
+                  {won(a)}
+                </button>
+              ))}
+            </span>
+          )}
         </label>
       )}
       {err && <p className={s.fieldError}>{err}</p>}
