@@ -13,18 +13,24 @@ import { maskMessages, parseMessages, suggestSpeakerMap } from "@/lib/mask";
 import type { Alias, MaskedLine } from "@/lib/types";
 import s from "./PasteFlow.module.css";
 
-/** 한 번에 보낼 수 있는 발언 수 (서버 검증은 D 담당, 여기는 안내용) */
+/** 한 번에 보낼 수 있는 발언 수 — D의 app/api/_lib/validate.ts LIMITS.linesMax와 같은 값 */
 export const MAX_LINES = 300;
+/** 한 줄 최대 글자 수 — D의 LIMITS.lineTextMax와 같은 값. 넘으면 서버가 거절하므로 보내기 전에 알린다 */
+export const MAX_LINE_TEXT = 1000;
 
 /**
- * 사전 고지 문구. 학습 사용 여부·보관 기간은 CLOVA Studio 약관 확인 결과로 맞춘다(구현계획서 4-2, B 확인).
- * TODO(C): B가 약관을 확인하면 문구를 최종본으로 바꾼다.
+ * 사전 고지 문구 (문제정의서: 붙여넣기 전에 AI 제공사와 국외 이전 여부를 알리고 동의를 받는다).
+ * AI 제공사는 팀장 결정으로 CLOVA Studio에서 OpenAI로 바뀌었다(B의 lib/extract.ts, AI_PROVIDER로 Gemini 선택 가능).
+ * 두 곳 모두 해외 서비스라 국외 이전을 알린다. 제공사 이름은 서버(paste/page.tsx)가 넘긴다.
+ * TODO(C): 입력의 학습 사용 여부·제공사 보관 기간은 B가 해당 API 정책을 확인하면 한 줄 추가한다.
  */
-const NOTICE = [
-  "이름은 별칭으로, 전화·계좌번호는 [전화번호]·[계좌번호]로 이 휴대폰에서 바꾼 뒤 보내요. 실명이 담긴 원문은 서버로 가지 않아요.",
-  "가린 대화는 네이버 클라우드 CLOVA Studio(국내) AI가 결제·정정·환불 후보를 찾는 데 쓰여요.",
-  "가린 대화와 근거는 마지막 수정 후 7일, 결과 링크는 확정 후 30일이 지나면 자동으로 지워져요. ‘모두 지우기’로 바로 지울 수도 있어요.",
-];
+function notice(aiProvider: string): string[] {
+  return [
+    "이름은 별칭으로, 전화·계좌번호는 [전화번호]·[계좌번호]로 이 휴대폰에서 바꾼 뒤 보내요. 실명이 담긴 원문은 서버로 가지 않아요.",
+    `가린 대화는 해외 AI 서비스(${aiProvider})로 전송돼 결제·정정·환불 후보를 찾는 데 쓰여요. 국외로 전송되는 것이에요.`,
+    "가린 대화와 근거는 마지막 수정 후 7일, 결과 링크는 확정 후 30일이 지나면 자동으로 지워져요. ‘모두 지우기’로 바로 지울 수도 있어요.",
+  ];
+}
 
 const NONE = "";
 
@@ -33,11 +39,14 @@ export function PasteFlow({
   eventId,
   roster,
   hasDraft,
+  aiProvider,
 }: {
   token: string;
   eventId: string;
   roster: Alias[];
   hasDraft: boolean;
+  /** 화면에 보일 AI 제공사 이름 (예: "OpenAI") */
+  aiProvider: string;
 }) {
   const router = useRouter();
   const [agreed, setAgreed] = useState(false);
@@ -106,6 +115,11 @@ export function PasteFlow({
       setError(`한 번에 ${MAX_LINES}줄까지 보낼 수 있어요. 정산과 관련 없는 줄을 빼 주세요.`);
       return;
     }
+    const tooLong = outgoing.find((l) => l.text.length > MAX_LINE_TEXT);
+    if (tooLong) {
+      setError(`${tooLong.no}번 줄이 너무 길어요. 한 줄은 ${MAX_LINE_TEXT.toLocaleString("ko-KR")}자까지 보낼 수 있어요. 줄을 빼거나 정산과 관련된 부분만 남겨 주세요.`);
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -135,13 +149,13 @@ export function PasteFlow({
       <section className={s.card}>
         <h2>보내기 전에 확인해 주세요</h2>
         <ul className={s.notice}>
-          {NOTICE.map((n) => (
+          {notice(aiProvider).map((n) => (
             <li key={n}>{n}</li>
           ))}
         </ul>
         <label className={s.check}>
           <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
-          <span>모임원에게 허락받은 정산 대화만 붙여넣고, 위 내용에 동의해요.</span>
+          <span>모임원에게 허락받은 정산 대화만 붙여넣고, 가린 대화가 국외 AI 서비스로 전송되는 것을 포함해 위 내용에 동의해요.</span>
         </label>
       </section>
 
