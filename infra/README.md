@@ -5,13 +5,20 @@
 ## 첫날 준비 순서
 
 1. **VPC·서브넷·ACG** 만들기 → **Server** 1대(Ubuntu)에 Docker·Nginx 설치
+   - 사양: **vCPU 4개 이상**(팀장 요청), 메모리 8GB 이상. 아래 "서버 사양" 참고
    - ACG: 80·443만 공개, SSH(22)는 팀원 IP만
 2. **Cloud DB for Cache** 생성 (같은 VPC, 사설 서브넷) → 서버에서 접속 확인
    - 서버 외부에서는 접근 불가. 그래서 로컬은 `STORE=memory`
-3. **CLOVA Studio**에서 HCX-007 API 키 발급, 사용 한도 설정
+3. **OpenAI** API 키 발급(B와 함께), **월 사용 한도(예산 상한)** 설정 — 팀장 결정으로 CLOVA Studio 대신 OpenAI를 쓴다
 4. 도메인 연결, `infra/nginx.conf` 적용, `certbot`으로 HTTPS
 5. **Container Registry** 생성 → GitHub Secrets·Variables 등록 (루트 README 표) → `deploy.yml` 켜기
-6. **Sub Account**로 팀원 권한 분리 (B: CLOVA Studio, D: 서버·DB, 콘솔 전체는 1명)
+6. **Sub Account**로 팀원 권한 분리 (D: 서버·DB, 콘솔 전체는 1명). OpenAI 대시보드 권한은 B·키 관리자만
+
+## 서버 사양
+
+- **vCPU 4개 이상, 메모리 8GB 이상, Ubuntu.** 정확한 상품은 콘솔에서 고른다.
+- 지금 배포는 컨테이너 1개라 Node.js가 실제로 쓰는 코어는 1개 정도다. AI 추출은 OpenAI에서, 이미지 빌드는 GitHub Actions에서 하므로 서버 부하는 작다.
+- 4코어를 다 쓰려면 컨테이너를 여러 개 띄우고 Nginx로 나눠야 한다. 그 전에 **RedisStore가 먼저 필요하다**(`MemoryStore`는 컨테이너마다 데이터가 따로라 여러 개로 늘리면 행사 데이터가 갈라진다).
 
 ## 서버 파일
 
@@ -27,8 +34,8 @@
 | --- | --- |
 | `MOCK_AI` | `0` |
 | `STORE` | `redis` (RedisStore 구현 전에는 `memory`. **`memory`여도 `ENCRYPTION_KEY`는 필수**) |
-| `CLOVASTUDIO_API_KEY` | CLOVA Studio 키 |
-| `CLOVA_MODEL` | `HCX-007` |
+| `OPENAI_API_KEY` | OpenAI API 키. 아래 "OpenAI 키 넣기" 참고 |
+| `OPENAI_MODEL` | B가 정한 모델 이름. 기본값 없음 — 비어 있으면 AI 추출이 실패하고 직접 입력으로 넘어간다 |
 | `REDIS_URL` | Cloud DB for Cache 사설 주소 |
 | `ENCRYPTION_KEY` | **필수.** 32바이트 키(표준 base64, 44자). 아래 "암호화 키 넣기" 참고. 바꾸면 기존 원문 계열 데이터는 읽을 수 없다 |
 
@@ -72,9 +79,29 @@ docker compose -f infra/docker-compose.yml down   # 키 없이도 동작
 npm run build && ENCRYPTION_KEY="$(openssl rand -base64 32)" npm start
 ```
 
-### 하지 말 것
+## OpenAI 키 넣기 (`OPENAI_API_KEY`, `OPENAI_MODEL`)
 
-- 키를 `docker-compose.yml`, `Dockerfile`, `.env.example`, 커밋, 채팅, 이슈에 적기
+팀장 결정으로 AI 추출은 CLOVA Studio 대신 **OpenAI**를 쓴다. 키는 서버 `.env`에만 두고, 로컬 개발은 `MOCK_AI=1`이라 키가 필요 없다.
+
+```bash
+cd /srv/assistant-manager
+umask 077
+read -rsp 'OPENAI_API_KEY: ' k && printf 'OPENAI_API_KEY=%s\n' "$k" >> .env; unset k; echo   # 입력이 화면·셸 기록에 남지 않는다
+printf 'OPENAI_MODEL=%s\n' '<B가 정한 모델 이름>' >> .env
+sed -i 's/^MOCK_AI=.*/MOCK_AI=0/' .env
+chmod 600 .env
+grep -cE '^OPENAI_API_KEY=.+' .env            # 1이면 정상 (값은 출력하지 않는다)
+```
+
+- **따옴표를 쓰지 않는다** (`docker --env-file`).
+- OpenAI 대시보드에서 **월 사용 한도**를 걸고, 키는 이 프로젝트 전용으로 만든다. 새면 바로 폐기하고 다시 발급한다.
+- 요청·응답 본문은 로그에 남기지 않는다(`lib/log.ts`만 사용). AI에는 브라우저에서 가린 발췌문만 보낸다.
+- OpenAI는 국외 사업자라 S2 사전 고지에 "AI 제공사: OpenAI, 국외 이전: 있음"을 알린다(C 담당 화면).
+- 키가 없거나 틀려도 서비스는 멈추지 않는다. AI 추출만 실패하고 총무 화면이 직접 입력으로 넘어간다(`app/api/_lib/pipeline.ts`).
+
+## 키 관리 — 하지 말 것
+
+- 키(`ENCRYPTION_KEY`, `OPENAI_API_KEY`)를 `docker-compose.yml`, `Dockerfile`, `.env.example`, 커밋, 채팅, 이슈에 적기
 - `infra/.env`에 키 두기 — compose가 자동으로 읽지만 `.dockerignore`는 루트 `.env`만 빼므로 빌드 컨텍스트(`COPY . .`)에 들어갈 수 있다
 - 로그·화면에 키 출력하기 (`echo $ENCRYPTION_KEY`, `cat .env`, `docker inspect`를 공유하기)
 
