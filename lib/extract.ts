@@ -27,12 +27,13 @@ export const PROMPT_VERSION = "v1";
 const TIMEOUT_MS = 10_000;
 const MAX_OUTPUT_TOKENS = 8192;
 // gemini-3.5-flash-lite는 2026-11 측정에서 503·10초 초과가 잦았고 3.1은 2~5초로 안정적이었다
-const DEFAULT_MODEL = { gemini: "gemini-3.1-flash-lite", openai: "gpt-6-luna" } as const;
+// OpenAI 모델은 기본값 없이 env.openaiModel(OPENAI_MODEL)에서 읽는다 (D의 lib/env.ts 약속). B가 정한 값: gpt-6-luna
+const GEMINI_DEFAULT_MODEL = "gemini-3.1-flash-lite";
 /** 일시 오류면 남은 시간 안에서 한 번 다시 보낸다 */
 const RETRY_STATUS = new Set([429, 500, 502, 503, 504]);
 const MIN_RETRY_MS = 2_500;
 
-type Provider = keyof typeof DEFAULT_MODEL;
+type Provider = "openai" | "gemini";
 
 const EVENT_TYPES = ["payment", "correct", "exclude", "refund", "cancel_planned", "out_of_scope", "not_settlement"] as const;
 const REASONS: OutOfScopeReason[] = ["foreign_currency", "prepaid", "partial_refund", "joint_payment", "other"];
@@ -325,7 +326,9 @@ export async function extractEvents(
   const provider: Provider = process.env.AI_PROVIDER === "gemini" ? "gemini" : "openai";
   const key = provider === "openai" ? process.env.OPENAI_API_KEY : process.env.GEMINI_API_KEY;
   if (!key) throw fail("no_key");
-  const model = (provider === "openai" ? process.env.OPENAI_MODEL : process.env.GEMINI_MODEL) || DEFAULT_MODEL[provider];
+  const model = provider === "openai" ? env.openaiModel : process.env.GEMINI_MODEL?.trim() || GEMINI_DEFAULT_MODEL;
+  // 모델이 비어 있으면 실패 → 화면은 직접 입력으로 넘어간다 (lib/env.ts openaiModel 설명)
+  if (!model) throw fail("no_model");
 
   const user = userPrompt(lines, roster, parsed);
   const text = provider === "openai" ? await callOpenAI(model, key, user) : await callGemini(model, key, user);
