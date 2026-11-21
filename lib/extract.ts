@@ -191,6 +191,8 @@ async function callOpenAI(model: string, key: string, user: string): Promise<str
       },
       // 추론을 끄는 모델 기준. reasoning_effort를 받지 않는 모델로 바꾸면 이 줄을 뺀다
       reasoning_effort: "none",
+      // 같은 대화면 같은 사건이 나오도록 무작위성을 끈다 (Gemini 쪽과 같은 값)
+      temperature: 0,
       max_completion_tokens: MAX_OUTPUT_TOKENS,
     },
   )) as OpenAIResponse;
@@ -212,8 +214,14 @@ const lineNo = (v: unknown): LineNo | null => (isStr(v) && /^\d+$/.test(v.trim()
 /**
  * AI 응답(평평한 객체) → SettlementEvent[]. 조건에 맞지 않는 사건은 버린다.
  * 버리는 경우: 없는 줄, 명단 밖 사람, 0 이하·정수 아닌 금액, 없는 결제를 가리키는 target, 빈 정정
+ * parsed(규칙 파서 결과)를 주면 제외 금액을 대화에 있는 금액과 맞춰 본다 (excludeAmount)
  */
-export function toEvents(data: unknown, lines: MaskedLine[], roster: Alias[]): { events: SettlementEvent[]; dropped: number } {
+export function toEvents(
+  data: unknown,
+  lines: MaskedLine[],
+  roster: Alias[],
+  parsed: ParsedLine[] = [],
+): { events: SettlementEvent[]; dropped: number } {
   const raw = (data as { events?: unknown } | null)?.events;
   if (!Array.isArray(raw)) throw fail("bad_shape");
   const lineSet = new Set(lines.map((l) => l.no));
@@ -244,16 +252,38 @@ export function toEvents(data: unknown, lines: MaskedLine[], roster: Alias[]): {
   };
 
   /**
-   * 정정 대상을 AI가 하나로 정했어도, 그 줄에 대상 결제의 항목 이름이 없으면 확실하지 않다.
+   * 정정·제외·환불·취소 대상을 AI가 하나로 정했어도, 그 줄에 대상 결제의 항목 이름이 없으면 확실하지 않다.
    * 그 줄 앞의 결제를 모두 후보로 돌려 조건 정리기가 Q-대상 질문을 만들게 한다 (구현계획서 4-3).
    */
   const textOf = new Map(lines.map((l) => [l.no, l.text]));
   function guardTarget(t: Target | null, line: LineNo): Target | null {
     if (typeof t !== "string") return t;
-    const item = original.get(t)?.item;
-    if (isStr(item) && textOf.get(line)?.includes(item)) return t;
+    const p = original.get(t);
+    // 항목 이름 후보: AI가 붙인 이름의 단어 + 결제 줄에서 금액 앞에 쓴 단어("점심 국밥 44,000원" → 점심, 국밥).
+    // AI가 이름을 매번 다르게 붙여도 대화에 쓴 말로 판단하도록. 여러 단어면 한 단어만 있어도 그 항목으로 본다
+    const item = isStr(p?.item) ? p.item.trim().split(/\s+/) : [];
+    const head = (textOf.get(lineNo(p?.line) ?? "") ?? "").split(/\d/)[0].trim().split(/\s+/);
+    const text = textOf.get(line) ?? "";
+    const named = (w: string, alone: boolean) => (alone || w.length >= 2) && text.includes(w);
+    if (item.some((w) => named(w, item.length === 1)) || head.some((w) => named(w, false))) return t;
     const before = [...original].filter(([, p]) => Number(lineNo(p.line) ?? Infinity) < Number(line)).map(([id]) => id);
     return before.length > 1 ? before : t;
+  }
+
+  /**
+   * 제외 금액을 대화에 있는 금액과 맞춘다. AI가 매번 다르게 내는 것을 코드로 고정한다.
+   * - AI 금액이 대화 어디에도 없으면 추측이다 → null (조건 정리기가 Q-분리 질문)
+   * - AI가 null인데 그 줄에 금액이 딱 하나 있고 대상 결제액보다 작으면 그 금액을 쓴다
+   *   결제액과 같거나 크면 결제 전체 금액을 다시 말한 것일 수 있어 그대로 질문한다
+   */
+  const amountsOf = new Map(parsed.map((p) => [p.no, p.amounts]));
+  const allAmounts = new Set(parsed.flatMap((p) => p.amounts));
+  function excludeAmount(v: unknown, t: Target, line: LineNo): number | null {
+    if (parsed.length === 0) return isAmount(v) ? v : null;
+    if (isAmount(v)) return allAmounts.has(v) ? v : null;
+    const own = amountsOf.get(line) ?? [];
+    const total = typeof t === "string" ? original.get(t)?.amount : undefined;
+    return own.length === 1 && isAmount(total) && own[0] < total ? own[0] : null;
   }
 
   const events: SettlementEvent[] = [];
@@ -287,12 +317,13 @@ export function toEvents(data: unknown, lines: MaskedLine[], roster: Alias[]): {
         return { type: "correct", line, target: t, set };
       }
       case "exclude": {
-        const t = target(r.target);
-        if (!t || !inRoster(r.who)) return null;
-        return { type: "exclude", line, who: r.who, target: t, what: isStr(r.what) ? r.what : "", amount: isAmount(r.amount) ? r.amount : null };
+        const t = guardTarget(target(r.target), line);
+        // 빠질 부분(what)을 말하지 못하면 일부 제외가 아니다 ("난 1차만 하고 갔어" 같은 말을 제외로 잘못 읽은 것)
+        if (!t || !inRoster(r.who) || !isStr(r.what)) return null;
+        return { type: "exclude", line, who: r.who, target: t, what: r.what, amount: excludeAmount(r.amount, t, line) };
       }
       case "refund": {
-        const t = target(r.target);
+        const t = guardTarget(target(r.target), line);
         if (!t) return null;
         // full이 확실하지 않으면 부분 환불로 본다 → 조건 정리기가 범위 밖으로 막는다
         const full = r.full === true;
@@ -301,11 +332,15 @@ export function toEvents(data: unknown, lines: MaskedLine[], roster: Alias[]): {
           : { type: "refund", line, target: t, status: "done", full };
       }
       case "cancel_planned": {
-        const t = target(r.target);
+        const t = guardTarget(target(r.target), line);
         return t ? { type: "cancel_planned", line, target: t } : null;
       }
-      case "out_of_scope":
-        return { type: "out_of_scope", line, reason: REASONS.includes(r.reason as OutOfScopeReason) ? (r.reason as OutOfScopeReason) : "other" };
+      case "out_of_scope": {
+        const reason = REASONS.includes(r.reason as OutOfScopeReason) ? (r.reason as OutOfScopeReason) : "other";
+        // 외화 결제라면서 숫자가 하나도 없는 줄("환전은 각자 했지?")은 결제가 아니다
+        if (reason === "foreign_currency" && !/\d/.test(textOf.get(line) ?? "")) return { type: "not_settlement", line };
+        return { type: "out_of_scope", line, reason };
+      }
       case "not_settlement":
         return { type: "not_settlement", line };
       default:
@@ -338,7 +373,11 @@ export async function extractEvents(
   } catch {
     throw fail("bad_json");
   }
-  const { events, dropped } = toEvents(data, lines, roster);
+  const { events, dropped } = toEvents(data, lines, roster, parsed);
+  // AI가 사건을 내지 않은 줄은 정산 외로 채운다. 화면도 사건 없는 줄을 정산 외로 보므로 결과는 같고,
+  // 같은 대화를 다시 돌렸을 때 "사건 없음"과 "정산 외"가 번갈아 나오지 않는다
+  const covered = new Set(events.map((e) => e.line));
+  for (const l of lines) if (!covered.has(l.no)) events.push({ type: "not_settlement", line: l.no });
   log.info("extract_done", { provider, model, promptVersion: PROMPT_VERSION, kept: events.length, dropped });
   return { events, model: `${provider}:${model}`, promptVersion: PROMPT_VERSION, ai: true };
 }

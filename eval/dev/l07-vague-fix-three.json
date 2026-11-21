@@ -1,0 +1,356 @@
+{
+  "name": "긴 대화 · 모호: 잡담 뒤 항목 이름 없는 정정 (후보 셋)",
+  "eventName": "놀이공원",
+  "roster": [
+    "하율",
+    "서진",
+    "예서",
+    "주안"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "하율",
+      "text": "아침 김밥 16,000원 내가 냈어 넷"
+    },
+    {
+      "no": "02",
+      "speaker": "서진",
+      "text": "입장권 52,000원 내가 결제했어 넷이"
+    },
+    {
+      "no": "03",
+      "speaker": "예서",
+      "text": "점심 돈가스 48,000원 내가 냈어 넷"
+    },
+    {
+      "no": "04",
+      "speaker": "주안",
+      "text": "오늘 진짜 덥다"
+    },
+    {
+      "no": "05",
+      "speaker": "하율",
+      "text": "다음엔 가을에 오자"
+    },
+    {
+      "no": "06",
+      "speaker": "서진",
+      "text": "사진 보정해서 보낼게"
+    },
+    {
+      "no": "07",
+      "speaker": "예서",
+      "text": "아까 그거 영수증 다시 보니까 46,000원이래"
+    },
+    {
+      "no": "08",
+      "speaker": "주안",
+      "text": "[계좌번호] 내 계좌"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "하율",
+      "amounts": [
+        16000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "서진",
+      "amounts": [
+        52000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "예서",
+      "amounts": [
+        48000
+      ]
+    },
+    {
+      "no": "04",
+      "speaker": "주안",
+      "amounts": []
+    },
+    {
+      "no": "05",
+      "speaker": "하율",
+      "amounts": []
+    },
+    {
+      "no": "06",
+      "speaker": "서진",
+      "amounts": []
+    },
+    {
+      "no": "07",
+      "speaker": "예서",
+      "amounts": [
+        46000
+      ]
+    },
+    {
+      "no": "08",
+      "speaker": "주안",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "하율",
+      "amount": 16000,
+      "item": "김밥",
+      "split": [
+        "하율",
+        "서진",
+        "예서",
+        "주안"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "서진",
+      "amount": 52000,
+      "item": "입장권",
+      "split": [
+        "하율",
+        "서진",
+        "예서",
+        "주안"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "03",
+      "payer": "예서",
+      "amount": 48000,
+      "item": "돈가스",
+      "split": [
+        "하율",
+        "서진",
+        "예서",
+        "주안"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "04"
+    },
+    {
+      "type": "not_settlement",
+      "line": "05"
+    },
+    {
+      "type": "not_settlement",
+      "line": "06"
+    },
+    {
+      "type": "correct",
+      "line": "07",
+      "target": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "set": {
+        "amount": 46000
+      }
+    },
+    {
+      "type": "not_settlement",
+      "line": "08"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "김밥",
+        "payer": "하율",
+        "grossAmount": 16000,
+        "amount": 16000,
+        "split": [
+          "하율",
+          "서진",
+          "예서",
+          "주안"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "입장권",
+        "payer": "서진",
+        "grossAmount": 52000,
+        "amount": 52000,
+        "split": [
+          "하율",
+          "서진",
+          "예서",
+          "주안"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "돈가스",
+        "payer": "예서",
+        "grossAmount": 48000,
+        "amount": 48000,
+        "split": [
+          "하율",
+          "서진",
+          "예서",
+          "주안"
+        ],
+        "evidence": [
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [
+      {
+        "id": "Q-target-07",
+        "kind": "target",
+        "line": "07",
+        "prompt": "07줄 정정은(는) 어느 결제에 적용할까요?",
+        "options": [
+          {
+            "value": "P1",
+            "label": "김밥 16,000원 (하율 결제)"
+          },
+          {
+            "value": "P2",
+            "label": "입장권 52,000원 (서진 결제)"
+          },
+          {
+            "value": "P3",
+            "label": "돈가스 48,000원 (예서 결제)"
+          }
+        ]
+      }
+    ],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate",
+      "04": "not_settlement",
+      "05": "not_settlement",
+      "06": "not_settlement",
+      "07": "needs_check",
+      "08": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "하율",
+        "paid": 16000,
+        "shares": {
+          "P1": 4000,
+          "P2": 13000,
+          "P3": 12000
+        },
+        "remainderFrom": [],
+        "total": 29000,
+        "balance": -13000
+      },
+      {
+        "alias": "서진",
+        "paid": 52000,
+        "shares": {
+          "P1": 4000,
+          "P2": 13000,
+          "P3": 12000
+        },
+        "remainderFrom": [],
+        "total": 29000,
+        "balance": 23000
+      },
+      {
+        "alias": "예서",
+        "paid": 48000,
+        "shares": {
+          "P1": 4000,
+          "P2": 13000,
+          "P3": 12000
+        },
+        "remainderFrom": [],
+        "total": 29000,
+        "balance": 19000
+      },
+      {
+        "alias": "주안",
+        "paid": 0,
+        "shares": {
+          "P1": 4000,
+          "P2": 13000,
+          "P3": 12000
+        },
+        "remainderFrom": [],
+        "total": 29000,
+        "balance": -29000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "하율",
+        "to": "서진",
+        "amount": 13000
+      },
+      {
+        "from": "주안",
+        "to": "서진",
+        "amount": 10000
+      },
+      {
+        "from": "주안",
+        "to": "예서",
+        "amount": 19000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

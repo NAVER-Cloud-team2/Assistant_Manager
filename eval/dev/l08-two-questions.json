@@ -1,0 +1,368 @@
+{
+  "name": "긴 대화 · 모호: 제외 금액 없음 + 취소 확인 안 됨 (질문 둘)",
+  "eventName": "연말 모임",
+  "roster": [
+    "나은",
+    "동건",
+    "리안",
+    "모아",
+    "보민"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "나은",
+      "text": "저녁 횟집 210,000원 내가 결제했어 다섯 명"
+    },
+    {
+      "no": "02",
+      "speaker": "동건",
+      "text": "2차 포차 85,000원 내가 냈어 다섯 다"
+    },
+    {
+      "no": "03",
+      "speaker": "리안",
+      "text": "난 횟집에서 술 안 마셨어"
+    },
+    {
+      "no": "04",
+      "speaker": "모아",
+      "text": "대리운전 32,000원 내가 냈어 나랑 보민 둘이"
+    },
+    {
+      "no": "05",
+      "speaker": "보민",
+      "text": "대리 업체에서 결제 취소한다고 했는데 아직 확인 안 됨"
+    },
+    {
+      "no": "06",
+      "speaker": "나은",
+      "text": "다음 모임은 12월?"
+    },
+    {
+      "no": "07",
+      "speaker": "동건",
+      "text": "[전화번호] 포차 사장님 번호"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "나은",
+      "amounts": [
+        210000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "동건",
+      "amounts": [
+        85000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "리안",
+      "amounts": []
+    },
+    {
+      "no": "04",
+      "speaker": "모아",
+      "amounts": [
+        32000
+      ]
+    },
+    {
+      "no": "05",
+      "speaker": "보민",
+      "amounts": []
+    },
+    {
+      "no": "06",
+      "speaker": "나은",
+      "amounts": []
+    },
+    {
+      "no": "07",
+      "speaker": "동건",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "나은",
+      "amount": 210000,
+      "item": "횟집",
+      "split": [
+        "나은",
+        "동건",
+        "리안",
+        "모아",
+        "보민"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "동건",
+      "amount": 85000,
+      "item": "포차",
+      "split": [
+        "나은",
+        "동건",
+        "리안",
+        "모아",
+        "보민"
+      ]
+    },
+    {
+      "type": "exclude",
+      "line": "03",
+      "who": "리안",
+      "target": "P1",
+      "what": "주류",
+      "amount": null
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "04",
+      "payer": "모아",
+      "amount": 32000,
+      "item": "대리운전",
+      "split": [
+        "모아",
+        "보민"
+      ]
+    },
+    {
+      "type": "cancel_planned",
+      "line": "05",
+      "target": "P3"
+    },
+    {
+      "type": "not_settlement",
+      "line": "06"
+    },
+    {
+      "type": "not_settlement",
+      "line": "07"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "횟집",
+        "payer": "나은",
+        "grossAmount": 210000,
+        "amount": 210000,
+        "split": [
+          "나은",
+          "동건",
+          "리안",
+          "모아",
+          "보민"
+        ],
+        "evidence": [
+          "01",
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "포차",
+        "payer": "동건",
+        "grossAmount": 85000,
+        "amount": 85000,
+        "split": [
+          "나은",
+          "동건",
+          "리안",
+          "모아",
+          "보민"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "대리운전",
+        "payer": "모아",
+        "grossAmount": 32000,
+        "amount": 32000,
+        "split": [
+          "모아",
+          "보민"
+        ],
+        "evidence": [
+          "04",
+          "05"
+        ],
+        "confirmations": [],
+        "status": "needs_check"
+      }
+    ],
+    "questions": [
+      {
+        "id": "Q-split-03",
+        "kind": "split",
+        "line": "03",
+        "prompt": "리안이(가) 횟집에서 빠질 주류 금액은 얼마인가요?",
+        "options": [
+          {
+            "value": "split",
+            "label": "금액을 입력해 따로 나누기"
+          },
+          {
+            "value": "ignore",
+            "label": "빼지 않고 그대로 나누기"
+          }
+        ]
+      },
+      {
+        "id": "Q-refund-05",
+        "kind": "refund",
+        "line": "05",
+        "prompt": "대리운전 결제가 취소 예정이에요. 환불이 끝났나요?",
+        "options": [
+          {
+            "value": "done",
+            "label": "환불됐어요 (0원으로)"
+          },
+          {
+            "value": "keep",
+            "label": "취소 안 해요 (그대로 정산)"
+          }
+        ]
+      }
+    ],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "needs_check",
+      "04": "candidate",
+      "05": "needs_check",
+      "06": "not_settlement",
+      "07": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "나은",
+        "paid": 210000,
+        "shares": {
+          "P1": 42000,
+          "P2": 17000,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 59000,
+        "balance": 151000
+      },
+      {
+        "alias": "동건",
+        "paid": 85000,
+        "shares": {
+          "P1": 42000,
+          "P2": 17000,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 59000,
+        "balance": 26000
+      },
+      {
+        "alias": "리안",
+        "paid": 0,
+        "shares": {
+          "P1": 42000,
+          "P2": 17000,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 59000,
+        "balance": -59000
+      },
+      {
+        "alias": "모아",
+        "paid": 32000,
+        "shares": {
+          "P1": 42000,
+          "P2": 17000,
+          "P3": 16000
+        },
+        "remainderFrom": [],
+        "total": 75000,
+        "balance": -43000
+      },
+      {
+        "alias": "보민",
+        "paid": 0,
+        "shares": {
+          "P1": 42000,
+          "P2": 17000,
+          "P3": 16000
+        },
+        "remainderFrom": [],
+        "total": 75000,
+        "balance": -75000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "리안",
+        "to": "나은",
+        "amount": 59000
+      },
+      {
+        "from": "모아",
+        "to": "나은",
+        "amount": 43000
+      },
+      {
+        "from": "보민",
+        "to": "나은",
+        "amount": 49000
+      },
+      {
+        "from": "보민",
+        "to": "동건",
+        "amount": 26000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}
