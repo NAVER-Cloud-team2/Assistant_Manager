@@ -1,0 +1,140 @@
+/* S1 행사 만들기 — 담당: C (globals.css와 겹치지 않게 이 파일에만 둔다) */
+.form,
+.done {
+  display: grid;
+  gap: 20px;
+}
+.field {
+  display: grid;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.field > span,
+.field > legend {
+  font-weight: 600;
+  padding: 0;
+}
+.form input {
+  width: 100%;
+  font: inherit;
+  font-size: 16px; /* iOS에서 확대되지 않게 16px 이상 */
+  padding: 12px;
+  border: 1px solid #d6d3ef;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--fg);
+}
+.form input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.hint {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.roster {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.roster li {
+  display: grid;
+  grid-template-columns: 24px 1fr 40px 40px 40px;
+  gap: 6px;
+  align-items: center;
+}
+.order {
+  color: var(--muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.roster button {
+  height: 44px;
+  border: 1px solid #d6d3ef;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--fg);
+  font-size: 16px;
+}
+.roster button:disabled {
+  opacity: 0.35;
+}
+.add {
+  justify-self: start;
+  margin-top: 4px;
+  padding: 10px 4px;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+}
+.errors {
+  margin: 0;
+  padding: 12px 12px 12px 32px;
+  background: #fdeceb;
+  border: 1px solid #f2b8b3;
+  border-radius: 10px;
+  color: #a1281f;
+  font-size: 14px;
+}
+.primary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  font-size: 17px;
+  text-align: center;
+  text-decoration: none;
+}
+.primary:disabled {
+  opacity: 0.6;
+}
+.secondary {
+  padding: 10px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+}
+.done h2 {
+  margin: 0;
+}
+.linkBox {
+  background: #fff;
+  border: 1px solid #e2e0f5;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+.label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.url {
+  margin: 0;
+  font-size: 14px;
+  word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.warn {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: #8a5a00;
+}
