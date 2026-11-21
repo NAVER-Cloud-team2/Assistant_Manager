@@ -6,7 +6,7 @@
  * 총무의 답·직접 입력은 확인값으로 저장되고 AI 사건보다 우선한다. 저장할 때마다 서버가 다시 정리·계산한다.
  */
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ADMIN_HEADER, type AnswersRequest, type ApiError } from "@/lib/api";
 import type { Alias, Answer, Blocker, Draft, LineStatus, ManualItem, Question } from "@/lib/types";
 import { won } from "./format";
@@ -41,6 +41,19 @@ const KIND_LABEL: Record<Question["kind"], string> = {
   refund: "환불",
   duplicate: "중복 의심",
 };
+
+/** 질문 답 값 → 화면 표시 (A의 resolve.ts 맨 위 표) */
+const ANSWER_LABEL: Record<string, string> = {
+  split: "금액을 따로 나눔",
+  ignore: "빼지 않고 그대로 나눔",
+  done: "환불됨 (0원으로)",
+  keep: "취소 안 함 (그대로 정산)",
+  dup: "같은 결제 (뒤의 것 지움)",
+  both: "둘 다 따로 결제",
+};
+
+/** 수동 정산(자동 계산 범위 밖) 사유인지. 그 밖은 항목 정보 부족·미해결 질문 */
+const isOutOfScope = (r: Blocker["reason"]) => r !== "invalid_item" && r !== "unresolved_question";
 
 /** "48,001" "48001원" → 48001. 정수가 아니면 null */
 export function parseWon(input: string): number | null {
@@ -126,14 +139,20 @@ export function ReviewBoard({
     return save({ ...confirm, lineOverrides: next });
   };
 
-  /** 답 값이 항목 id면 항목 이름으로 보여 준다 (P1 → 저녁) */
+  /** 답 값을 읽기 쉬운 말로: 항목 id면 항목 이름(P1 → 저녁), 아니면 답 값 이름 */
   const answerLabel = (v: string) => {
     const it = resolution.items.find((x) => x.id === v);
-    return it ? it.name : v;
+    return it ? it.name : (ANSWER_LABEL[v] ?? v);
   };
 
+  /** 정산 외 줄을 근거로 직접 입력 폼 열기 (말한 사람이 명단에 있으면 결제한 사람으로 미리 채움) */
+  const [prefill, setPrefill] = useState<{ line: string; payer: string; n: number } | null>(null);
+  const addFromLine = (no: string, speaker: string | null) =>
+    setPrefill((p) => ({ line: no, payer: speaker && roster.includes(speaker) ? speaker : "", n: (p?.n ?? 0) + 1 }));
+
   const unresolved = resolution.questions.length;
-  const blocked = resolution.blockers.filter((b) => b.reason !== "unresolved_question").length;
+  const outOfScope = resolution.blockers.filter((b) => isOutOfScope(b.reason)).length;
+  const invalid = resolution.blockers.filter((b) => b.reason === "invalid_item").length;
 
   return (
     <div className={s.board}>
@@ -160,9 +179,12 @@ export function ReviewBoard({
             <strong>아직 발행할 수 없어요</strong>
             <ul>
               {unresolved > 0 && <li>답할 질문 {unresolved}개</li>}
-              {blocked > 0 && <li>수동 정산이 필요한 줄 {blocked}개 (외화·선입금 등)</li>}
+              {outOfScope > 0 && <li>수동 정산이 필요한 줄 {outOfScope}개 (외화·선입금 등)</li>}
+              {invalid > 0 && <li>정보가 부족한 항목 {invalid}개 (금액·결제한 사람·나눌 사람 확인)</li>}
               {resolution.items.length === 0 && <li>정산할 항목이 없어요</li>}
-              {unresolved === 0 && blocked === 0 && resolution.items.length > 0 && <li>항목 정보나 검산을 확인해 주세요 (정산표)</li>}
+              {unresolved === 0 && outOfScope === 0 && invalid === 0 && resolution.items.length > 0 && (
+                <li>검산을 확인해 주세요 (정산표)</li>
+              )}
             </ul>
           </>
         )}
@@ -191,7 +213,8 @@ export function ReviewBoard({
         <h2>붙여넣은 대화</h2>
         <ol className={s.lines}>
           {draft.lines.map((l) => {
-            const st = resolution.lineStatus[l.no] ?? "candidate";
+            // 정리기가 상태를 주지 않은 줄 = 어떤 사건도 나오지 않은 줄 → 정산 외
+            const st = resolution.lineStatus[l.no] ?? "not_settlement";
             const ov = confirm.lineOverrides[l.no];
             const items = itemsByLine.get(l.no) ?? [];
             const blockers = blockersByLine.get(l.no) ?? [];
@@ -213,25 +236,24 @@ export function ReviewBoard({
                     ))}
                     {blockers.map((b, i) => (
                       <span key={i} className={`${s.tag} ${s.tagWarn}`}>
-                        수동 정산: {BLOCKER_LABEL[b.reason]}
+                        {isOutOfScope(b.reason) ? "수동 정산" : "확인 필요"}: {BLOCKER_LABEL[b.reason]}
                       </span>
                     ))}
                     {qs.length > 0 && <span className={`${s.tag} ${s.tagWarn}`}>질문 {qs.length}개</span>}
                   </div>
                 )}
                 <div className={s.lineActions}>
-                  {st === "not_settlement" ? (
-                    <button type="button" disabled={busy} onClick={() => setOverride(l.no, "candidate")}>
-                      정산에 넣기
+                  {ov ? (
+                    <button type="button" disabled={busy} onClick={() => setOverride(l.no, null)}>
+                      처음 판단으로 되돌리기
+                    </button>
+                  ) : st === "not_settlement" ? (
+                    <button type="button" disabled={busy} onClick={() => addFromLine(l.no, l.speaker)}>
+                      이 줄로 항목 추가
                     </button>
                   ) : (
                     <button type="button" disabled={busy} onClick={() => setOverride(l.no, "not_settlement")}>
                       정산 외로
-                    </button>
-                  )}
-                  {ov && (
-                    <button type="button" disabled={busy} onClick={() => setOverride(l.no, null)}>
-                      처음 판단으로 되돌리기
                     </button>
                   )}
                 </div>
@@ -273,7 +295,13 @@ export function ReviewBoard({
       )}
 
       {/* 직접 항목 추가 */}
-      <ManualItemForm roster={roster} lineNos={draft.lines.map((l) => l.no)} busy={busy} onAdd={addManual} />
+      <ManualItemForm
+        roster={roster}
+        lineNos={draft.lines.map((l) => l.no)}
+        busy={busy}
+        onAdd={addManual}
+        prefill={prefill}
+      />
 
       <p className={s.footer}>
         <Link href={`/m/${token}/table`}>정산표 보기 →</Link>
@@ -296,7 +324,8 @@ function QuestionCard({
   const [value, setValue] = useState("");
   const [amount, setAmount] = useState("");
   const [err, setErr] = useState<string | null>(null);
-  const needsAmount = q.kind === "split";
+  // Q-분리는 '금액을 입력해 따로 나누기'(value "split")를 골랐을 때만 금액이 필요하다 (A의 resolve.ts 답 형식)
+  const needsAmount = q.kind === "split" && value === "split";
 
   async function submit() {
     if (!value) return setErr("하나를 골라 주세요.");
@@ -348,11 +377,13 @@ function ManualItemForm({
   lineNos,
   busy,
   onAdd,
+  prefill,
 }: {
   roster: Alias[];
   lineNos: string[];
   busy: boolean;
   onAdd: (m: ManualItem) => Promise<boolean>;
+  prefill: { line: string; payer: string; n: number } | null;
 }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -361,6 +392,17 @@ function ManualItemForm({
   const [split, setSplit] = useState<Alias[]>(roster);
   const [line, setLine] = useState("");
   const [err, setErr] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // ‘이 줄로 항목 추가’를 누르면 그 줄을 근거로 폼을 열고 화면을 폼으로 옮긴다
+  useEffect(() => {
+    if (!prefill) return;
+    setOpen(true);
+    setLine(prefill.line);
+    if (prefill.payer) setPayer(prefill.payer);
+    setErr(null);
+    requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }, [prefill]);
 
   const toggle = (a: Alias) =>
     setSplit((cur) => (cur.includes(a) ? cur.filter((x) => x !== a) : roster.filter((r) => r === a || cur.includes(r))));
@@ -392,7 +434,7 @@ function ManualItemForm({
   }
 
   return (
-    <form className={s.manual} onSubmit={submit}>
+    <form className={s.manual} onSubmit={submit} ref={formRef}>
       <h2>직접 항목 추가</h2>
       <label>
         <span>항목</span>
