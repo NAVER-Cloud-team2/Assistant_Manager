@@ -7,8 +7,9 @@
  * 보관 기간: 원문 계열(excerpt·extract·confirm)은 마지막 수정 후 7일, 결과(version)는 확정 후 30일.
  * 원문 계열 키는 백업 대상에서 뺀다.
  */
+import { Redis } from "ioredis";
 import { env } from "./env";
-import { NotImplementedError } from "./errors";
+import { log } from "./log";
 
 export interface Store {
   get<T>(key: string): Promise<T | null>;
@@ -61,26 +62,70 @@ class MemoryStore implements Store {
   }
 }
 
-class RedisStore implements Store {
-  // TODO(D): ioredis 등으로 REDIS_URL에 연결. set은 "SET key value EX ttl", 값은 JSON 문자열.
+/** 저장소 오류. 메시지에 키 값·저장 값·접속 주소(비밀번호 포함 가능)를 넣지 않는다. */
+export class StoreError extends Error {
+  override name = "StoreError";
+}
+
+const ERROR_LOG_INTERVAL_MS = 30_000;
+
+/**
+ * 운영 저장소 — Cloud DB for Cache (Redis). 값은 JSON 문자열, TTL은 "SET key value EX ttl".
+ * REDIS_URL 예: redis://10.0.1.5:6379, 비밀번호가 있으면 redis://:비밀번호@10.0.1.5:6379, TLS면 rediss://
+ */
+export class RedisStore implements Store {
+  private client: Redis;
+  private lastErrorLogAt = 0;
+
+  constructor(url: string | undefined = process.env.REDIS_URL) {
+    if (!url?.trim()) throw new StoreError("STORE=redis인데 REDIS_URL이 없습니다");
+    this.client = new Redis(url.trim(), {
+      // 연결이 끊겼을 때 요청이 오래 매달리지 않게 한다 (API는 바로 500으로 실패)
+      maxRetriesPerRequest: 2,
+      connectTimeout: 5_000,
+    });
+    // 재연결 중에는 오류가 반복되므로 30초에 한 번만, 오류 종류만 남긴다 (메시지에 주소가 들어갈 수 있음)
+    this.client.on("error", (e: Error & { code?: string }) => {
+      const now = Date.now();
+      if (now - this.lastErrorLogAt < ERROR_LOG_INTERVAL_MS) return;
+      this.lastErrorLogAt = now;
+      log.warn("redis_error", { reason: e.code ?? e.name });
+    });
+  }
+
   async get<T>(key: string): Promise<T | null> {
-    void key;
-    throw new NotImplementedError("RedisStore.get — TODO(D)");
+    const raw = await this.client.get(key);
+    if (raw === null) return null;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      // SyntaxError 메시지에는 저장 값 일부가 들어가므로 원인을 버린다
+      throw new StoreError("저장된 값의 형식이 올바르지 않습니다");
+    }
   }
+
   async set<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
-    void key;
-    void value;
-    void ttlSeconds;
-    throw new NotImplementedError("RedisStore.set — TODO(D)");
+    const json = JSON.stringify(value);
+    if (json === undefined) throw new StoreError("저장할 수 없는 값입니다");
+    // Redis EX는 1 이상의 정수 초
+    const ttl = Math.max(1, Math.ceil(ttlSeconds));
+    await this.client.set(key, json, "EX", ttl);
   }
+
   async del(...ks: string[]): Promise<void> {
-    void ks;
-    throw new NotImplementedError("RedisStore.del — TODO(D)");
+    if (ks.length === 0) return;
+    await this.client.del(...ks);
+  }
+
+  /** 연결 종료 (테스트·종료 처리용) */
+  async close(): Promise<void> {
+    await this.client.quit().catch(() => this.client.disconnect());
   }
 }
 
-let instance: Store | null = null;
+// dev 서버 핫 리로드 때 Redis 연결이 쌓이지 않도록 globalThis에 하나만 둔다
+const gs = globalThis as unknown as { __daechongStoreInstance?: Store };
 export function getStore(): Store {
-  instance ??= env.store === "redis" ? new RedisStore() : new MemoryStore();
-  return instance;
+  gs.__daechongStoreInstance ??= env.store === "redis" ? new RedisStore() : new MemoryStore();
+  return gs.__daechongStoreInstance;
 }
