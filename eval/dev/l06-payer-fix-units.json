@@ -1,0 +1,296 @@
+{
+  "name": "긴 대화 · 정정: 남이 말한 결제자를 본인이 정정 + 만·천 표기",
+  "eventName": "동네 모임",
+  "roster": [
+    "윤슬",
+    "도담",
+    "별하",
+    "이음"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "윤슬",
+      "text": "어제 저녁 곱창 9만 2천 원은 도담이가 결제했어. 넷이 먹었어"
+    },
+    {
+      "no": "02",
+      "speaker": "별하",
+      "text": "택시 1만 4천 원 내가 냈어. 나랑 이음 둘이 탔어"
+    },
+    {
+      "no": "03",
+      "speaker": "도담",
+      "text": "잠깐 곱창 내가 낸 거 아니고 이음이가 냈어"
+    },
+    {
+      "no": "04",
+      "speaker": "이음",
+      "text": "맞아 내가 냈어 카드 내역 있어"
+    },
+    {
+      "no": "05",
+      "speaker": "윤슬",
+      "text": "디저트 와플 1만 2천 원 내가 샀어 넷이 나눠 먹었지"
+    },
+    {
+      "no": "06",
+      "speaker": "별하",
+      "text": "와플 맛있더라"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "윤슬",
+      "amounts": [
+        92000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "별하",
+      "amounts": [
+        14000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "도담",
+      "amounts": []
+    },
+    {
+      "no": "04",
+      "speaker": "이음",
+      "amounts": []
+    },
+    {
+      "no": "05",
+      "speaker": "윤슬",
+      "amounts": [
+        12000
+      ]
+    },
+    {
+      "no": "06",
+      "speaker": "별하",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "도담",
+      "amount": 92000,
+      "item": "곱창",
+      "split": [
+        "윤슬",
+        "도담",
+        "별하",
+        "이음"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "별하",
+      "amount": 14000,
+      "item": "택시",
+      "split": [
+        "별하",
+        "이음"
+      ]
+    },
+    {
+      "type": "correct",
+      "line": "03",
+      "target": "P1",
+      "set": {
+        "payer": "이음"
+      }
+    },
+    {
+      "type": "not_settlement",
+      "line": "04"
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "05",
+      "payer": "윤슬",
+      "amount": 12000,
+      "item": "와플",
+      "split": [
+        "윤슬",
+        "도담",
+        "별하",
+        "이음"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "06"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "곱창",
+        "payer": "이음",
+        "grossAmount": 92000,
+        "amount": 92000,
+        "split": [
+          "윤슬",
+          "도담",
+          "별하",
+          "이음"
+        ],
+        "evidence": [
+          "01",
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "택시",
+        "payer": "별하",
+        "grossAmount": 14000,
+        "amount": 14000,
+        "split": [
+          "별하",
+          "이음"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "와플",
+        "payer": "윤슬",
+        "grossAmount": 12000,
+        "amount": 12000,
+        "split": [
+          "윤슬",
+          "도담",
+          "별하",
+          "이음"
+        ],
+        "evidence": [
+          "05"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate",
+      "04": "not_settlement",
+      "05": "candidate",
+      "06": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "윤슬",
+        "paid": 12000,
+        "shares": {
+          "P1": 23000,
+          "P2": 0,
+          "P3": 3000
+        },
+        "remainderFrom": [],
+        "total": 26000,
+        "balance": -14000
+      },
+      {
+        "alias": "도담",
+        "paid": 0,
+        "shares": {
+          "P1": 23000,
+          "P2": 0,
+          "P3": 3000
+        },
+        "remainderFrom": [],
+        "total": 26000,
+        "balance": -26000
+      },
+      {
+        "alias": "별하",
+        "paid": 14000,
+        "shares": {
+          "P1": 23000,
+          "P2": 7000,
+          "P3": 3000
+        },
+        "remainderFrom": [],
+        "total": 33000,
+        "balance": -19000
+      },
+      {
+        "alias": "이음",
+        "paid": 92000,
+        "shares": {
+          "P1": 23000,
+          "P2": 7000,
+          "P3": 3000
+        },
+        "remainderFrom": [],
+        "total": 33000,
+        "balance": 59000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "윤슬",
+        "to": "이음",
+        "amount": 14000
+      },
+      {
+        "from": "도담",
+        "to": "이음",
+        "amount": 26000
+      },
+      {
+        "from": "별하",
+        "to": "이음",
+        "amount": 19000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

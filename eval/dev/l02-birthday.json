@@ -1,0 +1,338 @@
+{
+  "name": "긴 대화 · 명확: 생일 모임 (주인공 빼고 나눔)",
+  "eventName": "다은 생일",
+  "roster": [
+    "서준",
+    "하린",
+    "예준",
+    "다은",
+    "시우"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "서준",
+      "text": "다은이 생일 파티 7시 강남역이야"
+    },
+    {
+      "no": "02",
+      "speaker": "하린",
+      "text": "케이크 38,000원 내가 샀어. 다은이 빼고 넷이 나눠"
+    },
+    {
+      "no": "03",
+      "speaker": "예준",
+      "text": "저녁 파스타집 156,000원 내가 결제했어. 다은이 것도 우리 넷이 내주자"
+    },
+    {
+      "no": "04",
+      "speaker": "다은",
+      "text": "다들 고마워 ㅠㅠ"
+    },
+    {
+      "no": "05",
+      "speaker": "시우",
+      "text": "선물 꽃다발 45,000원 내가 냈어 다은이 빼고 넷이 나누자"
+    },
+    {
+      "no": "06",
+      "speaker": "서준",
+      "text": "카페는 다은이가 자기 돈으로 쐈어 정산 안 해도 돼"
+    },
+    {
+      "no": "07",
+      "speaker": "하린",
+      "text": "사진 진짜 잘 나왔다"
+    },
+    {
+      "no": "08",
+      "speaker": "예준",
+      "text": "[전화번호] 이거 파스타집 번호인데 다음에 또 가자"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "서준",
+      "amounts": []
+    },
+    {
+      "no": "02",
+      "speaker": "하린",
+      "amounts": [
+        38000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "예준",
+      "amounts": [
+        156000
+      ]
+    },
+    {
+      "no": "04",
+      "speaker": "다은",
+      "amounts": []
+    },
+    {
+      "no": "05",
+      "speaker": "시우",
+      "amounts": [
+        45000
+      ]
+    },
+    {
+      "no": "06",
+      "speaker": "서준",
+      "amounts": []
+    },
+    {
+      "no": "07",
+      "speaker": "하린",
+      "amounts": []
+    },
+    {
+      "no": "08",
+      "speaker": "예준",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "not_settlement",
+      "line": "01"
+    },
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "02",
+      "payer": "하린",
+      "amount": 38000,
+      "item": "케이크",
+      "split": [
+        "서준",
+        "하린",
+        "예준",
+        "시우"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "03",
+      "payer": "예준",
+      "amount": 156000,
+      "item": "저녁",
+      "split": [
+        "서준",
+        "하린",
+        "예준",
+        "시우"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "04"
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "05",
+      "payer": "시우",
+      "amount": 45000,
+      "item": "꽃다발",
+      "split": [
+        "서준",
+        "하린",
+        "예준",
+        "시우"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "06"
+    },
+    {
+      "type": "not_settlement",
+      "line": "07"
+    },
+    {
+      "type": "not_settlement",
+      "line": "08"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "케이크",
+        "payer": "하린",
+        "grossAmount": 38000,
+        "amount": 38000,
+        "split": [
+          "서준",
+          "하린",
+          "예준",
+          "시우"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "저녁",
+        "payer": "예준",
+        "grossAmount": 156000,
+        "amount": 156000,
+        "split": [
+          "서준",
+          "하린",
+          "예준",
+          "시우"
+        ],
+        "evidence": [
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "꽃다발",
+        "payer": "시우",
+        "grossAmount": 45000,
+        "amount": 45000,
+        "split": [
+          "서준",
+          "하린",
+          "예준",
+          "시우"
+        ],
+        "evidence": [
+          "05"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "not_settlement",
+      "02": "candidate",
+      "03": "candidate",
+      "04": "not_settlement",
+      "05": "candidate",
+      "06": "not_settlement",
+      "07": "not_settlement",
+      "08": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "서준",
+        "paid": 0,
+        "shares": {
+          "P1": 9500,
+          "P2": 39000,
+          "P3": 11250
+        },
+        "remainderFrom": [],
+        "total": 59750,
+        "balance": -59750
+      },
+      {
+        "alias": "하린",
+        "paid": 38000,
+        "shares": {
+          "P1": 9500,
+          "P2": 39000,
+          "P3": 11250
+        },
+        "remainderFrom": [],
+        "total": 59750,
+        "balance": -21750
+      },
+      {
+        "alias": "예준",
+        "paid": 156000,
+        "shares": {
+          "P1": 9500,
+          "P2": 39000,
+          "P3": 11250
+        },
+        "remainderFrom": [],
+        "total": 59750,
+        "balance": 96250
+      },
+      {
+        "alias": "다은",
+        "paid": 0,
+        "shares": {
+          "P1": 0,
+          "P2": 0,
+          "P3": 0
+        },
+        "remainderFrom": [],
+        "total": 0,
+        "balance": 0
+      },
+      {
+        "alias": "시우",
+        "paid": 45000,
+        "shares": {
+          "P1": 9500,
+          "P2": 39000,
+          "P3": 11250
+        },
+        "remainderFrom": [],
+        "total": 59750,
+        "balance": -14750
+      }
+    ],
+    "transfers": [
+      {
+        "from": "서준",
+        "to": "예준",
+        "amount": 59750
+      },
+      {
+        "from": "하린",
+        "to": "예준",
+        "amount": 21750
+      },
+      {
+        "from": "시우",
+        "to": "예준",
+        "amount": 14750
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

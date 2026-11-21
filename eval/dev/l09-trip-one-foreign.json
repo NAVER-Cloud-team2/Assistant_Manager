@@ -1,0 +1,318 @@
+{
+  "name": "긴 대화 · 범위 밖: 원화 결제 여럿 중 엔화 한 건",
+  "eventName": "오사카 여행",
+  "roster": [
+    "수호",
+    "아라",
+    "진우",
+    "해나"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "수호",
+      "text": "인천공항 리무진 버스 64,000원 내가 냈어 넷이"
+    },
+    {
+      "no": "02",
+      "speaker": "아라",
+      "text": "환전은 각자 했지?"
+    },
+    {
+      "no": "03",
+      "speaker": "진우",
+      "text": "첫날 저녁 라멘 4,800엔 내가 카드로 냈어 넷"
+    },
+    {
+      "no": "04",
+      "speaker": "해나",
+      "text": "면세점 선크림은 내 거라 정산에서 빼줘"
+    },
+    {
+      "no": "05",
+      "speaker": "수호",
+      "text": "유심 4개 44,000원 내가 한국에서 미리 결제했어 넷이"
+    },
+    {
+      "no": "06",
+      "speaker": "아라",
+      "text": "호텔은 내가 원화로 312,000원 결제했어 넷"
+    },
+    {
+      "no": "07",
+      "speaker": "진우",
+      "text": "내일 아침 8시 로비"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "수호",
+      "amounts": [
+        64000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "아라",
+      "amounts": []
+    },
+    {
+      "no": "03",
+      "speaker": "진우",
+      "amounts": [
+        4800
+      ]
+    },
+    {
+      "no": "04",
+      "speaker": "해나",
+      "amounts": []
+    },
+    {
+      "no": "05",
+      "speaker": "수호",
+      "amounts": [
+        44000
+      ]
+    },
+    {
+      "no": "06",
+      "speaker": "아라",
+      "amounts": [
+        312000
+      ]
+    },
+    {
+      "no": "07",
+      "speaker": "진우",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "수호",
+      "amount": 64000,
+      "item": "리무진 버스",
+      "split": [
+        "수호",
+        "아라",
+        "진우",
+        "해나"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "02"
+    },
+    {
+      "type": "out_of_scope",
+      "line": "03",
+      "reason": "foreign_currency"
+    },
+    {
+      "type": "not_settlement",
+      "line": "04"
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "05",
+      "payer": "수호",
+      "amount": 44000,
+      "item": "유심",
+      "split": [
+        "수호",
+        "아라",
+        "진우",
+        "해나"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "06",
+      "payer": "아라",
+      "amount": 312000,
+      "item": "호텔",
+      "split": [
+        "수호",
+        "아라",
+        "진우",
+        "해나"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "07"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "리무진 버스",
+        "payer": "수호",
+        "grossAmount": 64000,
+        "amount": 64000,
+        "split": [
+          "수호",
+          "아라",
+          "진우",
+          "해나"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "유심",
+        "payer": "수호",
+        "grossAmount": 44000,
+        "amount": 44000,
+        "split": [
+          "수호",
+          "아라",
+          "진우",
+          "해나"
+        ],
+        "evidence": [
+          "05"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "호텔",
+        "payer": "아라",
+        "grossAmount": 312000,
+        "amount": 312000,
+        "split": [
+          "수호",
+          "아라",
+          "진우",
+          "해나"
+        ],
+        "evidence": [
+          "06"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [
+      {
+        "line": "03",
+        "reason": "foreign_currency"
+      }
+    ],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "not_settlement",
+      "03": "needs_check",
+      "04": "not_settlement",
+      "05": "candidate",
+      "06": "candidate",
+      "07": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "수호",
+        "paid": 108000,
+        "shares": {
+          "P1": 16000,
+          "P2": 11000,
+          "P3": 78000
+        },
+        "remainderFrom": [],
+        "total": 105000,
+        "balance": 3000
+      },
+      {
+        "alias": "아라",
+        "paid": 312000,
+        "shares": {
+          "P1": 16000,
+          "P2": 11000,
+          "P3": 78000
+        },
+        "remainderFrom": [],
+        "total": 105000,
+        "balance": 207000
+      },
+      {
+        "alias": "진우",
+        "paid": 0,
+        "shares": {
+          "P1": 16000,
+          "P2": 11000,
+          "P3": 78000
+        },
+        "remainderFrom": [],
+        "total": 105000,
+        "balance": -105000
+      },
+      {
+        "alias": "해나",
+        "paid": 0,
+        "shares": {
+          "P1": 16000,
+          "P2": 11000,
+          "P3": 78000
+        },
+        "remainderFrom": [],
+        "total": 105000,
+        "balance": -105000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "진우",
+        "to": "수호",
+        "amount": 3000
+      },
+      {
+        "from": "진우",
+        "to": "아라",
+        "amount": 102000
+      },
+      {
+        "from": "해나",
+        "to": "아라",
+        "amount": 105000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

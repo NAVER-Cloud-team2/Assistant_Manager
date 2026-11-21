@@ -1,0 +1,358 @@
+{
+  "name": "긴 대화 · 정정: 같은 항목 두 번 수정 + 다른 항목 전액 환불",
+  "eventName": "가평 여행",
+  "roster": [
+    "시온",
+    "아린",
+    "재윤",
+    "하늘"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "시온",
+      "text": "바비큐 재료 88,000원 내가 결제했어 넷이"
+    },
+    {
+      "no": "02",
+      "speaker": "아린",
+      "text": "렌터카 120,000원 내가 냈어 넷이 타고 온 거"
+    },
+    {
+      "no": "03",
+      "speaker": "재윤",
+      "text": "기름값 45,000원은 내가 냈어 넷"
+    },
+    {
+      "no": "04",
+      "speaker": "하늘",
+      "text": "오늘 날씨 최고다"
+    },
+    {
+      "no": "05",
+      "speaker": "시온",
+      "text": "바비큐 재료 다시 계산해보니 92,000원이야"
+    },
+    {
+      "no": "06",
+      "speaker": "아린",
+      "text": "렌터카는 업체 사정으로 전액 환불해줬어 방금 들어옴"
+    },
+    {
+      "no": "07",
+      "speaker": "재윤",
+      "text": "오 다행이다"
+    },
+    {
+      "no": "08",
+      "speaker": "시온",
+      "text": "바비큐 재료 마지막으로 확인했어 90,500원이 맞아"
+    },
+    {
+      "no": "09",
+      "speaker": "하늘",
+      "text": "정산 언제 해?"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "시온",
+      "amounts": [
+        88000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "아린",
+      "amounts": [
+        120000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "재윤",
+      "amounts": [
+        45000
+      ]
+    },
+    {
+      "no": "04",
+      "speaker": "하늘",
+      "amounts": []
+    },
+    {
+      "no": "05",
+      "speaker": "시온",
+      "amounts": [
+        92000
+      ]
+    },
+    {
+      "no": "06",
+      "speaker": "아린",
+      "amounts": []
+    },
+    {
+      "no": "07",
+      "speaker": "재윤",
+      "amounts": []
+    },
+    {
+      "no": "08",
+      "speaker": "시온",
+      "amounts": [
+        90500
+      ]
+    },
+    {
+      "no": "09",
+      "speaker": "하늘",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "시온",
+      "amount": 88000,
+      "item": "바비큐 재료",
+      "split": [
+        "시온",
+        "아린",
+        "재윤",
+        "하늘"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "아린",
+      "amount": 120000,
+      "item": "렌터카",
+      "split": [
+        "시온",
+        "아린",
+        "재윤",
+        "하늘"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "03",
+      "payer": "재윤",
+      "amount": 45000,
+      "item": "기름값",
+      "split": [
+        "시온",
+        "아린",
+        "재윤",
+        "하늘"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "04"
+    },
+    {
+      "type": "correct",
+      "line": "05",
+      "target": "P1",
+      "set": {
+        "amount": 92000
+      }
+    },
+    {
+      "type": "refund",
+      "line": "06",
+      "target": "P2",
+      "status": "done",
+      "full": true
+    },
+    {
+      "type": "not_settlement",
+      "line": "07"
+    },
+    {
+      "type": "correct",
+      "line": "08",
+      "target": "P1",
+      "set": {
+        "amount": 90500
+      }
+    },
+    {
+      "type": "not_settlement",
+      "line": "09"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "바비큐 재료",
+        "payer": "시온",
+        "grossAmount": 90500,
+        "amount": 90500,
+        "split": [
+          "시온",
+          "아린",
+          "재윤",
+          "하늘"
+        ],
+        "evidence": [
+          "01",
+          "05",
+          "08"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "렌터카",
+        "payer": "아린",
+        "grossAmount": 120000,
+        "amount": 0,
+        "split": [
+          "시온",
+          "아린",
+          "재윤",
+          "하늘"
+        ],
+        "evidence": [
+          "02",
+          "06"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "기름값",
+        "payer": "재윤",
+        "grossAmount": 45000,
+        "amount": 45000,
+        "split": [
+          "시온",
+          "아린",
+          "재윤",
+          "하늘"
+        ],
+        "evidence": [
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate",
+      "04": "not_settlement",
+      "05": "candidate",
+      "06": "candidate",
+      "07": "not_settlement",
+      "08": "candidate",
+      "09": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "시온",
+        "paid": 90500,
+        "shares": {
+          "P1": 22625,
+          "P2": 0,
+          "P3": 11250
+        },
+        "remainderFrom": [],
+        "total": 33875,
+        "balance": 56625
+      },
+      {
+        "alias": "아린",
+        "paid": 0,
+        "shares": {
+          "P1": 22625,
+          "P2": 0,
+          "P3": 11250
+        },
+        "remainderFrom": [],
+        "total": 33875,
+        "balance": -33875
+      },
+      {
+        "alias": "재윤",
+        "paid": 45000,
+        "shares": {
+          "P1": 22625,
+          "P2": 0,
+          "P3": 11250
+        },
+        "remainderFrom": [],
+        "total": 33875,
+        "balance": 11125
+      },
+      {
+        "alias": "하늘",
+        "paid": 0,
+        "shares": {
+          "P1": 22625,
+          "P2": 0,
+          "P3": 11250
+        },
+        "remainderFrom": [],
+        "total": 33875,
+        "balance": -33875
+      }
+    ],
+    "transfers": [
+      {
+        "from": "아린",
+        "to": "시온",
+        "amount": 33875
+      },
+      {
+        "from": "하늘",
+        "to": "시온",
+        "amount": 22750
+      },
+      {
+        "from": "하늘",
+        "to": "재윤",
+        "amount": 11125
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

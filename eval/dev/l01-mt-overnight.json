@@ -1,0 +1,488 @@
+{
+  "name": "긴 대화 · 명확: 1박 엠티 (항목마다 분담자 다름)",
+  "eventName": "봄 엠티",
+  "roster": [
+    "로하",
+    "태오",
+    "세라",
+    "유찬",
+    "나래",
+    "건우"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "로하",
+      "text": "다들 내일 2시까지 청량리역 모여!"
+    },
+    {
+      "no": "02",
+      "speaker": "태오",
+      "text": "장보기 마트에서 186,400원 내가 결제했어 여섯 명 다"
+    },
+    {
+      "no": "03",
+      "speaker": "세라",
+      "text": "펜션 1박 240,000원 내가 냈어 여섯이 자는 거"
+    },
+    {
+      "no": "04",
+      "speaker": "유찬",
+      "text": "고기는 정육점에서 98,000원 내가 샀어 다 같이 먹은 거"
+    },
+    {
+      "no": "05",
+      "speaker": "나래",
+      "text": "난 내일 7시 기차라 먼저 갈게"
+    },
+    {
+      "no": "06",
+      "speaker": "건우",
+      "text": "편의점 얼음이랑 음료 23,500원 내가 냈어. 나랑 유찬 로하 셋이 마신 거"
+    },
+    {
+      "no": "07",
+      "speaker": "로하",
+      "text": "바베큐 숯 15,000원은 내가 냈어 여섯 명"
+    },
+    {
+      "no": "08",
+      "speaker": "태오",
+      "text": "사진 단톡에 올렸어 ㅋㅋ"
+    },
+    {
+      "no": "09",
+      "speaker": "세라",
+      "text": "돈은 [계좌번호]로 보내줘"
+    },
+    {
+      "no": "10",
+      "speaker": "유찬",
+      "text": "다음 엠티는 3월쯤?"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "로하",
+      "amounts": []
+    },
+    {
+      "no": "02",
+      "speaker": "태오",
+      "amounts": [
+        186400
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "세라",
+      "amounts": [
+        240000
+      ]
+    },
+    {
+      "no": "04",
+      "speaker": "유찬",
+      "amounts": [
+        98000
+      ]
+    },
+    {
+      "no": "05",
+      "speaker": "나래",
+      "amounts": []
+    },
+    {
+      "no": "06",
+      "speaker": "건우",
+      "amounts": [
+        23500
+      ]
+    },
+    {
+      "no": "07",
+      "speaker": "로하",
+      "amounts": [
+        15000
+      ]
+    },
+    {
+      "no": "08",
+      "speaker": "태오",
+      "amounts": []
+    },
+    {
+      "no": "09",
+      "speaker": "세라",
+      "amounts": []
+    },
+    {
+      "no": "10",
+      "speaker": "유찬",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "not_settlement",
+      "line": "01"
+    },
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "02",
+      "payer": "태오",
+      "amount": 186400,
+      "item": "장보기",
+      "split": [
+        "로하",
+        "태오",
+        "세라",
+        "유찬",
+        "나래",
+        "건우"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "03",
+      "payer": "세라",
+      "amount": 240000,
+      "item": "펜션",
+      "split": [
+        "로하",
+        "태오",
+        "세라",
+        "유찬",
+        "나래",
+        "건우"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "04",
+      "payer": "유찬",
+      "amount": 98000,
+      "item": "고기",
+      "split": [
+        "로하",
+        "태오",
+        "세라",
+        "유찬",
+        "나래",
+        "건우"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "05"
+    },
+    {
+      "type": "payment",
+      "id": "P4",
+      "line": "06",
+      "payer": "건우",
+      "amount": 23500,
+      "item": "편의점",
+      "split": [
+        "건우",
+        "유찬",
+        "로하"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P5",
+      "line": "07",
+      "payer": "로하",
+      "amount": 15000,
+      "item": "숯",
+      "split": [
+        "로하",
+        "태오",
+        "세라",
+        "유찬",
+        "나래",
+        "건우"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "08"
+    },
+    {
+      "type": "not_settlement",
+      "line": "09"
+    },
+    {
+      "type": "not_settlement",
+      "line": "10"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "장보기",
+        "payer": "태오",
+        "grossAmount": 186400,
+        "amount": 186400,
+        "split": [
+          "로하",
+          "태오",
+          "세라",
+          "유찬",
+          "나래",
+          "건우"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "펜션",
+        "payer": "세라",
+        "grossAmount": 240000,
+        "amount": 240000,
+        "split": [
+          "로하",
+          "태오",
+          "세라",
+          "유찬",
+          "나래",
+          "건우"
+        ],
+        "evidence": [
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "고기",
+        "payer": "유찬",
+        "grossAmount": 98000,
+        "amount": 98000,
+        "split": [
+          "로하",
+          "태오",
+          "세라",
+          "유찬",
+          "나래",
+          "건우"
+        ],
+        "evidence": [
+          "04"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P4",
+        "name": "편의점",
+        "payer": "건우",
+        "grossAmount": 23500,
+        "amount": 23500,
+        "split": [
+          "건우",
+          "유찬",
+          "로하"
+        ],
+        "evidence": [
+          "06"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P5",
+        "name": "숯",
+        "payer": "로하",
+        "grossAmount": 15000,
+        "amount": 15000,
+        "split": [
+          "로하",
+          "태오",
+          "세라",
+          "유찬",
+          "나래",
+          "건우"
+        ],
+        "evidence": [
+          "07"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "10": "not_settlement",
+      "01": "not_settlement",
+      "02": "candidate",
+      "03": "candidate",
+      "04": "candidate",
+      "05": "not_settlement",
+      "06": "candidate",
+      "07": "candidate",
+      "08": "not_settlement",
+      "09": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "로하",
+        "paid": 15000,
+        "shares": {
+          "P1": 31067,
+          "P2": 40000,
+          "P3": 16334,
+          "P4": 7834,
+          "P5": 2500
+        },
+        "remainderFrom": [
+          "P1",
+          "P3",
+          "P4"
+        ],
+        "total": 97735,
+        "balance": -82735
+      },
+      {
+        "alias": "태오",
+        "paid": 186400,
+        "shares": {
+          "P1": 31067,
+          "P2": 40000,
+          "P3": 16334,
+          "P4": 0,
+          "P5": 2500
+        },
+        "remainderFrom": [
+          "P1",
+          "P3"
+        ],
+        "total": 89901,
+        "balance": 96499
+      },
+      {
+        "alias": "세라",
+        "paid": 240000,
+        "shares": {
+          "P1": 31067,
+          "P2": 40000,
+          "P3": 16333,
+          "P4": 0,
+          "P5": 2500
+        },
+        "remainderFrom": [
+          "P1"
+        ],
+        "total": 89900,
+        "balance": 150100
+      },
+      {
+        "alias": "유찬",
+        "paid": 98000,
+        "shares": {
+          "P1": 31067,
+          "P2": 40000,
+          "P3": 16333,
+          "P4": 7833,
+          "P5": 2500
+        },
+        "remainderFrom": [
+          "P1"
+        ],
+        "total": 97733,
+        "balance": 267
+      },
+      {
+        "alias": "나래",
+        "paid": 0,
+        "shares": {
+          "P1": 31066,
+          "P2": 40000,
+          "P3": 16333,
+          "P4": 0,
+          "P5": 2500
+        },
+        "remainderFrom": [],
+        "total": 89899,
+        "balance": -89899
+      },
+      {
+        "alias": "건우",
+        "paid": 23500,
+        "shares": {
+          "P1": 31066,
+          "P2": 40000,
+          "P3": 16333,
+          "P4": 7833,
+          "P5": 2500
+        },
+        "remainderFrom": [],
+        "total": 97732,
+        "balance": -74232
+      }
+    ],
+    "transfers": [
+      {
+        "from": "로하",
+        "to": "태오",
+        "amount": 82735
+      },
+      {
+        "from": "나래",
+        "to": "태오",
+        "amount": 13764
+      },
+      {
+        "from": "나래",
+        "to": "세라",
+        "amount": 76135
+      },
+      {
+        "from": "건우",
+        "to": "세라",
+        "amount": 73965
+      },
+      {
+        "from": "건우",
+        "to": "유찬",
+        "amount": 267
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

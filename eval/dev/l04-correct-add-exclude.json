@@ -1,0 +1,335 @@
+{
+  "name": "긴 대화 · 정정: 분담자 추가 + 주류 분리(금액 있음)",
+  "eventName": "팀 회식",
+  "roster": [
+    "가온",
+    "나윤",
+    "도하",
+    "라희",
+    "마루"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "가온",
+      "text": "회식 삼겹살 150,000원 내가 결제했어 다섯 명"
+    },
+    {
+      "no": "02",
+      "speaker": "나윤",
+      "text": "볼링 60,000원 내가 냈어. 나랑 가온 도하 셋이 쳤어"
+    },
+    {
+      "no": "03",
+      "speaker": "도하",
+      "text": "볼링 재밌었다"
+    },
+    {
+      "no": "04",
+      "speaker": "라희",
+      "text": "난 회식 때 소주 한 잔도 안 마셨어. 주류가 36,000원 나왔대"
+    },
+    {
+      "no": "05",
+      "speaker": "마루",
+      "text": "볼링은 라희도 같이 쳤어. 넷으로 해줘"
+    },
+    {
+      "no": "06",
+      "speaker": "가온",
+      "text": "회식비는 [계좌번호]로 보내줘"
+    },
+    {
+      "no": "07",
+      "speaker": "나윤",
+      "text": "다들 조심히 들어가"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "가온",
+      "amounts": [
+        150000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "나윤",
+      "amounts": [
+        60000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "도하",
+      "amounts": []
+    },
+    {
+      "no": "04",
+      "speaker": "라희",
+      "amounts": [
+        36000
+      ]
+    },
+    {
+      "no": "05",
+      "speaker": "마루",
+      "amounts": []
+    },
+    {
+      "no": "06",
+      "speaker": "가온",
+      "amounts": []
+    },
+    {
+      "no": "07",
+      "speaker": "나윤",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "가온",
+      "amount": 150000,
+      "item": "회식",
+      "split": [
+        "가온",
+        "나윤",
+        "도하",
+        "라희",
+        "마루"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "나윤",
+      "amount": 60000,
+      "item": "볼링",
+      "split": [
+        "나윤",
+        "가온",
+        "도하"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "03"
+    },
+    {
+      "type": "exclude",
+      "line": "04",
+      "who": "라희",
+      "target": "P1",
+      "what": "주류",
+      "amount": 36000
+    },
+    {
+      "type": "correct",
+      "line": "05",
+      "target": "P2",
+      "set": {
+        "split": [
+          "나윤",
+          "가온",
+          "도하",
+          "라희"
+        ]
+      }
+    },
+    {
+      "type": "not_settlement",
+      "line": "06"
+    },
+    {
+      "type": "not_settlement",
+      "line": "07"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "회식",
+        "payer": "가온",
+        "grossAmount": 114000,
+        "amount": 114000,
+        "split": [
+          "가온",
+          "나윤",
+          "도하",
+          "라희",
+          "마루"
+        ],
+        "evidence": [
+          "01",
+          "04"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P1-x",
+        "name": "회식 (주류)",
+        "payer": "가온",
+        "grossAmount": 36000,
+        "amount": 36000,
+        "split": [
+          "가온",
+          "나윤",
+          "도하",
+          "마루"
+        ],
+        "evidence": [
+          "01",
+          "04"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "볼링",
+        "payer": "나윤",
+        "grossAmount": 60000,
+        "amount": 60000,
+        "split": [
+          "나윤",
+          "가온",
+          "도하",
+          "라희"
+        ],
+        "evidence": [
+          "02",
+          "05"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "not_settlement",
+      "04": "candidate",
+      "05": "candidate",
+      "06": "not_settlement",
+      "07": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "가온",
+        "paid": 150000,
+        "shares": {
+          "P1": 22800,
+          "P1-x": 9000,
+          "P2": 15000
+        },
+        "remainderFrom": [],
+        "total": 46800,
+        "balance": 103200
+      },
+      {
+        "alias": "나윤",
+        "paid": 60000,
+        "shares": {
+          "P1": 22800,
+          "P1-x": 9000,
+          "P2": 15000
+        },
+        "remainderFrom": [],
+        "total": 46800,
+        "balance": 13200
+      },
+      {
+        "alias": "도하",
+        "paid": 0,
+        "shares": {
+          "P1": 22800,
+          "P1-x": 9000,
+          "P2": 15000
+        },
+        "remainderFrom": [],
+        "total": 46800,
+        "balance": -46800
+      },
+      {
+        "alias": "라희",
+        "paid": 0,
+        "shares": {
+          "P1": 22800,
+          "P1-x": 0,
+          "P2": 15000
+        },
+        "remainderFrom": [],
+        "total": 37800,
+        "balance": -37800
+      },
+      {
+        "alias": "마루",
+        "paid": 0,
+        "shares": {
+          "P1": 22800,
+          "P1-x": 9000,
+          "P2": 0
+        },
+        "remainderFrom": [],
+        "total": 31800,
+        "balance": -31800
+      }
+    ],
+    "transfers": [
+      {
+        "from": "도하",
+        "to": "가온",
+        "amount": 46800
+      },
+      {
+        "from": "라희",
+        "to": "가온",
+        "amount": 37800
+      },
+      {
+        "from": "마루",
+        "to": "가온",
+        "amount": 18600
+      },
+      {
+        "from": "마루",
+        "to": "나윤",
+        "amount": 13200
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

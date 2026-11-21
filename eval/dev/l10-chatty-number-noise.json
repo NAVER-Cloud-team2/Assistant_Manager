@@ -1,0 +1,335 @@
+{
+  "name": "긴 대화 · 명확: 잡담 많고 시간·인원·날짜 숫자 섞임",
+  "eventName": "영화 데이",
+  "roster": [
+    "초아",
+    "한결",
+    "단비"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "초아",
+      "text": "우리 몇 시에 만나? 6시 반 괜찮아?"
+    },
+    {
+      "no": "02",
+      "speaker": "한결",
+      "text": "난 7시 가능 3번 출구 앞"
+    },
+    {
+      "no": "03",
+      "speaker": "단비",
+      "text": "오늘 영화 2편 연속 보는 거 맞지?"
+    },
+    {
+      "no": "04",
+      "speaker": "초아",
+      "text": "영화 티켓 두 편 세 명 꺼 66,000원 내가 예매했어"
+    },
+    {
+      "no": "05",
+      "speaker": "한결",
+      "text": "팝콘 콤보 2개 17,000원 내가 샀어 셋이 나눠 먹자"
+    },
+    {
+      "no": "06",
+      "speaker": "단비",
+      "text": "나 오늘 10시 전에 들어가야 돼"
+    },
+    {
+      "no": "07",
+      "speaker": "초아",
+      "text": "1편 끝나고 15분 쉬는 시간 있음"
+    },
+    {
+      "no": "08",
+      "speaker": "단비",
+      "text": "저녁 김치찌개 27,000원 내가 냈어 셋"
+    },
+    {
+      "no": "09",
+      "speaker": "한결",
+      "text": "나 다음 달 5일에 이사해"
+    },
+    {
+      "no": "10",
+      "speaker": "초아",
+      "text": "집들이 때 보자 ㅋㅋ [전화번호] 새 번호야"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "초아",
+      "amounts": []
+    },
+    {
+      "no": "02",
+      "speaker": "한결",
+      "amounts": []
+    },
+    {
+      "no": "03",
+      "speaker": "단비",
+      "amounts": []
+    },
+    {
+      "no": "04",
+      "speaker": "초아",
+      "amounts": [
+        66000
+      ]
+    },
+    {
+      "no": "05",
+      "speaker": "한결",
+      "amounts": [
+        17000
+      ]
+    },
+    {
+      "no": "06",
+      "speaker": "단비",
+      "amounts": []
+    },
+    {
+      "no": "07",
+      "speaker": "초아",
+      "amounts": []
+    },
+    {
+      "no": "08",
+      "speaker": "단비",
+      "amounts": [
+        27000
+      ]
+    },
+    {
+      "no": "09",
+      "speaker": "한결",
+      "amounts": []
+    },
+    {
+      "no": "10",
+      "speaker": "초아",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "not_settlement",
+      "line": "01"
+    },
+    {
+      "type": "not_settlement",
+      "line": "02"
+    },
+    {
+      "type": "not_settlement",
+      "line": "03"
+    },
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "04",
+      "payer": "초아",
+      "amount": 66000,
+      "item": "영화",
+      "split": [
+        "초아",
+        "한결",
+        "단비"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "05",
+      "payer": "한결",
+      "amount": 17000,
+      "item": "팝콘",
+      "split": [
+        "초아",
+        "한결",
+        "단비"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "06"
+    },
+    {
+      "type": "not_settlement",
+      "line": "07"
+    },
+    {
+      "type": "payment",
+      "id": "P3",
+      "line": "08",
+      "payer": "단비",
+      "amount": 27000,
+      "item": "김치찌개",
+      "split": [
+        "초아",
+        "한결",
+        "단비"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "09"
+    },
+    {
+      "type": "not_settlement",
+      "line": "10"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "영화",
+        "payer": "초아",
+        "grossAmount": 66000,
+        "amount": 66000,
+        "split": [
+          "초아",
+          "한결",
+          "단비"
+        ],
+        "evidence": [
+          "04"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "팝콘",
+        "payer": "한결",
+        "grossAmount": 17000,
+        "amount": 17000,
+        "split": [
+          "초아",
+          "한결",
+          "단비"
+        ],
+        "evidence": [
+          "05"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P3",
+        "name": "김치찌개",
+        "payer": "단비",
+        "grossAmount": 27000,
+        "amount": 27000,
+        "split": [
+          "초아",
+          "한결",
+          "단비"
+        ],
+        "evidence": [
+          "08"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "10": "not_settlement",
+      "01": "not_settlement",
+      "02": "not_settlement",
+      "03": "not_settlement",
+      "04": "candidate",
+      "05": "candidate",
+      "06": "not_settlement",
+      "07": "not_settlement",
+      "08": "candidate",
+      "09": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "초아",
+        "paid": 66000,
+        "shares": {
+          "P1": 22000,
+          "P2": 5667,
+          "P3": 9000
+        },
+        "remainderFrom": [
+          "P2"
+        ],
+        "total": 36667,
+        "balance": 29333
+      },
+      {
+        "alias": "한결",
+        "paid": 17000,
+        "shares": {
+          "P1": 22000,
+          "P2": 5667,
+          "P3": 9000
+        },
+        "remainderFrom": [
+          "P2"
+        ],
+        "total": 36667,
+        "balance": -19667
+      },
+      {
+        "alias": "단비",
+        "paid": 27000,
+        "shares": {
+          "P1": 22000,
+          "P2": 5666,
+          "P3": 9000
+        },
+        "remainderFrom": [],
+        "total": 36666,
+        "balance": -9666
+      }
+    ],
+    "transfers": [
+      {
+        "from": "한결",
+        "to": "초아",
+        "amount": 19667
+      },
+      {
+        "from": "단비",
+        "to": "초아",
+        "amount": 9666
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}
