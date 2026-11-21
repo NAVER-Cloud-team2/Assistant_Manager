@@ -369,3 +369,95 @@ describe("S6 결과 페이지 (/r/{token})", () => {
     await expect(renderPage(created.resultToken)).rejects.toMatchObject({ digest: expect.stringContaining("404") });
   });
 });
+
+describe("입력 검증 (화면을 거치지 않은 요청)", () => {
+  const SECRET_NAME = "김비밀실명";
+  const create = async (body: unknown) => createEvent(json(body));
+  const errorOf = async (res: Response) => ((await res.json()) as { error: string }).error;
+
+  it("행사 생성: 명단 2~10명·별칭 1~10자·중복 금지·이름 1~40자, 오류에 입력값을 되돌리지 않는다", async () => {
+    const roster = ["가람", "보람"];
+    const bad: unknown[] = [
+      null,
+      "문자열",
+      { name: 1, roster },
+      { name: "   ", roster },
+      { name: "가".repeat(41), roster },
+      { name: "줄\n바꿈", roster },
+      { name: "x", roster: "가람" },
+      { name: "x", roster: ["가람"] },
+      { name: "x", roster: Array.from({ length: 11 }, (_, i) => `p${i}`) },
+      { name: "x", roster: ["가람", 3] },
+      { name: "x", roster: ["가람", "  "] },
+      { name: "x", roster: ["가람", "가".repeat(11)] },
+      { name: "x", roster: ["가람", " 가람 "] },
+      { name: SECRET_NAME, roster: ["가람", SECRET_NAME + "열한자넘는별칭"] },
+    ];
+    for (const b of bad) {
+      const res = await create(b);
+      expect(res.status, JSON.stringify(b)).toBe(400);
+      expect(await errorOf(res)).not.toContain(SECRET_NAME);
+    }
+  });
+
+  it("행사 생성: 경계값(2명·10명·이름 40자)은 통과하고, 앞뒤 공백을 지운 값을 저장한다", async () => {
+    for (const roster of [["가", "나"], Array.from({ length: 10 }, (_, i) => `별칭${i}`)]) {
+      expect((await create({ name: "가".repeat(40), roster })).status).toBe(200);
+    }
+    const created = (await (await create({ name: "  뒤풀이  ", roster: [" 가람", "보람 "], extra: "무시" })).json()) as CreateEventResponse;
+    const meta = await getStore().get<Record<string, unknown>>(keys.event(created.eventId));
+    expect(meta?.name).toBe("뒤풀이");
+    expect(meta?.roster).toEqual(["가람", "보람"]);
+    expect(meta).not.toHaveProperty("extra");
+  });
+
+  it("발췌: 1~300줄·줄 번호 형식·중복·명단 밖 화자·줄 길이를 검사하고, 오류에 입력값을 되돌리지 않는다", async () => {
+    const created = (await (await create({ name: garam4.eventName, roster: garam4.roster })).json()) as CreateEventResponse;
+    const auth = { [ADMIN_HEADER]: created.adminToken };
+    const send = (body: unknown) => postExcerpt(json(body, auth), params({ id: created.eventId }));
+    const line = (no: string, speaker: string | null = garam4.roster[0], text = "저녁 4만원") => ({ no, speaker, text });
+
+    const bad: unknown[] = [
+      null,
+      { lines: "x" },
+      { lines: [] },
+      { lines: Array.from({ length: 301 }, (_, i) => line(String(i + 1).padStart(2, "0"))) },
+      { lines: ["문자열 줄"] },
+      { lines: [line("1")] },
+      { lines: [line("001x")] },
+      { lines: [line("00")] },
+      { lines: [line("1000")] },
+      { lines: [line("01"), line("01")] },
+      { lines: [line("01", SECRET_NAME)] }, // 실명이 화자 칸으로 들어오는 경우
+      { lines: [line("01", 3 as unknown as string)] },
+      { lines: [{ no: "01", speaker: null, text: 5 }] },
+      { lines: [line("01", null, SECRET_NAME + "가".repeat(1000))] },
+    ];
+    for (const b of bad) {
+      const res = await send(b);
+      expect(res.status, JSON.stringify(b).slice(0, 80)).toBe(400);
+      expect(await errorOf(res)).not.toContain(SECRET_NAME);
+    }
+    // 검증에 실패하면 아무것도 저장하지 않는다
+    expect(await getStore().get(keys.excerpt(created.eventId))).toBeNull();
+  });
+
+  it("발췌: 경계값(300줄·화자 null·한 줄 1,000자)은 통과하고, 모르는 필드는 저장하지 않는다", async () => {
+    const created = (await (await create({ name: garam4.eventName, roster: garam4.roster })).json()) as CreateEventResponse;
+    const auth = { [ADMIN_HEADER]: created.adminToken };
+    const lines = [
+      ...garam4.masked.map((l) => ({ ...l, extra: "버림" })),
+      ...Array.from({ length: 300 - garam4.masked.length }, (_, i) => ({
+        no: String(garam4.masked.length + i + 1).padStart(2, "0"),
+        speaker: i % 2 ? null : garam4.roster[1],
+        text: i === 0 ? "가".repeat(1000) : "ㅋㅋ",
+      })),
+    ];
+    const res = await postExcerpt(json({ lines }, auth), params({ id: created.eventId }));
+    expect(res.status).toBe(200);
+    const draft = (await res.json()) as Draft;
+    expect(draft.lines).toHaveLength(300);
+    expect(draft.lines[0]).toEqual(garam4.masked[0]);
+    expect(draft.lines[0]).not.toHaveProperty("extra");
+  });
+});

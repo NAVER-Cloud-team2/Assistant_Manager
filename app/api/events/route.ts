@@ -1,18 +1,18 @@
 /** POST /api/events — 행사 생성 (담당: D) */
 import { NextResponse } from "next/server";
-import type { CreateEventRequest, CreateEventResponse } from "@/lib/api";
+import type { CreateEventResponse } from "@/lib/api";
 import { log } from "@/lib/log";
 import { getStore, keys, TTL } from "@/lib/store";
 import { hashToken, newId, newToken } from "@/lib/token";
 import type { EventMeta } from "@/lib/types";
 import { jsonError } from "../_lib/auth";
+import { checkCreateEvent } from "../_lib/validate";
 
 export async function POST(req: Request) {
-  const body = (await req.json().catch(() => null)) as CreateEventRequest | null;
-  // TODO(D): 입력 검증 강화 (명단 2~10명, 별칭 중복 금지, 길이 제한)
-  if (!body || typeof body.name !== "string" || !Array.isArray(body.roster) || body.roster.length < 2) {
-    return jsonError(400, "행사 이름과 2명 이상의 명단이 필요합니다");
-  }
+  // 명단 2~10명, 별칭 1~10자·중복 금지, 행사 이름 1~40자 (화면과 같은 기준). 앞뒤 공백은 지운 값을 저장한다.
+  const checked = checkCreateEvent(await req.json().catch(() => null));
+  if (!checked.ok) return jsonError(400, checked.error);
+  const body = checked.value;
   const id = newId();
   const adminToken = newToken();
   const resultToken = newToken();
