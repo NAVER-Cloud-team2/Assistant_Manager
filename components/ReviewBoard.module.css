@@ -1,0 +1,284 @@
+/* S3 검토 — 담당: C (globals.css와 겹치지 않게 이 파일에만 둔다) */
+.board {
+  display: grid;
+  gap: 16px;
+}
+.board h2 {
+  font-size: 17px;
+  margin: 8px 0 10px;
+}
+.badge {
+  justify-self: start;
+  margin: 0;
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #ebe8ff;
+  color: var(--accent);
+}
+.banner {
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid;
+}
+.banner p,
+.banner ul {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+.banner ul {
+  padding-left: 18px;
+}
+.ok {
+  background: #e9f7f0;
+  border-color: #9fd8bd;
+}
+.warn {
+  background: #fff6e5;
+  border-color: #f0c46b;
+}
+.error,
+.fieldError {
+  margin: 0;
+  padding: 8px 12px;
+  background: #fdeceb;
+  border-radius: 8px;
+  color: #a1281f;
+  font-size: 14px;
+}
+.questions {
+  display: grid;
+  gap: 10px;
+}
+.qcard {
+  background: #fff;
+  border: 2px solid #f0c46b;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 8px;
+}
+.qkind {
+  margin: 0;
+  font-size: 12px;
+  color: #8a5a00;
+  font-weight: 600;
+}
+.quote {
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.prompt {
+  margin: 0;
+  font-weight: 600;
+}
+.options,
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.options label,
+.chips label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #d6d3ef;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 15px;
+}
+.options input,
+.chips input {
+  accent-color: var(--accent);
+}
+.picked {
+  border-color: var(--accent) !important;
+  background: #f1efff !important;
+}
+.amount,
+.manual label {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+.amount input,
+.manual input,
+.manual select {
+  font: inherit;
+  font-size: 16px;
+  padding: 10px 12px;
+  border: 1px solid #d6d3ef;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--fg);
+  min-height: 44px;
+}
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.line {
+  background: #fff;
+  border: 1px solid #e2e0f5;
+  border-left-width: 4px;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+.candidate {
+  border-left-color: var(--accent);
+}
+.needsCheck {
+  border-left-color: #e0a100;
+}
+.notSettlement {
+  border-left-color: #c8c6dc;
+  background: #faf9ff;
+}
+.notSettlement .text {
+  color: var(--muted);
+}
+.lineHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+}
+.no {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.who {
+  font-weight: 600;
+}
+.status {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+.needsCheck .status {
+  color: #8a5a00;
+  font-weight: 600;
+}
+.text {
+  margin: 2px 0 0;
+  font-size: 15px;
+  word-break: break-word;
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.tag {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #ebe8ff;
+  color: var(--accent);
+}
+.tagWarn {
+  background: #fff6e5;
+  color: #8a5a00;
+}
+.lineActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 2px;
+}
+.lineActions button,
+.confirmed button {
+  border: 0;
+  background: none;
+  padding: 8px 0;
+  color: var(--accent);
+  font: inherit;
+  font-size: 13px;
+}
+.confirmed button {
+  flex: none;
+  white-space: nowrap;
+}
+.lineActions button:disabled,
+.confirmed button:disabled {
+  opacity: 0.5;
+}
+.confirmed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border: 1px solid #e2e0f5;
+  border-radius: 12px;
+}
+.confirmed li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+.confirmed li + li {
+  border-top: 1px solid #e2e0f5;
+}
+.manual {
+  background: #fff;
+  border: 1px solid #e2e0f5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: grid;
+  gap: 12px;
+}
+.manual h2 {
+  margin: 0;
+}
+.manual fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.manual legend {
+  font-size: 14px;
+  margin-bottom: 6px;
+  padding: 0;
+}
+.formActions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px;
+}
+.primary,
+.secondary {
+  min-height: 48px;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+}
+.primary {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+}
+.primary:disabled {
+  opacity: 0.6;
+}
+.secondary {
+  border: 1px solid var(--accent);
+  background: #fff;
+  color: var(--accent);
+}
+.footer {
+  margin: 4px 0 0;
+  text-align: right;
+}
