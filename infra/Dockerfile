@@ -20,6 +20,12 @@ ENV NODE_ENV=production \
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=build --chown=app:app /app/.next/standalone ./
 COPY --from=build --chown=app:app /app/.next/static ./.next/static
+# 시작 검사: 운영(NODE_ENV=production)에서 ENCRYPTION_KEY가 없으면 앱을 띄우지 않는다.
+# 키는 이미지에 넣지 않고 실행할 때 환경 변수로만 받는다 (--env-file / compose environment).
+# Windows에서 체크아웃해 CRLF가 섞여도 동작하도록 줄끝을 정리한다.
+COPY infra/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh && chmod 0755 /usr/local/bin/docker-entrypoint.sh
 USER app
 EXPOSE 3000
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["node", "server.js"]
