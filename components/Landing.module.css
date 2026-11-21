@@ -1,0 +1,43 @@
+/* S1 첫 화면 — 담당: C */
+.top {
+  padding: 18px 20px 28px;
+}
+.brand {
+  font-size: 15px;
+  font-weight: 700;
+}
+.hero {
+  margin-top: 28px;
+  font-size: clamp(30px, 8.4vw, 44px);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.lede {
+  max-width: 34em;
+  margin-top: 12px;
+  color: var(--pencil);
+}
+/* 행사 만들기: 장부 한 장. 화면 맨 아래까지 늘어나지 않게 한다 */
+.create {
+  flex: none;
+  padding-bottom: 20px;
+  border-top: 1px solid var(--rule-strong);
+}
+.close {
+  display: grid;
+  gap: 18px;
+  padding: 36px 20px 64px;
+  border-top: 1px solid var(--rule-strong);
+}
+.closeTitle {
+  font-size: 22px;
+  line-height: 1.3;
+}
+.facts li {
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.facts li:first-child {
+  border-top: 1px solid var(--rule-strong);
+}

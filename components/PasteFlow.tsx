@@ -90,6 +90,12 @@ export function PasteFlow({
   );
   const noSpeaker = outgoing.filter((l) => !l.speaker).length;
 
+  /** 미리보기 줄마다 여백에 적을 번호 = 실제로 보낼 줄 번호 (뺀 줄은 null) */
+  const sentNo = useMemo(() => {
+    let n = 0;
+    return preview.map((_, i) => (excluded.has(i) ? null : String(++n).padStart(2, "0")));
+  }, [preview, excluded]);
+
   function onPaste(text: string) {
     setRaw(text);
     setExcluded(new Set());
@@ -144,56 +150,73 @@ export function PasteFlow({
   }
 
   return (
-    <div className={s.flow}>
+    <>
       {/* 1. 고지·동의 */}
-      <section className={s.card}>
-        <h2>보내기 전에 확인해 주세요</h2>
-        <ul className={s.notice}>
+      <section aria-labelledby="paste-notice">
+        <h2 className="blk sub" id="paste-notice">
+          보내기 전에 확인해 주세요
+        </h2>
+        <ul>
           {notice(aiProvider).map((n) => (
-            <li key={n}>{n}</li>
+            <li key={n} className={`row ${s.fine}`}>
+              {n}
+            </li>
           ))}
         </ul>
-        <label className={s.check}>
-          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
-          <span>모임원에게 허락받은 정산 대화만 붙여넣고, 가린 대화가 국외 AI 서비스로 전송되는 것을 포함해 위 내용에 동의해요.</span>
-        </label>
+        <div className="blk stack">
+          <label className={agreed ? "opt picked" : "opt"}>
+            <input type="checkbox" name="agree" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
+            <span>모임원에게 허락받은 정산 대화만 붙여넣고, 가린 대화가 국외 AI 서비스로 전송되는 것을 포함해 위 내용에 동의해요.</span>
+          </label>
+        </div>
       </section>
 
       {agreed && (
         <>
           {/* 2. 붙여넣기 */}
-          <section className={s.card}>
-            <h2>대화 붙여넣기</h2>
-            <p className={s.hint}>카카오톡에서 정산 이야기가 나온 부분만 길게 눌러 복사해 붙여넣어 주세요.</p>
-            <textarea
-              className={s.raw}
-              value={raw}
-              onChange={(e) => onPaste(e.target.value)}
-              placeholder={"[김가람] [오후 9:12] 저녁 52,001원 내가 냈어\n[이보람] [오후 11:40] 2차는 내가 냈어"}
-              rows={8}
-              spellCheck={false}
-              autoComplete="off"
-            />
-            {raw && (
-              <p className={s.hint}>
-                {parsed.recognized
-                  ? `발언 ${parsed.messages.length}개, 말한 사람 ${speakers.length}명을 찾았어요.`
-                  : "카카오톡 형식을 읽지 못했어요. 아래에서 줄마다 말한 사람을 골라 주세요."}
-              </p>
-            )}
+          <section aria-labelledby="paste-raw">
+            <h2 className="blk sub" id="paste-raw">
+              대화 붙여넣기
+            </h2>
+            <div className="blk stack">
+              <label className="note" htmlFor="paste-raw-input">
+                카카오톡에서 정산 이야기가 나온 부분만 길게 눌러 복사해 붙여넣어 주세요.
+              </label>
+              <textarea
+                id="paste-raw-input"
+                name="raw"
+                className="textarea"
+                value={raw}
+                onChange={(e) => onPaste(e.target.value)}
+                placeholder={"[김가람] [오후 9:12] 저녁 52,001원 내가 냈어\n[이보람] [오후 11:40] 2차는 내가 냈어…"}
+                rows={8}
+                spellCheck={false}
+                autoComplete="off"
+              />
+              {raw && (
+                <p className="note" aria-live="polite">
+                  {parsed.recognized
+                    ? `발언 ${parsed.messages.length}개, 말한 사람 ${speakers.length}명을 찾았어요.`
+                    : "카카오톡 형식을 읽지 못했어요. 아래에서 줄마다 말한 사람을 골라 주세요."}
+                </p>
+              )}
+            </div>
           </section>
 
           {/* 3. 화자 연결 */}
           {parsed.recognized && speakers.length > 0 && (
-            <section className={s.card}>
-              <h2>말한 사람 연결</h2>
-              <p className={s.hint}>대화 속 이름을 명단의 별칭에 연결하면, 본문에 나온 이름도 별칭으로 바뀌어요.</p>
-              <ul className={s.map}>
-                {speakers.map((sp) => (
-                  <li key={sp}>
+            <section aria-labelledby="paste-map">
+              <h2 className="blk sub" id="paste-map">
+                말한 사람 연결
+              </h2>
+              <p className="blk note tip">대화 속 이름을 명단의 별칭에 연결하면, 본문에 나온 이름도 별칭으로 바뀌어요.</p>
+              <ul>
+                {speakers.map((sp, i) => (
+                  <li key={sp} className={`row ${s.map}`}>
                     <span className={s.realName}>{sp}</span>
-                    <span aria-hidden>→</span>
                     <select
+                      className="select"
+                      name={`speaker-${i}`}
                       value={speakerMap[sp] ?? NONE}
                       onChange={(e) => setSpeakerMap((m) => ({ ...m, [sp]: e.target.value }))}
                       aria-label={`${sp}의 별칭`}
@@ -209,30 +232,37 @@ export function PasteFlow({
                 ))}
               </ul>
               {unmapped.length > 0 && (
-                <p className={s.warn}>
-                  연결 안 된 사람 {unmapped.length}명: 발언은 ‘말한 사람 없음’으로 보내고, 본문의 그 이름은 [이름]으로 가려요.
-                </p>
+                <div className="blk tip">
+                  <p className="caution">
+                    연결 안 된 사람 {unmapped.length}명: 발언은 ‘말한 사람 없음’으로 보내고, 본문의 그 이름은 [이름]으로 가려요.
+                  </p>
+                </div>
               )}
             </section>
           )}
 
-          {/* 4. 미리보기 */}
+          {/* 4. 미리보기 — 여백의 번호가 검토 화면에서 근거로 쓰일 줄 번호다 */}
           {preview.length > 0 && (
-            <section className={s.card}>
-              <h2>서버로 보낼 내용</h2>
-              <p className={s.hint}>
+            <section aria-labelledby="paste-preview">
+              <h2 className="blk sub" id="paste-preview">
+                서버로 보낼 내용
+              </h2>
+              <p className="blk note tip">
                 정산과 관련 없는 사적인 줄은 ‘빼기’를 눌러 주세요. 이름이 덜 가려진 곳이 없는지도 확인해 주세요.
               </p>
-              <ol className={s.preview}>
+              <ol>
                 {preview.map((l, i) => {
                   const out = excluded.has(i);
                   return (
-                    <li key={i} className={out ? s.out : undefined}>
-                      <div className={s.lineHead}>
+                    <li key={i} className={`row ${s.line} ${out ? s.out : ""}`}>
+                      {sentNo[i] && <span className="no">{sentNo[i]}</span>}
+                      <div className={s.said}>
                         {parsed.recognized ? (
                           <span className={s.who}>{l.speaker ?? "말한 사람 없음"}</span>
                         ) : (
                           <select
+                            className={`select ${s.pick}`}
+                            name={`line-speaker-${i}`}
                             value={lineSpeaker[i] ?? NONE}
                             onChange={(e) => setLineSpeaker((m) => ({ ...m, [i]: e.target.value }))}
                             aria-label={`${i + 1}번째 줄 말한 사람`}
@@ -245,11 +275,11 @@ export function PasteFlow({
                             ))}
                           </select>
                         )}
-                        <button type="button" className={s.toggle} onClick={() => toggleExclude(i)} aria-pressed={out}>
-                          {out ? "되살리기" : "빼기"}
-                        </button>
+                        <p className={s.text}>{l.text}</p>
                       </div>
-                      <p className={s.text}>{l.text}</p>
+                      <button type="button" className="textbtn" onClick={() => toggleExclude(i)} aria-pressed={out}>
+                        {out ? "되살리기" : "빼기"}
+                      </button>
                     </li>
                   );
                 })}
@@ -259,23 +289,23 @@ export function PasteFlow({
 
           {/* 5. 보내기 */}
           {preview.length > 0 && (
-            <section className={s.sendBox}>
+            <section className="blk stack">
               {hasDraft && (
-                <p className={s.warn}>이미 보낸 대화가 있어요. 다시 보내면 이전 대화와 검토 화면에서 한 답이 새 내용으로 바뀌어요.</p>
+                <p className="caution">이미 보낸 대화가 있어요. 다시 보내면 이전 대화와 검토 화면에서 한 답이 새 내용으로 바뀌어요.</p>
               )}
-              {noSpeaker > 0 && <p className={s.warn}>말한 사람이 없는 줄이 {noSpeaker}개 있어요. 결제자를 알기 어려울 수 있어요.</p>}
+              {noSpeaker > 0 && <p className="caution">말한 사람이 없는 줄이 {noSpeaker}개 있어요. 결제자를 알기 어려울 수 있어요.</p>}
               {error && (
-                <p className={s.error} role="alert">
+                <p className="alert" role="alert">
                   {error}
                 </p>
               )}
-              <button type="button" className={s.primary} onClick={send} disabled={busy || outgoing.length === 0}>
+              <button type="button" className="btn wide" onClick={send} disabled={busy || outgoing.length === 0}>
                 {busy ? "보내는 중… (AI 분석까지 최대 10초)" : `가린 ${outgoing.length}줄 보내기`}
               </button>
             </section>
           )}
         </>
       )}
-    </div>
+    </>
   );
 }

@@ -1,0 +1,75 @@
+/* 총무 화면 단계 이동(결재란) — 담당: C */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 14px var(--pad) 0;
+  border: 1px solid var(--rule-strong);
+}
+.step {
+  display: grid;
+  grid-template-rows: auto 32px;
+  border-left: 1px solid var(--rule-strong);
+  color: var(--pencil);
+  font-size: 13px;
+  text-align: center;
+  text-decoration: none;
+}
+.step:first-child {
+  border-left: 0;
+}
+.step:focus-visible {
+  outline-offset: -2px;
+}
+.label {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--rule-strong);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+.mark {
+  display: grid;
+  place-items: center;
+}
+.mark svg {
+  width: 18px;
+  height: 18px;
+  color: var(--blue);
+}
+.step[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 700;
+}
+.step[aria-current="page"] .label {
+  background: var(--ink);
+  color: var(--paper);
+}
+.count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--marker);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.seal {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--seal);
+  border-radius: 50%;
+  color: var(--seal);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(-7deg);
+}
+@media (hover: hover) and (pointer: fine) {
+  .step:hover {
+    color: var(--ink);
+  }
+}

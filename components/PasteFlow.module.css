@@ -1,160 +1,47 @@
-/* S2 붙여넣기 — 담당: C (globals.css와 겹치지 않게 이 파일에만 둔다) */
-.flow {
-  display: grid;
-  gap: 14px;
-}
-.card {
-  background: #fff;
-  border: 1px solid #e2e0f5;
-  border-radius: 12px;
-  padding: 14px 16px;
-}
-.card h2 {
-  margin: 0 0 6px;
-  font-size: 17px;
-}
-.hint {
-  margin: 0 0 8px;
+/* S2 붙여넣기 — 담당: C (공통 모양은 app/globals.css, 이 화면에만 쓰는 것만 여기 둔다) */
+.fine {
   font-size: 14px;
-  color: var(--muted);
-}
-.notice {
-  margin: 0 0 12px;
-  padding-left: 18px;
-  font-size: 14px;
-  display: grid;
-  gap: 4px;
-}
-.check {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  font-weight: 600;
-  font-size: 15px;
-}
-.check input {
-  width: 22px;
-  height: 22px;
-  margin: 1px 0 0;
-  flex: none;
-  accent-color: var(--accent);
-}
-.raw {
-  width: 100%;
-  font: inherit;
-  font-size: 16px;
-  padding: 12px;
-  border: 1px solid #d6d3ef;
-  border-radius: 10px;
-  resize: vertical;
-  color: var(--fg);
-}
-.card select {
-  font: inherit;
-  font-size: 16px;
-  padding: 8px 10px;
-  border: 1px solid #d6d3ef;
-  border-radius: 10px;
-  background: #fff;
-  color: var(--fg);
-  min-height: 44px;
 }
 .map {
-  list-style: none;
-  margin: 0;
-  padding: 0;
   display: grid;
-  gap: 8px;
-}
-.map li {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
   gap: 10px;
   align-items: center;
 }
 .realName {
-  font-weight: 600;
   overflow: hidden;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.warn {
-  margin: 8px 0 0;
-  padding: 8px 10px;
-  background: #fff6e5;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #8a5a00;
-}
-.preview {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.line {
   display: grid;
-  gap: 8px;
-}
-.preview li {
-  background: var(--bg);
-  border-radius: 10px;
-  padding: 8px 10px;
-}
-.preview li.out {
-  opacity: 0.45;
-}
-.preview li.out .text {
-  text-decoration: line-through;
-}
-.lineHead {
-  display: flex;
-  justify-content: space-between;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
   align-items: center;
-  gap: 8px;
+  /* 대화가 300줄까지 올 수 있다: 화면 밖의 줄은 그리지 않는다 */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 72px;
+}
+.said {
+  min-width: 0;
 }
 .who {
+  font-size: 14px;
   font-weight: 600;
-  font-size: 14px;
 }
-.toggle {
-  border: 0;
-  background: none;
-  color: var(--accent);
-  font: inherit;
-  font-size: 14px;
-  padding: 8px 4px;
-  min-height: 36px;
+.pick {
+  margin-bottom: 6px;
 }
 .text {
-  margin: 2px 0 0;
-  font-size: 15px;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
-.sendBox {
-  display: grid;
-  gap: 8px;
+/* 뺀 줄: 빨강 펜으로 그은 줄 */
+.out .who,
+.out .text {
+  color: var(--pencil);
 }
-.sendBox .warn {
-  margin: 0;
-}
-.error {
-  margin: 0;
-  padding: 10px 12px;
-  background: #fdeceb;
-  border: 1px solid #f2b8b3;
-  border-radius: 10px;
-  color: #a1281f;
-  font-size: 14px;
-}
-.primary {
-  width: 100%;
-  padding: 14px;
-  border: 0;
-  border-radius: 12px;
-  background: var(--accent);
-  color: #fff;
-  font: inherit;
-  font-weight: 600;
-  font-size: 17px;
-}
-.primary:disabled {
-  opacity: 0.6;
+.out .text {
+  text-decoration: line-through;
+  text-decoration-color: var(--red);
 }
