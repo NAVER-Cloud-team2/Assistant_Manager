@@ -41,6 +41,7 @@ beforeEach(() => {
   vi.stubEnv("AI_PROVIDER", "gemini");
   vi.stubEnv("GEMINI_API_KEY", "test-gemini-key");
   vi.stubEnv("OPENAI_API_KEY", "test-openai-key");
+  vi.stubEnv("OPENAI_MODEL", "gpt-6-luna");
 });
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -114,6 +115,13 @@ describe("extractEvents · Gemini", () => {
 
 describe("extractEvents · OpenAI", () => {
   beforeEach(() => vi.stubEnv("AI_PROVIDER", "openai"));
+
+  it("OPENAI_MODEL이 비어 있으면 기본값 없이 실패 (lib/env.ts 약속)", async () => {
+    vi.stubEnv("OPENAI_MODEL", "  ");
+    const fetch = stubFetch(openai(aiEvents));
+    await expect(extractEvents(masked, roster, parsed)).rejects.toThrow("no_model");
+    expect(fetch).not.toHaveBeenCalled();
+  });
 
   it("AI_PROVIDER가 없으면 OpenAI를 쓴다", async () => {
     vi.stubEnv("AI_PROVIDER", "");
