@@ -1,0 +1,202 @@
+{
+  "name": "정정: 점심 금액 수정",
+  "eventName": "학과 점심",
+  "roster": [
+    "가을",
+    "겨레",
+    "나무"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "가을",
+      "text": "점심 33,000원 내가 냈어 셋이"
+    },
+    {
+      "no": "02",
+      "speaker": "겨레",
+      "text": "점심 영수증 보니까 31,500원이던데"
+    },
+    {
+      "no": "03",
+      "speaker": "나무",
+      "text": "커피 12,000원 내가 냈어 셋 다"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "가을",
+      "amounts": [
+        33000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "겨레",
+      "amounts": [
+        31500
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "나무",
+      "amounts": [
+        12000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "가을",
+      "amount": 33000,
+      "item": "점심",
+      "split": [
+        "가을",
+        "겨레",
+        "나무"
+      ]
+    },
+    {
+      "type": "correct",
+      "line": "02",
+      "target": "P1",
+      "set": {
+        "amount": 31500
+      }
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "03",
+      "payer": "나무",
+      "amount": 12000,
+      "item": "커피",
+      "split": [
+        "가을",
+        "겨레",
+        "나무"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "점심",
+        "payer": "가을",
+        "grossAmount": 31500,
+        "amount": 31500,
+        "split": [
+          "가을",
+          "겨레",
+          "나무"
+        ],
+        "evidence": [
+          "01",
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "커피",
+        "payer": "나무",
+        "grossAmount": 12000,
+        "amount": 12000,
+        "split": [
+          "가을",
+          "겨레",
+          "나무"
+        ],
+        "evidence": [
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "가을",
+        "paid": 31500,
+        "shares": {
+          "P1": 10500,
+          "P2": 4000
+        },
+        "remainderFrom": [],
+        "total": 14500,
+        "balance": 17000
+      },
+      {
+        "alias": "겨레",
+        "paid": 0,
+        "shares": {
+          "P1": 10500,
+          "P2": 4000
+        },
+        "remainderFrom": [],
+        "total": 14500,
+        "balance": -14500
+      },
+      {
+        "alias": "나무",
+        "paid": 12000,
+        "shares": {
+          "P1": 10500,
+          "P2": 4000
+        },
+        "remainderFrom": [],
+        "total": 14500,
+        "balance": -2500
+      }
+    ],
+    "transfers": [
+      {
+        "from": "겨레",
+        "to": "가을",
+        "amount": 14500
+      },
+      {
+        "from": "나무",
+        "to": "가을",
+        "amount": 2500
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

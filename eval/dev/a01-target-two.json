@@ -1,0 +1,221 @@
+{
+  "name": "모호: 정정 대상 둘",
+  "eventName": "점심·카페",
+  "roster": [
+    "지원",
+    "현우",
+    "다인"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "지원",
+      "text": "점심 30,000원 내가 냈어 셋"
+    },
+    {
+      "no": "02",
+      "speaker": "현우",
+      "text": "카페 15,000원 내가 냈어 셋"
+    },
+    {
+      "no": "03",
+      "speaker": "다인",
+      "text": "아까 18,000원이었대"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "지원",
+      "amounts": [
+        30000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "현우",
+      "amounts": [
+        15000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "다인",
+      "amounts": [
+        18000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "지원",
+      "amount": 30000,
+      "item": "점심",
+      "split": [
+        "지원",
+        "현우",
+        "다인"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "현우",
+      "amount": 15000,
+      "item": "카페",
+      "split": [
+        "지원",
+        "현우",
+        "다인"
+      ]
+    },
+    {
+      "type": "correct",
+      "line": "03",
+      "target": [
+        "P1",
+        "P2"
+      ],
+      "set": {
+        "amount": 18000
+      }
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "점심",
+        "payer": "지원",
+        "grossAmount": 30000,
+        "amount": 30000,
+        "split": [
+          "지원",
+          "현우",
+          "다인"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "카페",
+        "payer": "현우",
+        "grossAmount": 15000,
+        "amount": 15000,
+        "split": [
+          "지원",
+          "현우",
+          "다인"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [
+      {
+        "id": "Q-target-03",
+        "kind": "target",
+        "line": "03",
+        "prompt": "어느 결제 금액을 바꿀까요?",
+        "options": [
+          {
+            "value": "P1",
+            "label": "점심"
+          },
+          {
+            "value": "P2",
+            "label": "카페"
+          }
+        ]
+      }
+    ],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "needs_check"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "지원",
+        "paid": 30000,
+        "shares": {
+          "P1": 10000,
+          "P2": 6000
+        },
+        "remainderFrom": [],
+        "total": 16000,
+        "balance": 14000
+      },
+      {
+        "alias": "현우",
+        "paid": 18000,
+        "shares": {
+          "P1": 10000,
+          "P2": 6000
+        },
+        "remainderFrom": [],
+        "total": 16000,
+        "balance": 2000
+      },
+      {
+        "alias": "다인",
+        "paid": 0,
+        "shares": {
+          "P1": 10000,
+          "P2": 6000
+        },
+        "remainderFrom": [],
+        "total": 16000,
+        "balance": -16000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "다인",
+        "to": "지원",
+        "amount": 14000
+      },
+      {
+        "from": "다인",
+        "to": "현우",
+        "amount": 2000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

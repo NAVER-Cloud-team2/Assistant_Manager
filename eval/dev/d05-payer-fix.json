@@ -1,0 +1,154 @@
+{
+  "name": "정정: 결제자 수정",
+  "eventName": "점심 모임",
+  "roster": [
+    "하윤",
+    "지우",
+    "예준"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "하윤",
+      "text": "점심 27,000원 내가 냈어 셋이"
+    },
+    {
+      "no": "02",
+      "speaker": "지우",
+      "text": "아 점심은 사실 예준이가 계산했어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "하윤",
+      "amounts": [
+        27000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "지우",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "하윤",
+      "amount": 27000,
+      "item": "점심",
+      "split": [
+        "하윤",
+        "지우",
+        "예준"
+      ]
+    },
+    {
+      "type": "correct",
+      "line": "02",
+      "target": "P1",
+      "set": {
+        "payer": "예준"
+      }
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "점심",
+        "payer": "예준",
+        "grossAmount": 27000,
+        "amount": 27000,
+        "split": [
+          "하윤",
+          "지우",
+          "예준"
+        ],
+        "evidence": [
+          "01",
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "하윤",
+        "paid": 0,
+        "shares": {
+          "P1": 9000
+        },
+        "remainderFrom": [],
+        "total": 9000,
+        "balance": -9000
+      },
+      {
+        "alias": "지우",
+        "paid": 0,
+        "shares": {
+          "P1": 9000
+        },
+        "remainderFrom": [],
+        "total": 9000,
+        "balance": -9000
+      },
+      {
+        "alias": "예준",
+        "paid": 27000,
+        "shares": {
+          "P1": 9000
+        },
+        "remainderFrom": [],
+        "total": 9000,
+        "balance": 18000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "하윤",
+        "to": "예준",
+        "amount": 9000
+      },
+      {
+        "from": "지우",
+        "to": "예준",
+        "amount": 9000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

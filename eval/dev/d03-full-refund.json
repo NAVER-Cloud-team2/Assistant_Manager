@@ -1,0 +1,199 @@
+{
+  "name": "정정: 택시 전액 환불",
+  "eventName": "1박 여행",
+  "roster": [
+    "민준",
+    "서연",
+    "지호"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "민준",
+      "text": "숙소 120,000원 내가 냈어 셋이"
+    },
+    {
+      "no": "02",
+      "speaker": "서연",
+      "text": "택시 15,000원 내가 냈어 셋이 탔어"
+    },
+    {
+      "no": "03",
+      "speaker": "서연",
+      "text": "택시 회사에서 택시비 전액 환불해줬어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "민준",
+      "amounts": [
+        120000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "서연",
+      "amounts": [
+        15000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "서연",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "민준",
+      "amount": 120000,
+      "item": "숙소",
+      "split": [
+        "민준",
+        "서연",
+        "지호"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "서연",
+      "amount": 15000,
+      "item": "택시",
+      "split": [
+        "민준",
+        "서연",
+        "지호"
+      ]
+    },
+    {
+      "type": "refund",
+      "line": "03",
+      "target": "P2",
+      "status": "done",
+      "full": true
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "숙소",
+        "payer": "민준",
+        "grossAmount": 120000,
+        "amount": 120000,
+        "split": [
+          "민준",
+          "서연",
+          "지호"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "택시",
+        "payer": "서연",
+        "grossAmount": 15000,
+        "amount": 0,
+        "split": [
+          "민준",
+          "서연",
+          "지호"
+        ],
+        "evidence": [
+          "02",
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "민준",
+        "paid": 120000,
+        "shares": {
+          "P1": 40000,
+          "P2": 0
+        },
+        "remainderFrom": [],
+        "total": 40000,
+        "balance": 80000
+      },
+      {
+        "alias": "서연",
+        "paid": 0,
+        "shares": {
+          "P1": 40000,
+          "P2": 0
+        },
+        "remainderFrom": [],
+        "total": 40000,
+        "balance": -40000
+      },
+      {
+        "alias": "지호",
+        "paid": 0,
+        "shares": {
+          "P1": 40000,
+          "P2": 0
+        },
+        "remainderFrom": [],
+        "total": 40000,
+        "balance": -40000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "서연",
+        "to": "민준",
+        "amount": 40000
+      },
+      {
+        "from": "지호",
+        "to": "민준",
+        "amount": 40000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

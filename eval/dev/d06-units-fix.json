@@ -1,0 +1,238 @@
+{
+  "name": "정정: 만·천 표기 금액 수정",
+  "eventName": "노래방 뒤풀이",
+  "roster": [
+    "소은",
+    "태민",
+    "유리",
+    "건우"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "소은",
+      "text": "노래방 4만 원 내가 냈어 넷"
+    },
+    {
+      "no": "02",
+      "speaker": "태민",
+      "text": "치킨 38,000원 내가 냈어 넷이"
+    },
+    {
+      "no": "03",
+      "speaker": "유리",
+      "text": "노래방 연장해서 5만 2천 원 나왔대"
+    },
+    {
+      "no": "04",
+      "speaker": "건우",
+      "text": "ㅇㅋ"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "소은",
+      "amounts": [
+        40000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "태민",
+      "amounts": [
+        38000
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "유리",
+      "amounts": [
+        52000
+      ]
+    },
+    {
+      "no": "04",
+      "speaker": "건우",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "소은",
+      "amount": 40000,
+      "item": "노래방",
+      "split": [
+        "소은",
+        "태민",
+        "유리",
+        "건우"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "태민",
+      "amount": 38000,
+      "item": "치킨",
+      "split": [
+        "소은",
+        "태민",
+        "유리",
+        "건우"
+      ]
+    },
+    {
+      "type": "correct",
+      "line": "03",
+      "target": "P1",
+      "set": {
+        "amount": 52000
+      }
+    },
+    {
+      "type": "not_settlement",
+      "line": "04"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "노래방",
+        "payer": "소은",
+        "grossAmount": 52000,
+        "amount": 52000,
+        "split": [
+          "소은",
+          "태민",
+          "유리",
+          "건우"
+        ],
+        "evidence": [
+          "01",
+          "03"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "치킨",
+        "payer": "태민",
+        "grossAmount": 38000,
+        "amount": 38000,
+        "split": [
+          "소은",
+          "태민",
+          "유리",
+          "건우"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "candidate",
+      "04": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "소은",
+        "paid": 52000,
+        "shares": {
+          "P1": 13000,
+          "P2": 9500
+        },
+        "remainderFrom": [],
+        "total": 22500,
+        "balance": 29500
+      },
+      {
+        "alias": "태민",
+        "paid": 38000,
+        "shares": {
+          "P1": 13000,
+          "P2": 9500
+        },
+        "remainderFrom": [],
+        "total": 22500,
+        "balance": 15500
+      },
+      {
+        "alias": "유리",
+        "paid": 0,
+        "shares": {
+          "P1": 13000,
+          "P2": 9500
+        },
+        "remainderFrom": [],
+        "total": 22500,
+        "balance": -22500
+      },
+      {
+        "alias": "건우",
+        "paid": 0,
+        "shares": {
+          "P1": 13000,
+          "P2": 9500
+        },
+        "remainderFrom": [],
+        "total": 22500,
+        "balance": -22500
+      }
+    ],
+    "transfers": [
+      {
+        "from": "유리",
+        "to": "소은",
+        "amount": 22500
+      },
+      {
+        "from": "건우",
+        "to": "소은",
+        "amount": 7000
+      },
+      {
+        "from": "건우",
+        "to": "태민",
+        "amount": 15500
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

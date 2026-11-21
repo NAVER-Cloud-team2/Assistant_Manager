@@ -1,0 +1,196 @@
+{
+  "name": "정정: 술값 분리 (금액 있음)",
+  "eventName": "종강 저녁",
+  "roster": [
+    "채아",
+    "도현",
+    "이안",
+    "수아"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "채아",
+      "text": "저녁 96,000원 내가 냈어 넷이 먹었어"
+    },
+    {
+      "no": "02",
+      "speaker": "수아",
+      "text": "난 저녁에 술 안 마셨어. 술값은 24,000원이었어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "채아",
+      "amounts": [
+        96000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "수아",
+      "amounts": [
+        24000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "채아",
+      "amount": 96000,
+      "item": "저녁",
+      "split": [
+        "채아",
+        "도현",
+        "이안",
+        "수아"
+      ]
+    },
+    {
+      "type": "exclude",
+      "line": "02",
+      "who": "수아",
+      "target": "P1",
+      "what": "주류",
+      "amount": 24000
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "저녁",
+        "payer": "채아",
+        "grossAmount": 72000,
+        "amount": 72000,
+        "split": [
+          "채아",
+          "도현",
+          "이안",
+          "수아"
+        ],
+        "evidence": [
+          "01",
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P1-주류",
+        "name": "저녁(주류)",
+        "payer": "채아",
+        "grossAmount": 24000,
+        "amount": 24000,
+        "split": [
+          "채아",
+          "도현",
+          "이안"
+        ],
+        "evidence": [
+          "01",
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "채아",
+        "paid": 96000,
+        "shares": {
+          "P1": 18000,
+          "P1-주류": 8000
+        },
+        "remainderFrom": [],
+        "total": 26000,
+        "balance": 70000
+      },
+      {
+        "alias": "도현",
+        "paid": 0,
+        "shares": {
+          "P1": 18000,
+          "P1-주류": 8000
+        },
+        "remainderFrom": [],
+        "total": 26000,
+        "balance": -26000
+      },
+      {
+        "alias": "이안",
+        "paid": 0,
+        "shares": {
+          "P1": 18000,
+          "P1-주류": 8000
+        },
+        "remainderFrom": [],
+        "total": 26000,
+        "balance": -26000
+      },
+      {
+        "alias": "수아",
+        "paid": 0,
+        "shares": {
+          "P1": 18000,
+          "P1-주류": 0
+        },
+        "remainderFrom": [],
+        "total": 18000,
+        "balance": -18000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "도현",
+        "to": "채아",
+        "amount": 26000
+      },
+      {
+        "from": "이안",
+        "to": "채아",
+        "amount": 26000
+      },
+      {
+        "from": "수아",
+        "to": "채아",
+        "amount": 18000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "name": "범위 밖: 공동 결제",
+  "eventName": "저녁 모임",
+  "roster": [
+    "진우",
+    "미래",
+    "솔"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "진우",
+      "text": "저녁 60,000원 나랑 미래가 반반 결제했어 셋이 먹었고"
+    },
+    {
+      "no": "02",
+      "speaker": "솔",
+      "text": "커피 9,000원 내가 냈어 셋"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "진우",
+      "amounts": [
+        60000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "솔",
+      "amounts": [
+        9000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "out_of_scope",
+      "line": "01",
+      "reason": "joint_payment"
+    },
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "02",
+      "payer": "솔",
+      "amount": 9000,
+      "item": "커피",
+      "split": [
+        "진우",
+        "미래",
+        "솔"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "커피",
+        "payer": "솔",
+        "grossAmount": 9000,
+        "amount": 9000,
+        "split": [
+          "진우",
+          "미래",
+          "솔"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [
+      {
+        "line": "01",
+        "reason": "joint_payment"
+      }
+    ],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "진우",
+        "paid": 0,
+        "shares": {
+          "P1": 3000
+        },
+        "remainderFrom": [],
+        "total": 3000,
+        "balance": -3000
+      },
+      {
+        "alias": "미래",
+        "paid": 0,
+        "shares": {
+          "P1": 3000
+        },
+        "remainderFrom": [],
+        "total": 3000,
+        "balance": -3000
+      },
+      {
+        "alias": "솔",
+        "paid": 9000,
+        "shares": {
+          "P1": 3000
+        },
+        "remainderFrom": [],
+        "total": 3000,
+        "balance": 6000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "진우",
+        "to": "솔",
+        "amount": 3000
+      },
+      {
+        "from": "미래",
+        "to": "솔",
+        "amount": 3000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

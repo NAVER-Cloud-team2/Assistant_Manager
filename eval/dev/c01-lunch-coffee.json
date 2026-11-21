@@ -1,0 +1,195 @@
+{
+  "name": "명확: 점심·커피 셋이",
+  "eventName": "스터디 점심",
+  "roster": [
+    "지민",
+    "서준",
+    "하은"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "지민",
+      "text": "점심 36,000원 내가 냈어 셋이서 먹은 거"
+    },
+    {
+      "no": "02",
+      "speaker": "서준",
+      "text": "커피 셋 거 13,500원 내가 계산함"
+    },
+    {
+      "no": "03",
+      "speaker": "하은",
+      "text": "잘 먹었어~"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "지민",
+      "amounts": [
+        36000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "서준",
+      "amounts": [
+        13500
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "하은",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "지민",
+      "amount": 36000,
+      "item": "점심",
+      "split": [
+        "지민",
+        "서준",
+        "하은"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "서준",
+      "amount": 13500,
+      "item": "커피",
+      "split": [
+        "지민",
+        "서준",
+        "하은"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "03"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "점심",
+        "payer": "지민",
+        "grossAmount": 36000,
+        "amount": 36000,
+        "split": [
+          "지민",
+          "서준",
+          "하은"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "커피",
+        "payer": "서준",
+        "grossAmount": 13500,
+        "amount": 13500,
+        "split": [
+          "지민",
+          "서준",
+          "하은"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate",
+      "03": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "지민",
+        "paid": 36000,
+        "shares": {
+          "P1": 12000,
+          "P2": 4500
+        },
+        "remainderFrom": [],
+        "total": 16500,
+        "balance": 19500
+      },
+      {
+        "alias": "서준",
+        "paid": 13500,
+        "shares": {
+          "P1": 12000,
+          "P2": 4500
+        },
+        "remainderFrom": [],
+        "total": 16500,
+        "balance": -3000
+      },
+      {
+        "alias": "하은",
+        "paid": 0,
+        "shares": {
+          "P1": 12000,
+          "P2": 4500
+        },
+        "remainderFrom": [],
+        "total": 16500,
+        "balance": -16500
+      }
+    ],
+    "transfers": [
+      {
+        "from": "서준",
+        "to": "지민",
+        "amount": 3000
+      },
+      {
+        "from": "하은",
+        "to": "지민",
+        "amount": 16500
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

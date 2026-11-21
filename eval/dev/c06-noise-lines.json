@@ -1,0 +1,250 @@
+{
+  "name": "명확: 잡담·계좌 섞임",
+  "eventName": "펜션 MT 장보기",
+  "roster": [
+    "소율",
+    "은호",
+    "지안",
+    "채원"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "소율",
+      "text": "오늘 정산할게요"
+    },
+    {
+      "no": "02",
+      "speaker": "소율",
+      "text": "마트 장보기 67,890원 내가 냈어 넷이 같이 먹을 거"
+    },
+    {
+      "no": "03",
+      "speaker": "은호",
+      "text": "고마워!"
+    },
+    {
+      "no": "04",
+      "speaker": "지안",
+      "text": "바베큐 숯이랑 그릴 25,000원 내가 냈어 다 같이 쓴 거"
+    },
+    {
+      "no": "05",
+      "speaker": "채원",
+      "text": "[계좌번호]로 보내면 돼?"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "소율",
+      "amounts": []
+    },
+    {
+      "no": "02",
+      "speaker": "소율",
+      "amounts": [
+        67890
+      ]
+    },
+    {
+      "no": "03",
+      "speaker": "은호",
+      "amounts": []
+    },
+    {
+      "no": "04",
+      "speaker": "지안",
+      "amounts": [
+        25000
+      ]
+    },
+    {
+      "no": "05",
+      "speaker": "채원",
+      "amounts": []
+    }
+  ],
+  "events": [
+    {
+      "type": "not_settlement",
+      "line": "01"
+    },
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "02",
+      "payer": "소율",
+      "amount": 67890,
+      "item": "장보기",
+      "split": [
+        "소율",
+        "은호",
+        "지안",
+        "채원"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "03"
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "04",
+      "payer": "지안",
+      "amount": 25000,
+      "item": "바베큐",
+      "split": [
+        "소율",
+        "은호",
+        "지안",
+        "채원"
+      ]
+    },
+    {
+      "type": "not_settlement",
+      "line": "05"
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "장보기",
+        "payer": "소율",
+        "grossAmount": 67890,
+        "amount": 67890,
+        "split": [
+          "소율",
+          "은호",
+          "지안",
+          "채원"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "바베큐",
+        "payer": "지안",
+        "grossAmount": 25000,
+        "amount": 25000,
+        "split": [
+          "소율",
+          "은호",
+          "지안",
+          "채원"
+        ],
+        "evidence": [
+          "04"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "not_settlement",
+      "02": "candidate",
+      "03": "not_settlement",
+      "04": "candidate",
+      "05": "not_settlement"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "소율",
+        "paid": 67890,
+        "shares": {
+          "P1": 16973,
+          "P2": 6250
+        },
+        "remainderFrom": [
+          "P1"
+        ],
+        "total": 23223,
+        "balance": 44667
+      },
+      {
+        "alias": "은호",
+        "paid": 0,
+        "shares": {
+          "P1": 16973,
+          "P2": 6250
+        },
+        "remainderFrom": [
+          "P1"
+        ],
+        "total": 23223,
+        "balance": -23223
+      },
+      {
+        "alias": "지안",
+        "paid": 25000,
+        "shares": {
+          "P1": 16972,
+          "P2": 6250
+        },
+        "remainderFrom": [],
+        "total": 23222,
+        "balance": 1778
+      },
+      {
+        "alias": "채원",
+        "paid": 0,
+        "shares": {
+          "P1": 16972,
+          "P2": 6250
+        },
+        "remainderFrom": [],
+        "total": 23222,
+        "balance": -23222
+      }
+    ],
+    "transfers": [
+      {
+        "from": "은호",
+        "to": "소율",
+        "amount": 23223
+      },
+      {
+        "from": "채원",
+        "to": "소율",
+        "amount": 21444
+      },
+      {
+        "from": "채원",
+        "to": "지안",
+        "amount": 1778
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

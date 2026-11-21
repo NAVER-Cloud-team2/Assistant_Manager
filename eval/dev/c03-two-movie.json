@@ -1,0 +1,159 @@
+{
+  "name": "명확: 두 명 영화",
+  "eventName": "주말 영화",
+  "roster": [
+    "도윤",
+    "시우"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "도윤",
+      "text": "영화 표 2장 28,000원 내가 결제했어"
+    },
+    {
+      "no": "02",
+      "speaker": "시우",
+      "text": "팝콘 같이 먹은 거 11,000원은 내가 냈어"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "도윤",
+      "amounts": [
+        28000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "시우",
+      "amounts": [
+        11000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "도윤",
+      "amount": 28000,
+      "item": "영화",
+      "split": [
+        "도윤",
+        "시우"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "시우",
+      "amount": 11000,
+      "item": "팝콘",
+      "split": [
+        "도윤",
+        "시우"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "영화",
+        "payer": "도윤",
+        "grossAmount": 28000,
+        "amount": 28000,
+        "split": [
+          "도윤",
+          "시우"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "팝콘",
+        "payer": "시우",
+        "grossAmount": 11000,
+        "amount": 11000,
+        "split": [
+          "도윤",
+          "시우"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "candidate"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "도윤",
+        "paid": 28000,
+        "shares": {
+          "P1": 14000,
+          "P2": 5500
+        },
+        "remainderFrom": [],
+        "total": 19500,
+        "balance": 8500
+      },
+      {
+        "alias": "시우",
+        "paid": 11000,
+        "shares": {
+          "P1": 14000,
+          "P2": 5500
+        },
+        "remainderFrom": [],
+        "total": 19500,
+        "balance": -8500
+      }
+    ],
+    "transfers": [
+      {
+        "from": "시우",
+        "to": "도윤",
+        "amount": 8500
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}

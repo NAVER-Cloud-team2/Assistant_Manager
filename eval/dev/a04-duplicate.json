@@ -1,0 +1,194 @@
+{
+  "name": "모호: 같은 결제 두 번",
+  "eventName": "저녁 모임",
+  "roster": [
+    "윤서",
+    "재민",
+    "시아"
+  ],
+  "masked": [
+    {
+      "no": "01",
+      "speaker": "윤서",
+      "text": "저녁 45,000원 내가 냈어 셋이"
+    },
+    {
+      "no": "02",
+      "speaker": "윤서",
+      "text": "저녁 45,000원 결제했어 셋이 먹은 거"
+    }
+  ],
+  "parsed": [
+    {
+      "no": "01",
+      "speaker": "윤서",
+      "amounts": [
+        45000
+      ]
+    },
+    {
+      "no": "02",
+      "speaker": "윤서",
+      "amounts": [
+        45000
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "payment",
+      "id": "P1",
+      "line": "01",
+      "payer": "윤서",
+      "amount": 45000,
+      "item": "저녁",
+      "split": [
+        "윤서",
+        "재민",
+        "시아"
+      ]
+    },
+    {
+      "type": "payment",
+      "id": "P2",
+      "line": "02",
+      "payer": "윤서",
+      "amount": 45000,
+      "item": "저녁",
+      "split": [
+        "윤서",
+        "재민",
+        "시아"
+      ]
+    }
+  ],
+  "resolution": {
+    "items": [
+      {
+        "id": "P1",
+        "name": "저녁",
+        "payer": "윤서",
+        "grossAmount": 45000,
+        "amount": 45000,
+        "split": [
+          "윤서",
+          "재민",
+          "시아"
+        ],
+        "evidence": [
+          "01"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      },
+      {
+        "id": "P2",
+        "name": "저녁",
+        "payer": "윤서",
+        "grossAmount": 45000,
+        "amount": 45000,
+        "split": [
+          "윤서",
+          "재민",
+          "시아"
+        ],
+        "evidence": [
+          "02"
+        ],
+        "confirmations": [],
+        "status": "candidate"
+      }
+    ],
+    "questions": [
+      {
+        "id": "Q-duplicate-02",
+        "kind": "duplicate",
+        "line": "02",
+        "prompt": "같은 결제인가요?",
+        "options": [
+          {
+            "value": "P1",
+            "label": "저녁"
+          },
+          {
+            "value": "P2",
+            "label": "저녁"
+          }
+        ]
+      }
+    ],
+    "blockers": [],
+    "lineStatus": {
+      "01": "candidate",
+      "02": "needs_check"
+    }
+  },
+  "settlement": {
+    "people": [
+      {
+        "alias": "윤서",
+        "paid": 45000,
+        "shares": {
+          "P1": 15000
+        },
+        "remainderFrom": [],
+        "total": 15000,
+        "balance": 30000
+      },
+      {
+        "alias": "재민",
+        "paid": 0,
+        "shares": {
+          "P1": 15000
+        },
+        "remainderFrom": [],
+        "total": 15000,
+        "balance": -15000
+      },
+      {
+        "alias": "시아",
+        "paid": 0,
+        "shares": {
+          "P1": 15000
+        },
+        "remainderFrom": [],
+        "total": 15000,
+        "balance": -15000
+      }
+    ],
+    "transfers": [
+      {
+        "from": "재민",
+        "to": "윤서",
+        "amount": 15000
+      },
+      {
+        "from": "시아",
+        "to": "윤서",
+        "amount": 15000
+      }
+    ],
+    "checks": [
+      {
+        "name": "항목별 부담 합 = 항목 금액",
+        "ok": true
+      },
+      {
+        "name": "전체 부담 합 = 전체 순결제액",
+        "ok": true
+      },
+      {
+        "name": "잔액 합 = 0",
+        "ok": true
+      },
+      {
+        "name": "송금 반영 후 모두 0",
+        "ok": true
+      },
+      {
+        "name": "모든 금액이 정수",
+        "ok": true
+      }
+    ]
+  }
+}
