@@ -25,6 +25,26 @@
   display: grid;
   gap: 8px;
 }
+.amount {
+  display: grid;
+  gap: 6px;
+}
+/* 대화에 나온 금액 고르기 */
+.picks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.pick {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--field);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
 
 /* 대화 한 줄: 왼쪽에 발언, 오른쪽에 그 줄에 할 수 있는 일 */
 .line {
@@ -62,6 +82,22 @@
   gap: 4px 14px;
   margin-top: 4px;
   font-size: 13px;
+}
+/* 이 줄에서 읽어 낸 항목 하나: 이름·금액, 결제한 사람·나눈 사람, 고치기 */
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 10px;
+  font-size: 13px;
+}
+.itemInfo {
+  color: var(--pencil);
+}
+/* 줄 오른쪽의 버튼들 (놓친 금액 줄은 두 개) */
+.actions {
+  display: grid;
+  justify-items: end;
 }
 .needsCheck .status {
   color: var(--ink);
@@ -138,6 +174,17 @@
 }
 .chip input:focus-visible {
   outline: none;
+}
+/* 일부 금액을 따로 나누기: 안쪽으로 들여 쓴 묶음 */
+.part {
+  display: grid;
+  gap: 12px;
+  padding-left: 12px;
+  border-left: 3px double var(--rule-strong);
+}
+.partSum {
+  white-space: normal;
+  font-size: 14px;
 }
 .formActions {
   display: grid;
