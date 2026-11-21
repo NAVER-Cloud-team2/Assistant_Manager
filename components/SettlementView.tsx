@@ -12,9 +12,28 @@ const STATUS_LABEL: Record<Item["status"], string> = {
   manual: "직접 입력",
 };
 
-function confirmationLabel(c: string): string {
-  return c.startsWith("Q-") || c.startsWith("q") ? `총무 답변 (${c})` : `총무 확인 (${c})`;
+const QUESTION_KIND: Record<string, string> = {
+  target: "어느 결제",
+  split: "금액 나누기",
+  refund: "환불",
+  duplicate: "중복",
+};
+
+/** 정리기가 남긴 확인 표시(Q-{kind}-{줄}, manual) → 화면 문구. 직접 입력은 따로 표시하므로 null */
+function confirmationLabel(c: string): string | null {
+  if (c === "manual") return null;
+  const m = /^Q-([a-z]+)-(.+)$/.exec(c);
+  if (m) return `총무가 답한 질문: ${QUESTION_KIND[m[1]] ?? m[1]} (${m[2]}줄)`;
+  return `총무 확인 (${c})`;
 }
+
+const OUT_OF_SCOPE_LABEL: Record<string, string> = {
+  foreign_currency: "외화",
+  prepaid: "선입금",
+  partial_refund: "부분 환불",
+  joint_payment: "공동 결제",
+  other: "자동 계산 범위 밖",
+};
 
 /** 항목 하나의 근거: 원 발언·정정 발언 줄과 총무 확인값 */
 function ItemEvidence({ item, lines }: { item: Item; lines: Map<LineNo, MaskedLine> }) {
@@ -54,11 +73,12 @@ function ItemEvidence({ item, lines }: { item: Item; lines: Map<LineNo, MaskedLi
       ) : (
         <p className="muted">근거 줄 없음</p>
       )}
-      {item.confirmations.length > 0 && (
+      {item.confirmations.some((c) => confirmationLabel(c)) && (
         <ul className="confirms">
-          {item.confirmations.map((c) => (
-            <li key={c}>✔ {confirmationLabel(c)}</li>
-          ))}
+          {item.confirmations.map((c) => {
+            const t = confirmationLabel(c);
+            return t ? <li key={c}>✔ {t}</li> : null;
+          })}
         </ul>
       )}
       {item.status === "manual" && <p className="muted">총무가 직접 넣은 항목 · 확인자: 총무</p>}
@@ -118,6 +138,8 @@ export function SettlementView({ draft }: { draft: Draft }) {
   const { resolution, settlement } = draft;
   const lines = new Map(draft.lines.map((l) => [l.no, l]));
   const failedChecks = settlement?.checks.filter((c) => !c.ok) ?? [];
+  const outOfScope = resolution.blockers.filter((b) => b.reason in OUT_OF_SCOPE_LABEL);
+  const invalid = resolution.blockers.filter((b) => b.reason === "invalid_item");
 
   return (
     <>
@@ -128,9 +150,15 @@ export function SettlementView({ draft }: { draft: Draft }) {
           <strong>아직 발행할 수 없어요</strong>
           <ul>
             {resolution.questions.length > 0 && <li>답하지 않은 질문 {resolution.questions.length}건 (검토 화면)</li>}
-            {resolution.blockers.length > 0 && (
+            {outOfScope.length > 0 && (
               <li>
-                수동 정산이 필요한 줄 {resolution.blockers.map((b) => b.line).join(", ")}
+                수동 정산이 필요한 줄:{" "}
+                {outOfScope.map((b) => `${b.line}줄(${OUT_OF_SCOPE_LABEL[b.reason] ?? b.reason})`).join(", ")}
+              </li>
+            )}
+            {invalid.length > 0 && (
+              <li>
+                정보가 부족한 항목: {invalid.map((b) => (b.line ? `${b.line}줄` : "직접 입력")).join(", ")} (검토 화면)
               </li>
             )}
             {failedChecks.map((c) => (

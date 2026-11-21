@@ -241,7 +241,11 @@ export function PublishPanel({
               ))}
             </ul>
           ) : (
-            <p className={s.note}>이미 공유했거나 잘 모른다고 해서, 다시 송금하라는 안내는 넣지 않았어요.</p>
+            <p className={s.note}>
+              {version.n === 1
+                ? "이미 공유했거나 잘 모른다고 해서, 송금안 대신 사람별 받을 돈·보낼 돈만 넣었어요."
+                : "이미 공유했거나 잘 모른다고 해서, 다시 송금하라는 안내 없이 바뀐 금액만 넣었어요."}
+            </p>
           )}
 
           {!resultUrl && (
