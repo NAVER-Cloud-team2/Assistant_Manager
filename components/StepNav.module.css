@@ -1,75 +1,87 @@
-/* 총무 화면 단계 이동(결재란) — 담당: C */
-.steps {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  margin: 14px var(--pad) 0;
-  border: 1px solid var(--rule-strong);
+/* 총무 화면 아래의 탭 막대 — 담당: C. 떠 있는 유리 막대 */
+.bar {
+  position: fixed;
+  z-index: 30;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--glass);
+  box-shadow:
+    var(--shadow-float),
+    inset 0 0.5px 0 var(--glass-edge),
+    0 0 0 0.5px rgb(0 0 0 / 0.06);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  backdrop-filter: saturate(180%) blur(24px);
+  transform: translateX(-50%);
 }
-.step {
+.tab {
   display: grid;
-  grid-template-rows: auto 32px;
-  border-left: 1px solid var(--rule-strong);
-  color: var(--pencil);
-  font-size: 13px;
-  text-align: center;
+  justify-items: center;
+  gap: 1px;
+  min-width: 74px;
+  padding: 6px 12px 5px;
+  border-radius: 999px;
+  color: var(--label);
   text-decoration: none;
-}
-.step:first-child {
-  border-left: 0;
-}
-.step:focus-visible {
-  outline-offset: -2px;
-}
-.label {
-  padding: 5px 0;
-  border-bottom: 1px solid var(--rule-strong);
   transition:
-    background-color 160ms ease,
-    color 160ms ease;
+    background-color 220ms ease,
+    color 220ms ease;
 }
-.mark {
-  display: grid;
-  place-items: center;
-}
-.mark svg {
-  width: 18px;
-  height: 18px;
+.tab[aria-current="page"] {
+  background: rgb(0 0 0 / 0.06);
   color: var(--blue);
 }
-.step[aria-current="page"] {
-  color: var(--ink);
-  font-weight: 700;
+.tab:focus-visible {
+  outline-offset: -2px;
 }
-.step[aria-current="page"] .label {
-  background: var(--ink);
-  color: var(--paper);
-}
-.count {
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: 11px;
-  background: var(--marker);
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 22px;
-}
-.seal {
+.icon {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 26px;
+  width: 28px;
   height: 26px;
-  border: 2px solid var(--seal);
-  border-radius: 50%;
-  color: var(--seal);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1;
-  transform: rotate(-7deg);
+}
+.icon svg {
+  width: 24px;
+  height: 24px;
+}
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -10px;
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+}
+/* 발행한 판: 작은 빨간 확정 표시 */
+.version {
+  position: absolute;
+  top: -6px;
+  right: -18px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff6b57, #e0173d);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.5;
+  white-space: nowrap;
 }
 @media (hover: hover) and (pointer: fine) {
-  .step:hover {
-    color: var(--ink);
+  .tab:hover:not([aria-current="page"]) {
+    background: rgb(0 0 0 / 0.04);
+  }
+}
+@media (max-width: 360px) {
+  .tab {
+    min-width: 64px;
+    padding-inline: 8px;
   }
 }

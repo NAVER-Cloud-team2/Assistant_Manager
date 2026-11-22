@@ -1,62 +1,100 @@
 /* S3 검토 — 담당: C (공통 모양은 app/globals.css, 이 화면에만 쓰는 것만 여기 둔다) */
-.verdict {
-  display: grid;
+.legend {
+  display: flex;
+  align-items: center;
   gap: 6px;
 }
-.next {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 16px;
-  margin-top: 4px;
+.legend svg {
+  width: 14px;
+  height: 14px;
+}
+/* AI가 뽑은 값의 반짝이 */
+.ai {
+  color: #af52de;
+}
+.error {
+  margin-top: 12px;
 }
 
 /* 질문 한 건 */
 .q {
   display: grid;
-  gap: 8px;
-  padding-top: 13px;
-  padding-bottom: 16px;
+  gap: 12px;
+}
+.q + .q {
+  margin-top: 12px;
+}
+.qHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.quote {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--label-2);
+  font-size: 15px;
+}
+.quote b {
+  margin-right: 4px;
+  color: var(--label);
+  font-weight: 600;
 }
 .prompt {
-  font-weight: 700;
-}
-.options {
-  display: grid;
-  gap: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 .amount {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
-/* 대화에 나온 금액 고르기 */
+.fieldLabel {
+  flex: none;
+  min-width: 5.5em;
+}
+.alignEnd {
+  text-align: right;
+}
 .picks {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
-.pick {
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--rule-strong);
-  border-radius: 4px;
-  background: var(--field);
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
+.err {
+  color: var(--red-text);
+  font-size: 15px;
+}
+.q :global(.actions) {
+  margin-top: 2px;
 }
 
-/* 대화 한 줄: 왼쪽에 발언, 오른쪽에 그 줄에 할 수 있는 일 */
+/* 대화 한 줄: 왼쪽 번호 · 말한 사람과 말 · 읽어 낸 항목 · 이 줄에 할 수 있는 일 */
+.lines {
+  --inset: 52px;
+}
 .line {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: center;
+  align-items: flex-start;
+  padding-block: 13px;
   /* 대화가 300줄까지 올 수 있다: 화면 밖의 줄은 그리지 않는다 */
   content-visibility: auto;
-  contain-intrinsic-size: auto 76px;
+  contain-intrinsic-size: auto 96px;
+}
+.no {
+  flex: none;
+  width: 24px;
+  padding-top: 2px;
+  color: var(--label-3);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 .said {
+  display: grid;
+  flex: 1;
+  gap: 4px;
   min-width: 0;
 }
 .meta {
@@ -64,48 +102,65 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: 2px 8px;
-  font-size: 14px;
 }
 .who {
+  font-size: 15px;
   font-weight: 600;
 }
 .status {
+  color: var(--label-3);
   font-size: 13px;
-  color: var(--pencil);
+}
+/* 이 줄에 할 수 있는 한 가지: 오른쪽 위의 작은 파랑 글씨 */
+.lineAction {
+  /* 보이는 크기는 작게, 누르는 자리는 44px로 */
+  min-height: 44px;
+  margin: -12px -6px -12px auto;
+  padding: 0 6px 0 12px;
+  font-size: 14px;
 }
 .text {
   overflow-wrap: anywhere;
+  font-size: 16px;
+  line-height: 1.45;
 }
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  margin-top: 4px;
-  font-size: 13px;
-}
-/* 이 줄에서 읽어 낸 항목 하나: 이름·금액, 결제한 사람·나눈 사람, 고치기 */
 .item {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 10px;
-  font-size: 13px;
+  gap: 2px 10px;
+  margin-top: 2px;
+}
+.item :global(.chip) {
+  font-size: 14px;
 }
 .itemInfo {
-  color: var(--pencil);
+  color: var(--label-2);
+  font-size: 13px;
 }
-/* 줄 오른쪽의 버튼들 (놓친 금액 줄은 두 개) */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
 .actions {
-  display: grid;
-  justify-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.actions :global(.pill) svg {
+  width: 13px;
+  height: 13px;
 }
 .needsCheck .status {
-  color: var(--ink);
+  color: var(--orange-text);
   font-weight: 600;
 }
 .notSettlement .who,
 .notSettlement .text {
-  color: var(--pencil);
+  color: var(--label-2);
   font-weight: 400;
 }
 /* 확인이 필요한 줄에 형광펜이 한 번 그어진다 */
@@ -114,7 +169,7 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .sweep {
-    animation: sweep 420ms var(--ease-out) both;
+    animation: sweep 480ms var(--ease-out) both;
   }
 }
 @keyframes sweep {
@@ -126,68 +181,37 @@
   }
 }
 
-/* 직접 항목 추가 */
-.manual {
-  scroll-margin-top: 12px;
-  border-top: 1px solid var(--rule-strong);
-  border-bottom: 1px solid var(--rule-strong);
-  background: var(--paper-2);
-}
-.formTitle {
-  font-size: 16px;
-  line-height: 1.4;
-}
-.chips {
+/* 총무가 확인한 것 */
+.confirmed {
   display: flex;
-  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 8px;
-  margin-top: 6px;
+  font-size: 15px;
 }
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 14px 0 12px;
-  border: 1px solid var(--rule-strong);
-  border-radius: 4px;
-  background: var(--field);
-  cursor: pointer;
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease;
+.confirmed svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  color: var(--green);
 }
-.chip input {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  accent-color: var(--blue);
-}
-.chipOn {
-  border-color: var(--blue);
-  background: var(--blue-wash);
-  box-shadow: inset 0 0 0 1px var(--blue);
-}
-.chip:focus-within {
-  outline: 2px solid var(--blue);
-  outline-offset: 2px;
-}
-.chip input:focus-visible {
-  outline: none;
-}
-/* 일부 금액을 따로 나누기: 안쪽으로 들여 쓴 묶음 */
-.part {
+
+/* 직접 항목 추가·고치기 시트 */
+.manual {
   display: grid;
-  gap: 12px;
-  padding-left: 12px;
-  border-left: 3px double var(--rule-strong);
+}
+.manual > :global(.card) {
+  margin-top: 4px;
+}
+.manual :global(.section):first-of-type {
+  margin-top: 16px;
+}
+.save {
+  font-weight: 600;
 }
 .partSum {
   white-space: normal;
-  font-size: 14px;
 }
-.formActions {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 8px;
+.formErr {
+  margin-top: 16px;
 }

@@ -1,12 +1,39 @@
 /* S2 붙여넣기 — 담당: C (공통 모양은 app/globals.css, 이 화면에만 쓰는 것만 여기 둔다) */
-.fine {
-  font-size: 14px;
-}
-.map {
+/* 고지: 아이콘 + 한 줄 설명 (애플 개인정보 안내처럼) */
+.notice {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-  gap: 10px;
-  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.notice li {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.noticeIcon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--blue-wash);
+  color: var(--blue);
+}
+.noticeIcon svg {
+  width: 18px;
+  height: 18px;
+}
+.agree {
+  margin-top: 12px;
+}
+.agree :global(.cell-sub) {
+  margin-top: 2px;
+}
+.paste {
+  margin-inline: var(--side);
 }
 .realName {
   overflow: hidden;
@@ -14,16 +41,31 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.gap {
+  margin-top: 12px;
+}
+
+/* 보낼 줄: 왼쪽 번호 · 말한 사람과 말 · 빼기 */
+.lines {
+  --inset: 52px;
+}
 .line {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: center;
+  align-items: flex-start;
   /* 대화가 300줄까지 올 수 있다: 화면 밖의 줄은 그리지 않는다 */
   content-visibility: auto;
   contain-intrinsic-size: auto 72px;
 }
+.no {
+  flex: none;
+  width: 24px;
+  padding-top: 2px;
+  color: var(--label-3);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
 .said {
+  flex: 1;
   min-width: 0;
 }
 .who {
@@ -31,15 +73,19 @@
   font-weight: 600;
 }
 .pick {
-  margin-bottom: 6px;
+  max-width: none;
+  margin-left: -4px;
+  text-align: left;
+  text-align-last: left;
 }
 .text {
   overflow-wrap: anywhere;
+  font-size: 16px;
 }
-/* 뺀 줄: 빨강 펜으로 그은 줄 */
+/* 뺀 줄: 빨간 줄로 긋는다 */
 .out .who,
 .out .text {
-  color: var(--pencil);
+  color: var(--label-3);
 }
 .out .text {
   text-decoration: line-through;

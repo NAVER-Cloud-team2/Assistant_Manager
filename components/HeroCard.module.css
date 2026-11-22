@@ -1,0 +1,268 @@
+/* 첫 화면의 휴대폰 두 대 — 담당: C. 처음 열 때 한 번: 휴대폰이 올라오고, 확정 표시가 찍힌다 */
+.stage {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 0;
+  padding-top: 24px;
+}
+/* 휴대폰 뒤에 깔리는 부드러운 빛 (표지 색에서 번진다) */
+.stage::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 8%;
+  width: min(120%, 760px);
+  aspect-ratio: 1.3;
+  background: radial-gradient(closest-side, rgb(255 98 115 / 0.22), rgb(138 107 255 / 0.12) 55%, transparent);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.back {
+  display: none;
+}
+.front {
+  position: relative;
+  z-index: 2;
+}
+.phoneFront {
+  --w: 300px;
+  --zoom: 0.713;
+}
+.phoneBack {
+  --w: 276px;
+  --zoom: 0.651;
+}
+
+/* 뒤 휴대폰: 총무의 검토 화면 */
+.nav {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 20px;
+}
+:global(.largetitle) .lt {
+  color: var(--label);
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+.lines {
+  --inset: 52px;
+}
+.line {
+  align-items: flex-start;
+}
+.no {
+  flex: none;
+  width: 24px;
+  padding-top: 2px;
+  color: var(--label-3);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.said {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  flex: 1;
+  font-size: 16px;
+}
+.said b {
+  font-size: 15px;
+}
+.dim {
+  color: var(--label-2);
+}
+.ai {
+  color: #af52de;
+}
+.tabbar {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  display: flex;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--glass);
+  box-shadow:
+    var(--shadow-float),
+    0 0 0 0.5px rgb(0 0 0 / 0.06);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  backdrop-filter: saturate(180%) blur(24px);
+  transform: translateX(-50%);
+}
+.tab {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  min-width: 76px;
+  padding: 6px 12px 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tabOn {
+  background: rgb(0 0 0 / 0.06);
+  color: var(--blue);
+}
+.tabIcon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 26px;
+}
+.tabIcon svg {
+  width: 24px;
+  height: 24px;
+}
+.tabBadge {
+  position: absolute;
+  top: -4px;
+  right: -10px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* 앞 휴대폰: 결과 링크 */
+.cover {
+  position: relative;
+  margin-top: -54px;
+  padding: 74px 20px 30px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 130% at 0% 0%, #ff9a62 0%, transparent 55%),
+    radial-gradient(110% 120% at 100% 10%, #ff4f8b 0%, transparent 58%),
+    radial-gradient(140% 120% at 60% 110%, #8a6bff 0%, transparent 62%),
+    #ff6273;
+  color: #fff;
+}
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(170deg, rgb(255 255 255 / 0.26), transparent 45%);
+  pointer-events: none;
+}
+.kicker {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.kicker svg {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.7);
+}
+.title {
+  position: relative;
+  z-index: 1;
+  margin-top: 22px;
+  padding-right: 104px;
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.024em;
+}
+.until {
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+  padding-right: 104px;
+  font-size: 15px;
+  opacity: 0.92;
+}
+.seal {
+  position: absolute;
+  z-index: 1;
+  right: 18px;
+  bottom: 18px;
+}
+.alias {
+  font-size: 17px;
+  font-weight: 600;
+}
+.balance {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* 넓은 화면: 두 대를 겹쳐 비스듬히 */
+@media (min-width: 760px) {
+  .stage {
+    padding-top: 40px;
+  }
+  .back {
+    display: block;
+    z-index: 1;
+    margin-right: -64px;
+    margin-bottom: 56px;
+    transform: rotate(-7deg);
+  }
+  .front {
+    transform: rotate(2.5deg);
+  }
+  .phoneFront {
+    --w: 330px;
+    --zoom: 0.79;
+  }
+}
+@media (min-width: 1100px) {
+  .phoneFront {
+    --w: 350px;
+    --zoom: 0.841;
+  }
+  .phoneBack {
+    --w: 300px;
+    --zoom: 0.713;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .front {
+    animation: rise 1000ms 80ms var(--ease) both;
+  }
+  .back {
+    animation: slide 1000ms 260ms var(--ease) both;
+  }
+  .stage::before {
+    animation: glow 1400ms 200ms ease-out both;
+  }
+  /* 휴대폰이 자리를 잡은 뒤 확정 표시가 찍힌다 (Seal의 stamp 동작을 늦춘다) */
+  .cover .seal {
+    animation-delay: 900ms;
+  }
+  .cover .seal [data-check] {
+    animation-delay: 1160ms;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 80px;
+  }
+}
+@keyframes slide {
+  from {
+    opacity: 0;
+    translate: -48px 40px;
+  }
+}
+@keyframes glow {
+  from {
+    opacity: 0;
+  }
+}
