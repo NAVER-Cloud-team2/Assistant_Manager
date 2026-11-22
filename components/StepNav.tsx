@@ -1,9 +1,9 @@
 /**
- * 총무 화면 단계 이동 — 담당: C
- * 결재란 모양. 칸마다 지금 상태를 찍는다: 끝난 단계는 체크, 확인할 것이 남으면 개수, 발행했으면 판 번호 도장.
+ * 총무 화면 아래의 탭 막대 — 담당: C
+ * 애플 앱처럼 화면 아래에 떠 있는 유리 막대. 확인할 것이 남으면 검토 탭에 빨간 숫자를, 발행했으면 발행 탭에 판 번호를 단다.
  */
 import Link from "next/link";
-import { IconCheck } from "./icons";
+import { IconTabChat, IconTabReview, IconTabSend, IconTabTable } from "./icons";
 import s from "./StepNav.module.css";
 
 export interface StepState {
@@ -17,56 +17,46 @@ export interface StepState {
 }
 
 const STEPS = [
-  { href: "paste", label: "붙여넣기" },
-  { href: "", label: "검토" },
-  { href: "table", label: "정산표" },
-  { href: "publish", label: "발행" },
+  { href: "paste", label: "대화", Icon: IconTabChat },
+  { href: "", label: "검토", Icon: IconTabReview },
+  { href: "table", label: "정산", Icon: IconTabTable },
+  { href: "publish", label: "발행", Icon: IconTabSend },
 ] as const;
 
 export type StepHref = (typeof STEPS)[number]["href"];
 
-function Mark({ step, state }: { step: StepHref; state: StepState }) {
-  const done = (
-    <>
-      <IconCheck />
-      <span className="sr">끝남</span>
-    </>
-  );
-  if (step === "paste") return state.pasted ? done : null;
-  if (step === "") {
-    if (!state.pasted) return null;
-    if (state.todo > 0)
-      return (
-        <span className={s.count}>
-          {state.todo}
-          <span className="sr">개 확인 필요</span>
-        </span>
-      );
-    return state.publishable ? done : null;
-  }
-  if (step === "table") return state.publishable ? done : null;
-  return state.published ? (
-    <span className={s.seal}>
-      {state.published}
-      <span className="sr">판 발행함</span>
-    </span>
-  ) : null;
+function Badge({ step, state }: { step: StepHref; state: StepState }) {
+  if (step === "" && state.pasted && state.todo > 0)
+    return (
+      <span className={`badge ${s.badge}`}>
+        {state.todo}
+        <span className="sr">개 확인 필요</span>
+      </span>
+    );
+  if (step === "publish" && state.published)
+    return (
+      <span className={s.version}>
+        {state.published}판<span className="sr"> 발행함</span>
+      </span>
+    );
+  return null;
 }
 
 export function StepNav({ token, current, state }: { token: string; current: StepHref; state: StepState }) {
   return (
-    <nav className={s.steps} aria-label="총무 화면 단계">
-      {STEPS.map((t) => (
+    <nav className={s.bar} aria-label="총무 화면 단계">
+      {STEPS.map(({ href, label, Icon }) => (
         <Link
-          key={t.label}
-          className={s.step}
-          href={`/m/${token}${t.href ? `/${t.href}` : ""}`}
-          aria-current={t.href === current ? "page" : undefined}
+          key={label}
+          className={s.tab}
+          href={`/m/${token}${href ? `/${href}` : ""}`}
+          aria-current={href === current ? "page" : undefined}
         >
-          <span className={s.label}>{t.label}</span>
-          <span className={s.mark}>
-            <Mark step={t.href} state={state} />
+          <span className={s.icon}>
+            <Icon />
+            <Badge step={href} state={state} />
           </span>
+          <span className={s.label}>{label}</span>
         </Link>
       ))}
     </nav>

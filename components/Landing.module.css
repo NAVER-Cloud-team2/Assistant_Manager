@@ -1,43 +1,295 @@
-/* S1 첫 화면 — 담당: C */
-.top {
-  padding: 18px 20px 28px;
+/*
+ * S1 첫 화면 — 담당: C. 애플 제품 소개 페이지처럼: 흰 바탕과 옅은 회색 바탕이 번갈아 나오고, 제목이 크다.
+ * 스스로 움직이는 것은 처음 열 때 한 번(제목이 떠오르고 휴대폰이 올라와 확정 표시가 찍힘)뿐이다.
+ */
+.landing {
+  overflow-x: clip;
+  background: #fbfbfd;
 }
-.brand {
-  font-size: 15px;
-  font-weight: 700;
+
+/* 위에 떠 있는 유리 막대 */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 0.5px solid rgb(0 0 0 / 0.08);
+  background: rgb(251 251 253 / 0.72);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
 }
+.navInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(100% - 32px, 1080px);
+  height: 52px;
+  margin-inline: auto;
+}
+
+/* 첫 화면 */
 .hero {
-  margin-top: 28px;
-  font-size: clamp(30px, 8.4vw, 44px);
-  line-height: 1.2;
+  padding: 52px 20px 72px;
+  text-align: center;
+}
+.headline {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 10.6vw, 80px);
+  line-height: 1.08;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.035em;
 }
 .lede {
-  max-width: 34em;
-  margin-top: 12px;
-  color: var(--pencil);
+  max-width: 30em;
+  margin: 18px auto 0;
+  color: var(--label-2);
+  font-size: clamp(17px, 2.3vw, 21px);
+  line-height: 1.45;
 }
-/* 행사 만들기: 장부 한 장. 화면 맨 아래까지 늘어나지 않게 한다 */
-.create {
-  flex: none;
-  padding-bottom: 20px;
-  border-top: 1px solid var(--rule-strong);
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 26px;
+  margin-top: 28px;
 }
-.close {
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 44px;
+  color: var(--blue-text);
+  font-size: 17px;
+}
+.more svg {
+  width: 13px;
+  height: 13px;
+  margin-top: 1px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .headline,
+  .lede,
+  .actions {
+    animation: lift 800ms var(--ease) both;
+  }
+  .lede {
+    animation-delay: 80ms;
+  }
+  .actions {
+    animation-delay: 140ms;
+  }
+}
+@keyframes lift {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+}
+
+/* 섹션 제목 */
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 7.4vw, 56px);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* 믿고 쓸 수 있는 이유: 크기가 다른 타일 넷 */
+.features {
+  padding: 96px 16px;
+  background: #fff;
+  text-align: center;
+}
+.bento {
   display: grid;
-  gap: 18px;
-  padding: 36px 20px 64px;
-  border-top: 1px solid var(--rule-strong);
+  gap: 16px;
+  width: min(100%, 1080px);
+  margin: 44px auto 0;
+  text-align: left;
 }
-.closeTitle {
-  font-size: 22px;
+.tile {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 24px 24px 30px;
+  border-radius: 28px;
+  background: #f5f5f7;
+}
+.tile h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 21px;
   line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.tile h3 svg {
+  width: 22px;
+  height: 22px;
+  color: var(--blue);
+}
+.tile > p {
+  color: var(--label-2);
+  font-size: 17px;
+}
+.visual {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  min-height: 168px;
+  margin-bottom: 14px;
+  padding: 20px;
+  border-radius: 20px;
+  background: #fff;
+}
+.maskDemo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(19px, 4.6vw, 24px);
+}
+.blurred {
+  color: var(--label-2);
+  filter: blur(3.5px);
+}
+.arrow {
+  width: 16px;
+  height: 16px;
+  color: var(--label-3);
+}
+.maskDemo b {
+  font-weight: 700;
+}
+.bigNum {
+  font-family: var(--font-display);
+  font-size: 46px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.cites {
+  display: flex;
+  gap: 6px;
+}
+.calc {
+  color: var(--label-2);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.split {
+  display: flex;
+  gap: 10px;
+  color: var(--label-3);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.split b {
+  color: var(--blue-text);
+}
+.linkDemo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--label-2);
+  font-size: 17px;
+}
+.linkDemo svg {
+  width: 18px;
+  height: 18px;
+}
+@media (min-width: 760px) {
+  .bento {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .wide {
+    grid-column: span 2;
+  }
+}
+
+/* 행사 만들기 */
+.create {
+  padding: 96px 0 112px;
+  background: #f5f5f7;
+}
+.createGrid {
+  display: grid;
+  gap: 36px;
+  width: min(100% - 32px, 1080px);
+  margin-inline: auto;
+}
+.createCopy {
+  padding-inline: 4px;
+}
+.createLede {
+  margin-top: 16px;
+  color: var(--label-2);
+  font-size: 19px;
+  line-height: 1.45;
+}
+.facts {
+  display: grid;
+  gap: 14px;
+  margin-top: 26px;
 }
 .facts li {
-  padding: 11px 0;
-  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 17px;
 }
-.facts li:first-child {
-  border-top: 1px solid var(--rule-strong);
+.facts svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  color: var(--green);
+}
+/* 폼은 iOS 시트처럼: 좁은 화면은 양옆 끝까지, 넓은 화면은 떠 있는 카드 */
+.formCard {
+  margin-inline: -16px;
+  overflow: hidden;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -12px 40px rgb(0 0 0 / 0.08);
+}
+@media (min-width: 960px) {
+  .createGrid {
+    grid-template-columns: minmax(0, 1fr) 520px;
+    align-items: start;
+    gap: 80px;
+  }
+  .createCopy {
+    position: sticky;
+    top: 110px;
+  }
+  .formCard {
+    margin-inline: 0;
+    border-radius: 28px;
+    box-shadow:
+      0 0 0 0.5px rgb(0 0 0 / 0.06),
+      0 30px 60px -30px rgb(0 0 0 / 0.28);
+  }
+}
+
+.footer {
+  display: grid;
+  gap: 4px;
+  padding: 28px 20px 44px;
+  border-top: 0.5px solid rgb(0 0 0 / 0.08);
+  background: #f5f5f7;
+  color: var(--label-2);
+  font-size: 13px;
+  text-align: center;
+}
+.footer p:first-child {
+  color: var(--label);
+  font-weight: 600;
 }

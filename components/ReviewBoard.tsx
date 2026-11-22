@@ -5,17 +5,19 @@
  * 줄 번호 붙은 발언을 ‘확정 후보 / 확인 필요 / 정산 외’로 표시, 질문 카드, 직접 항목 추가, 줄 분류 바꾸기.
  * 총무의 답·직접 입력은 확인값으로 저장되고 AI 사건보다 우선한다. 저장할 때마다 서버가 다시 정리·계산한다.
  *
- * 표시: 연필(점선) = AI가 뽑은 값, 형광펜 = 확인 필요, 파랑 펜 = 총무가 확인한 값. 여백의 번호는 대화의 줄 번호다.
+ * 표시: 반짝이(✦) = AI가 뽑은 값, 노랑 형광 = 확인 필요, 초록 체크 = 총무가 확인한 값. 왼쪽 번호는 대화의 줄 번호다.
+ * 직접 항목 추가·항목 고치기는 아래에서 올라오는 시트에서 한다.
  */
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ADMIN_HEADER, type AnswersRequest, type ApiError } from "@/lib/api";
 import { parseLines } from "@/lib/parse";
 import type { Alias, Answer, Blocker, Draft, Item, LineStatus, ManualItem, MaskedLine, Question } from "@/lib/types";
-import { scrollBehavior, won } from "./format";
-import { IconCheck } from "./icons";
+import { won } from "./format";
+import { IconCheck, IconCheckCircle, IconPlus, IconSparkle, IconWarn } from "./icons";
 import s from "./ReviewBoard.module.css";
+import { Sheet } from "./Sheet";
 
 type Overrides = Record<string, "candidate" | "not_settlement">;
 export interface Confirm {
@@ -165,7 +167,7 @@ export function ReviewBoard({
       }
       setDraft(data);
       setConfirm(next);
-      router.refresh(); // 위쪽 단계 메뉴의 남은 개수·체크를 새 초안에 맞춘다
+      router.refresh(); // 아래 탭 막대의 남은 개수를 새 초안에 맞춘다
       return true;
     } catch {
       setError("인터넷 연결을 확인하고 다시 해 주세요.");
@@ -218,7 +220,7 @@ export function ReviewBoard({
     return it ? it.name : (ANSWER_LABEL[v] ?? v);
   };
 
-  /** 정산 외 줄을 근거로 직접 입력 폼 열기 (말한 사람이 명단에 있으면 결제한 사람으로, 읽힌 금액이 있으면 금액으로 미리 채움) */
+  /** 정산 외 줄을 근거로 직접 입력 시트 열기 (말한 사람이 명단에 있으면 결제한 사람으로, 읽힌 금액이 있으면 금액으로 미리 채움) */
   const [prefill, setPrefill] = useState<FormPrefill | null>(null);
   const addFromLine = (no: string, speaker: string | null) =>
     setPrefill((p) => ({
@@ -229,11 +231,11 @@ export function ReviewBoard({
       partLine: missedLines.find((x) => x !== no) ?? "",
       fix: null,
     }));
-  /** 항목 고치기: AI(또는 직접 입력)가 만든 항목의 값으로 폼을 채워 연다 */
+  /** 항목 고치기: AI(또는 직접 입력)가 만든 항목의 값으로 시트를 채워 연다 */
   const fixItem = (it: Item) => {
     const manualIndex = it.status === "manual" ? Number(it.id.slice(1)) - 1 : undefined;
     const lines = [...new Set(it.evidence)];
-    // 같은 줄에서 나온 다른 항목은 그 줄을 정산 외로 돌리면 함께 사라진다 → 폼에서 미리 알린다
+    // 같은 줄에서 나온 다른 항목은 그 줄을 정산 외로 돌리면 함께 사라진다 → 시트에서 미리 알린다
     const alsoRemoved =
       manualIndex !== undefined
         ? []
@@ -269,92 +271,77 @@ export function ReviewBoard({
   return (
     <>
       {/* 상태 요약 */}
-      <div className="blk status">
-        {draft.aiFailed ? (
-          <>
-            <p>
-              <b>AI 분석에 실패했어요.</b>
+      <section className="section" aria-live="polite">
+        {draft.aiFailed && (
+          <div className="card err">
+            <p className="card-title">
+              <IconWarn />
+              AI 분석에 실패했어요
             </p>
-            <p className="note">아래 ‘직접 항목 추가’로 결제를 넣어 주세요. 붙여넣은 대화는 근거로 고를 수 있어요.</p>
-          </>
-        ) : (
-          draft.aiDraft && (
-            <p className="note">
-              <span className="pencil">AI 추출 초안</span> · 연필 글씨는 AI가 뽑은 값이에요. 확인한 뒤 발행해요.
-            </p>
-          )
+            <p className="small">아래 ‘직접 항목 추가’로 결제를 넣어 주세요. 붙여넣은 대화는 근거로 고를 수 있어요.</p>
+          </div>
         )}
         {missedLines.length > 0 && (
-          <div className="caution">
-            <p>
-              <b>금액이 있는데 반영되지 않은 줄이 있어요.</b>
+          <div className="card warn">
+            <p className="card-title">
+              <IconWarn />
+              금액이 있는데 반영되지 않은 줄이 있어요
             </p>
-            <p>
-              {missedLines.join(", ")}줄 · AI가 놓쳤을 수 있어요. 그 줄의 ‘항목 추가’나 관련 항목의 ‘고치기’로 반영하고, 정산과 무관한
-              줄이면 ‘정산과 무관해요’를 눌러 주세요.
+            <p className="small">
+              {missedLines.join(", ")}줄 · AI가 놓쳤을 수 있어요. 그 줄의 ‘항목 추가’나 관련 항목의 ‘고치기’로 반영하고, 정산과 무관한 줄이면
+              ‘정산과 무관해요’를 눌러 주세요.
             </p>
           </div>
         )}
-        <div className={s.verdict} aria-live="polite">
-          {draft.publishable ? (
-            <>
-              <p className="pen">
-                <IconCheck />
-                발행할 수 있어요
-              </p>
-              <p className={s.next}>
-                <Link className="btn" href={`/m/${token}/publish`}>
-                  발행하러 가기
-                </Link>
-                <Link className="textbtn" href={`/m/${token}/table`}>
-                  정산표 확인
-                </Link>
-              </p>
-            </>
-          ) : (
-            <>
-              <p>
-                <b>아직 발행할 수 없어요.</b>
-              </p>
-              <ul className="todo">
-                {unresolved > 0 && (
-                  <li>
-                    <span className="mark">답할 질문 {unresolved}개</span>
-                  </li>
-                )}
-                {outOfScope > 0 && (
-                  <li>
-                    <span className="mark">수동 정산이 필요한 줄 {outOfScope}개</span> (외화·선입금 등)
-                  </li>
-                )}
-                {invalid > 0 && (
-                  <li>
-                    <span className="mark">정보가 부족한 항목 {invalid}개</span> (금액·결제한 사람·나눌 사람 확인)
-                  </li>
-                )}
-                {resolution.items.length === 0 && <li>정산할 항목이 없어요</li>}
-                {unresolved === 0 && outOfScope === 0 && invalid === 0 && resolution.items.length > 0 && (
-                  <li>검산을 확인해 주세요 (정산표)</li>
-                )}
-              </ul>
-            </>
-          )}
-        </div>
-      </div>
+        {draft.publishable ? (
+          <div className="card ok">
+            <p className="card-title">
+              <IconCheckCircle />
+              발행할 수 있어요
+            </p>
+            <div className="actions row">
+              <Link className="btn" href={`/m/${token}/publish`}>
+                발행하러 가기
+              </Link>
+              <Link className="btn gray" href={`/m/${token}/table`}>
+                정산 보기
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="card warn">
+            <p className="card-title">
+              <IconWarn />
+              아직 발행할 수 없어요
+            </p>
+            <ul className="dots">
+              {unresolved > 0 && <li>답할 질문 {unresolved}개</li>}
+              {outOfScope > 0 && <li>수동 정산이 필요한 줄 {outOfScope}개 (외화·선입금 등)</li>}
+              {invalid > 0 && <li>정보가 부족한 항목 {invalid}개 (금액·결제한 사람·나눌 사람 확인)</li>}
+              {resolution.items.length === 0 && <li>정산할 항목이 없어요</li>}
+              {unresolved === 0 && outOfScope === 0 && invalid === 0 && resolution.items.length > 0 && <li>검산을 확인해 주세요 (정산 탭)</li>}
+            </ul>
+          </div>
+        )}
+        {draft.aiDraft && !draft.aiFailed && (
+          <p className={`section-footer ${s.legend}`}>
+            <IconSparkle className={s.ai} />
+            AI 추출 초안 · 반짝이 표시는 AI가 뽑은 값이에요. 확인한 뒤 발행해요.
+          </p>
+        )}
+      </section>
 
       {error && (
-        <div className="blk tip">
-          <p className="alert" role="alert">
-            {error}
-          </p>
+        <div className={`card err ${s.error}`} role="alert">
+          <p>{error}</p>
         </div>
       )}
 
       {/* 질문 */}
       {resolution.questions.length > 0 && (
-        <section aria-labelledby="review-questions">
-          <h2 className="blk sub" id="review-questions">
-            확인이 필요한 것<span className="unit">{resolution.questions.length}개</span>
+        <section className="section" aria-labelledby="review-questions">
+          <h2 className="section-header" id="review-questions">
+            확인이 필요해요<span className="count">{resolution.questions.length}개</span>
           </h2>
           {resolution.questions.map((q) => (
             <QuestionCard
@@ -371,11 +358,11 @@ export function ReviewBoard({
       )}
 
       {/* 발언 목록 */}
-      <section aria-labelledby="review-lines">
-        <h2 className="blk sub" id="review-lines">
-          붙여넣은 대화
+      <section className="section" aria-labelledby="review-lines">
+        <h2 className="section-header" id="review-lines">
+          붙여넣은 대화<span className="count">{draft.lines.length}줄</span>
         </h2>
-        <ol>
+        <ol className={`group ${s.lines}`}>
           {draft.lines.map((l) => {
             // 정리기가 상태를 주지 않은 줄 = 어떤 사건도 나오지 않은 줄 → 정산 외. 금액이 있는데 반영되지 않았으면 확인 필요로 보인다
             const missed = missedLines.includes(l.no);
@@ -384,29 +371,45 @@ export function ReviewBoard({
             const items = itemsByLine.get(l.no) ?? [];
             const blockers = blockersByLine.get(l.no) ?? [];
             const qs = questionsByLine.get(l.no) ?? [];
+            // 이 줄에 할 수 있는 일. 반영 안 된 금액 줄은 두 가지를 아래에 크게, 그 밖은 한 가지를 오른쪽 위에 작게 둔다
+            const action =
+              ov && manualOnLine(l.no).length > 0
+                ? { label: "고친 값 취소", aria: `${l.no}줄의 고친 값을 취소하고 AI 판단으로 되돌리기`, run: () => revertFix(l.no) }
+                : ov
+                  ? { label: "되돌리기", aria: `${l.no}줄을 처음 판단으로 되돌리기`, run: () => setOverride(l.no, null) }
+                  : missed
+                    ? null
+                    : st === "not_settlement"
+                      ? { label: "항목 추가", aria: `${l.no}줄로 항목 추가`, run: () => addFromLine(l.no, l.speaker) }
+                      : { label: "정산 외로", aria: `${l.no}줄을 정산 외로`, run: () => setOverride(l.no, "not_settlement") };
             return (
-              <li key={l.no} className={`row ${s.line} ${STATUS[st].cls}`}>
-                <span className="no">{l.no}</span>
+              <li key={l.no} className={`cell ${s.line} ${STATUS[st].cls}`}>
+                <span className={s.no}>{l.no}</span>
                 <div className={s.said}>
                   <p className={s.meta}>
                     <span className={s.who}>{l.speaker ?? "말한 사람 없음"}</span>
                     <span className={s.status}>{STATUS[st].label}</span>
+                    {action && (
+                      <button type="button" className={`link small ${s.lineAction}`} disabled={busy} onClick={action.run} aria-label={action.aria}>
+                        {action.label}
+                      </button>
+                    )}
                   </p>
-                  <p className={s.text}>{st === "needs_check" ? <span className={`mark ${s.sweep}`}>{l.text}</span> : l.text}</p>
-                  {/* 이 줄에서 읽어 낸 항목: 연필 = AI 초안, 파랑 펜 = 총무가 확인하거나 직접 넣은 값 */}
+                  <p className={s.text}>{st === "needs_check" ? <span className={`hl ${s.sweep}`}>{l.text}</span> : l.text}</p>
+                  {/* 이 줄에서 읽어 낸 항목: 반짝이 = AI 초안, 초록 체크 = 총무가 확인하거나 직접 넣은 값 */}
                   {items.map((it) => {
                     const confirmed = it.status === "manual" || it.confirmations.length > 0;
                     return (
                       <p key={it.id} className={s.item}>
-                        <span className={confirmed ? "pen" : "pencil"}>
-                          {confirmed && <IconCheck />}
+                        <span className={confirmed ? "chip ok" : "chip"}>
+                          {confirmed ? <IconCheck /> : <IconSparkle className={s.ai} />}
                           {it.name} {won(it.amount)}
                         </span>
                         <span className={s.itemInfo}>
                           {it.payer} 결제 · {it.split.length}명({it.split.join("·")})
                         </span>
                         {it.amount > 0 ? (
-                          <button type="button" className="textbtn" disabled={busy} onClick={() => fixItem(it)} aria-label={`${it.name} 항목 고치기`}>
+                          <button type="button" className="link small" disabled={busy} onClick={() => fixItem(it)} aria-label={`${it.name} 항목 고치기`}>
                             고치기
                           </button>
                         ) : (
@@ -417,78 +420,31 @@ export function ReviewBoard({
                   })}
                   {(blockers.length > 0 || qs.length > 0 || missed) && (
                     <p className={s.tags}>
-                      {missed && <span className="mark">금액 {won(amountsByLine.get(l.no)?.[0] ?? 0)} · 반영 안 됨</span>}
+                      {missed && <span className="chip warn">금액 {won(amountsByLine.get(l.no)?.[0] ?? 0)} · 반영 안 됨</span>}
                       {blockers.map((b, i) => (
-                        <span key={i} className="mark">
+                        <span key={i} className="chip warn">
                           {isOutOfScope(b.reason) ? "수동 정산" : "확인 필요"}: {BLOCKER_LABEL[b.reason]}
                         </span>
                       ))}
-                      {qs.length > 0 && <span className="mark">질문 {qs.length}개</span>}
+                      {qs.length > 0 && <span className="chip warn">질문 {qs.length}개</span>}
                     </p>
                   )}
-                </div>
-                <div className={s.actions}>
-                  {ov && manualOnLine(l.no).length > 0 ? (
-                    <button
-                      type="button"
-                      className="textbtn"
-                      disabled={busy}
-                      onClick={() => revertFix(l.no)}
-                      aria-label={`${l.no}줄의 고친 값을 취소하고 AI 판단으로 되돌리기`}
-                    >
-                      고친 값 취소
-                    </button>
-                  ) : ov ? (
-                    <button
-                      type="button"
-                      className="textbtn"
-                      disabled={busy}
-                      onClick={() => setOverride(l.no, null)}
-                      aria-label={`${l.no}줄을 처음 판단으로 되돌리기`}
-                    >
-                      되돌리기
-                    </button>
-                  ) : missed ? (
-                    <>
-                      <button
-                        type="button"
-                        className="textbtn"
-                        disabled={busy}
-                        onClick={() => addFromLine(l.no, l.speaker)}
-                        aria-label={`${l.no}줄로 항목 추가`}
-                      >
+                  {missed && !ov && (
+                    <div className={s.actions}>
+                      <button type="button" className="pill" disabled={busy} onClick={() => addFromLine(l.no, l.speaker)} aria-label={`${l.no}줄로 항목 추가`}>
+                        <IconPlus />
                         항목 추가
                       </button>
                       <button
                         type="button"
-                        className="textbtn"
+                        className="pill"
                         disabled={busy}
                         onClick={() => setOverride(l.no, "not_settlement")}
                         aria-label={`${l.no}줄은 정산과 무관해요`}
                       >
                         정산과 무관해요
                       </button>
-                    </>
-                  ) : st === "not_settlement" ? (
-                    <button
-                      type="button"
-                      className="textbtn"
-                      disabled={busy}
-                      onClick={() => addFromLine(l.no, l.speaker)}
-                      aria-label={`${l.no}줄로 항목 추가`}
-                    >
-                      항목 추가
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="textbtn"
-                      disabled={busy}
-                      onClick={() => setOverride(l.no, "not_settlement")}
-                      aria-label={`${l.no}줄을 정산 외로`}
-                    >
-                      정산 외로
-                    </button>
+                    </div>
                   )}
                 </div>
               </li>
@@ -499,39 +455,37 @@ export function ReviewBoard({
 
       {/* 총무 확인값 */}
       {(confirm.answers.length > 0 || confirm.manualItems.length > 0) && (
-        <section aria-labelledby="review-confirmed">
-          <h2 className="blk sub" id="review-confirmed">
+        <section className="section" aria-labelledby="review-confirmed">
+          <h2 className="section-header" id="review-confirmed">
             총무가 확인한 것
           </h2>
-          <ul>
+          <ul className={`group ${s.lines}`}>
             {confirm.answers.map((a) => (
-              <li key={a.questionId} className={`row ${s.line}`}>
-                {lineOfQuestion(a.questionId) && <span className="no">{lineOfQuestion(a.questionId)}</span>}
-                <span className="pen">
-                  <IconCheck />
-                  질문 답 · {answerLabel(a.value)}
-                  {a.amount !== undefined && ` · ${won(a.amount)}`}
+              <li key={a.questionId} className={`cell ${s.line}`}>
+                <span className={s.no}>{lineOfQuestion(a.questionId) ?? ""}</span>
+                <span className={`cell-main ${s.confirmed}`}>
+                  <IconCheckCircle />
+                  <span>
+                    질문 답 · {answerLabel(a.value)}
+                    {a.amount !== undefined && ` · ${won(a.amount)}`}
+                  </span>
                 </span>
-                <button type="button" className="textbtn" disabled={busy} onClick={() => undoAnswer(a.questionId)}>
+                <button type="button" className="pill" disabled={busy} onClick={() => undoAnswer(a.questionId)}>
                   답 취소
                 </button>
               </li>
             ))}
             {confirm.manualItems.map((m, i) => (
-              <li key={`m${i}`} className={`row ${s.line}`}>
-                {m.lines[0] && <span className="no">{m.lines[0]}</span>}
-                <span className="pen">
-                  <IconCheck />
-                  직접 입력: {m.name} {won(m.amount)} · {m.payer} 결제 · {m.split.join("·")}
-                  {m.lines.length > 1 && ` · 근거 ${m.lines.join(", ")}`}
+              <li key={`m${i}`} className={`cell ${s.line}`}>
+                <span className={s.no}>{m.lines[0] ?? ""}</span>
+                <span className={`cell-main ${s.confirmed}`}>
+                  <IconCheckCircle />
+                  <span>
+                    직접 입력: {m.name} {won(m.amount)} · {m.payer} 결제 · {m.split.join("·")}
+                    {m.lines.length > 1 && ` · 근거 ${m.lines.join(", ")}`}
+                  </span>
                 </span>
-                <button
-                  type="button"
-                  className="textbtn"
-                  disabled={busy}
-                  onClick={() => removeManual(i)}
-                  aria-label={`직접 입력 ${m.name} 빼기`}
-                >
+                <button type="button" className="pill danger" disabled={busy} onClick={() => removeManual(i)} aria-label={`직접 입력 ${m.name} 빼기`}>
                   빼기
                 </button>
               </li>
@@ -540,14 +494,14 @@ export function ReviewBoard({
         </section>
       )}
 
-      {/* 직접 항목 추가·항목 고치기 */}
+      {/* 직접 항목 추가·항목 고치기 (시트) */}
       <ManualItemForm roster={roster} lineNos={draft.lines.map((l) => l.no)} busy={busy} onSubmit={submitManual} prefill={prefill} />
 
-      <p className="blk tip">
-        <Link className="textbtn" href={`/m/${token}/table`}>
-          정산표 보기
+      <div className="actions">
+        <Link className="btn gray wide" href={`/m/${token}/table`}>
+          정산 보기
         </Link>
-      </p>
+      </div>
     </>
   );
 }
@@ -598,54 +552,57 @@ function QuestionCard({
   }
 
   return (
-    <article className={`row ${s.q}`}>
-      <span className="no">{q.line}</span>
-      <p>
-        <span className="mark">{KIND_LABEL[q.kind]}</span>
+    <article className={`card ${s.q}`}>
+      <p className={s.qHead}>
+        <span className="chip warn">{KIND_LABEL[q.kind]}</span>
+        <span className="chip">{q.line}줄</span>
       </p>
       {line && (
-        <blockquote className="note">
-          {line.speaker ?? "말한 사람 없음"} · {line.text}
+        <blockquote className={s.quote}>
+          <b>{line.speaker ?? "말한 사람 없음"}</b> {line.text}
         </blockquote>
       )}
       <p className={s.prompt} id={`${q.id}-prompt`}>
         {fixJosa(q.prompt)}
       </p>
-      <div className={s.options} role="radiogroup" aria-labelledby={`${q.id}-prompt`}>
+      <div className="group" role="radiogroup" aria-labelledby={`${q.id}-prompt`}>
         {q.options.map((o) => (
-          <label key={o.value} className={value === o.value ? "opt picked" : "opt"}>
+          <label key={o.value} className="cell choice">
             <input type="radio" name={q.id} value={o.value} checked={value === o.value} onChange={() => setValue(o.value)} />
-            <span>
-              <b>{o.label}</b>
+            <span className="cell-main">
+              <span className="cell-title">{o.label}</span>
               {(optionEvidence[o.value] ?? []).map((l) => (
-                <small key={l.no}>
+                <span key={l.no} className="cell-sub">
                   {l.no} {l.who} · {l.text}
-                </small>
+                </span>
               ))}
             </span>
+            <IconCheck className="tick" />
           </label>
         ))}
       </div>
       {needsAmount && (
         <div className={s.amount}>
-          <label>
-            <span className="label">뺄 금액</span>
-            <input
-              className="input"
-              name="amount"
-              inputMode="numeric"
-              autoComplete="off"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="예: 12,000…"
-            />
-          </label>
-          {prefilled && <p className="note">대화에서 읽은 금액을 넣어 뒀어요. 다르면 고쳐 주세요.</p>}
+          <div className="group">
+            <label className="cell">
+              <span className={s.fieldLabel}>뺄 금액</span>
+              <input
+                className={`input ${s.alignEnd}`}
+                name="amount"
+                inputMode="numeric"
+                autoComplete="off"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="예: 12,000"
+              />
+            </label>
+          </div>
+          {prefilled && <p className="caption">대화에서 읽은 금액을 넣어 뒀어요. 다르면 고쳐 주세요.</p>}
           {canSplit && lineAmounts.length > 1 && (
             <p className={s.picks}>
-              <span className="note">대화에 나온 금액:</span>
+              <span className="caption">대화에 나온 금액:</span>
               {lineAmounts.map((a) => (
-                <button key={a} type="button" className={s.pick} onClick={() => setAmount(a.toLocaleString("ko-KR"))}>
+                <button key={a} type="button" className="pill" onClick={() => setAmount(a.toLocaleString("ko-KR"))}>
                   {won(a)}
                 </button>
               ))}
@@ -654,13 +611,15 @@ function QuestionCard({
         </div>
       )}
       {err && (
-        <p className="alert" role="alert">
+        <p className={s.err} role="alert">
           {err}
         </p>
       )}
-      <button type="button" className="btn wide" disabled={busy} onClick={submit}>
-        이렇게 확인
-      </button>
+      <div className="actions">
+        <button type="button" className="btn wide" disabled={busy} onClick={submit}>
+          이렇게 확인
+        </button>
+      </div>
     </article>
   );
 }
@@ -680,7 +639,7 @@ interface FixTarget {
 }
 
 interface FormPrefill {
-  /** 같은 값으로 다시 눌러도 폼이 다시 채워지도록 누를 때마다 1씩 늘린다 */
+  /** 같은 값으로 다시 눌러도 시트가 다시 채워지도록 누를 때마다 1씩 늘린다 */
   n: number;
   line: string;
   payer: string;
@@ -703,6 +662,7 @@ function ManualItemForm({
   onSubmit: (items: ManualItem[], fix: FixTarget | null) => Promise<boolean>;
   prefill: FormPrefill | null;
 }) {
+  const formId = useId();
   const [open, setOpen] = useState(false);
   const [fix, setFix] = useState<FixTarget | null>(null);
   const [name, setName] = useState("");
@@ -717,7 +677,7 @@ function ManualItemForm({
   const [partOut, setPartOut] = useState<Alias[]>([]);
   const [partLine, setPartLine] = useState("");
   const [err, setErr] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
     setFix(null);
@@ -734,7 +694,7 @@ function ManualItemForm({
     setErr(null);
   };
 
-  // ‘항목 추가’·‘고치기’를 누르면 값을 채워 폼을 열고 화면을 폼으로 옮긴다
+  // ‘항목 추가’·‘고치기’를 누르면 값을 채워 시트를 연다
   useEffect(() => {
     if (!prefill) return;
     reset();
@@ -748,7 +708,6 @@ function ManualItemForm({
       setName(prefill.fix.name);
       setSplit(roster.filter((r) => prefill.fix!.split.includes(r)));
     }
-    requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: scrollBehavior(), block: "start" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefill]);
 
@@ -794,173 +753,215 @@ function ManualItemForm({
     }
   }
 
-  if (!open) {
-    return (
-      <div className="blk stack">
+  const close = () => {
+    reset();
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <div className="actions">
         <button
           type="button"
-          className="btn ghost wide"
+          className="btn gray wide"
           onClick={() => {
             reset();
             setOpen(true);
+            requestAnimationFrame(() => nameRef.current?.focus());
           }}
         >
+          <IconPlus />
           직접 항목 추가
         </button>
       </div>
-    );
-  }
 
-  return (
-    <form className={`blk stack ${s.manual}`} onSubmit={submit} ref={formRef}>
-      <h2 className={s.formTitle}>{fix ? `항목 고치기 · ${fix.itemName}` : "직접 항목 추가"}</h2>
-      {fix && fix.manualIndex === undefined && (
-        <p className="caution">
-          저장하면 {fix.lines.join(", ")}줄의 AI 판단 대신 아래 값으로 정산해요.
-          {fix.alsoRemoved.length > 0 && ` 같은 줄에서 나온 ‘${fix.alsoRemoved.join("’, ‘")}’도 함께 빠지니, 필요하면 다시 추가해 주세요.`}
-        </p>
-      )}
-      <label>
-        <span className="label">항목</span>
-        <input
-          className="input"
-          name="item"
-          autoComplete="off"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="예: 노래방…"
-          maxLength={20}
-        />
-      </label>
-      <label>
-        <span className="label">금액 (전체)</span>
-        <input
-          className="input"
-          name="amount"
-          inputMode="numeric"
-          autoComplete="off"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          placeholder="예: 30,000…"
-        />
-      </label>
-      <label>
-        <span className="label">결제한 사람</span>
-        <select className="select" name="payer" value={payer} onChange={(e) => setPayer(e.target.value)}>
-          <option value="">고르기</option>
-          {roster.map((a) => (
-            <option key={a} value={a}>
-              {a}
-            </option>
-          ))}
-        </select>
-      </label>
-      <fieldset>
-        <legend className="label">나눠 낼 사람 ({split.length}명)</legend>
-        <div className={s.chips}>
-          {roster.map((a) => (
-            <label key={a} className={split.includes(a) ? `${s.chip} ${s.chipOn}` : s.chip}>
-              <input type="checkbox" name="split" value={a} checked={split.includes(a)} onChange={() => toggle(a)} />
-              {a}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <Sheet
+        open={open}
+        onClose={close}
+        title={fix ? "항목 고치기" : "새 항목"}
+        leading={
+          <button type="button" className="link" onClick={close}>
+            취소
+          </button>
+        }
+        trailing={
+          <button type="submit" form={formId} className={`link ${s.save}`} disabled={busy}>
+            {fix ? "저장" : "추가"}
+          </button>
+        }
+      >
+        <form id={formId} className={s.manual} onSubmit={submit}>
+          {fix && fix.manualIndex === undefined && (
+            <div className="card warn">
+              <p className="card-title">
+                <IconWarn />
+                {fix.itemName} 항목을 고쳐요
+              </p>
+              <p className="small">
+                저장하면 {fix.lines.join(", ")}줄의 AI 판단 대신 아래 값으로 정산해요.
+                {fix.alsoRemoved.length > 0 && ` 같은 줄에서 나온 ‘${fix.alsoRemoved.join("’, ‘")}’도 함께 빠지니, 필요하면 다시 추가해 주세요.`}
+              </p>
+            </div>
+          )}
 
-      <label className={partOn ? "opt picked" : "opt"}>
-        <input type="checkbox" name="part" checked={partOn} onChange={(e) => setPartOn(e.target.checked)} />
-        <span>일부 금액은 몇 명을 빼고 따로 나누기 (예: 술 안 마신 사람)</span>
-      </label>
-      {partOn && (
-        <div className={s.part}>
-          <label>
-            <span className="label">따로 나눌 부분</span>
-            <input
-              className="input"
-              name="part-name"
-              autoComplete="off"
-              value={partName}
-              onChange={(e) => setPartName(e.target.value)}
-              placeholder="예: 주류…"
-              maxLength={10}
-            />
-          </label>
-          <label>
-            <span className="label">그 부분 금액</span>
-            <input
-              className="input"
-              name="part-amount"
-              inputMode="numeric"
-              autoComplete="off"
-              value={partAmount}
-              onChange={(e) => setPartAmount(e.target.value)}
-              placeholder="예: 31,000…"
-            />
-          </label>
-          <fieldset>
-            <legend className="label">그 부분에서 빠질 사람</legend>
-            <div className={s.chips}>
-              {split.map((a) => (
-                <label key={a} className={partOut.includes(a) ? `${s.chip} ${s.chipOn}` : s.chip}>
-                  <input type="checkbox" name="part-out" value={a} checked={partOut.includes(a)} onChange={() => togglePartOut(a)} />
-                  {a}
+          <div className="section">
+            <div className="group">
+              <label className="cell">
+                <span className={s.fieldLabel}>항목</span>
+                <input
+                  ref={nameRef}
+                  className={`input ${s.alignEnd}`}
+                  name="item"
+                  autoComplete="off"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="예: 노래방"
+                  maxLength={20}
+                />
+              </label>
+              <label className="cell">
+                <span className={s.fieldLabel}>금액 (전체)</span>
+                <input
+                  className={`input ${s.alignEnd}`}
+                  name="amount"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="예: 30,000"
+                />
+              </label>
+              <label className="cell">
+                <span className="cell-main">결제한 사람</span>
+                <select className="select" name="payer" value={payer} onChange={(e) => setPayer(e.target.value)}>
+                  <option value="">고르기</option>
+                  {roster.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <fieldset className="section">
+            <legend className="section-header">
+              나눠 낼 사람<span className="count">{split.length}명</span>
+            </legend>
+            <div className="group">
+              {roster.map((a) => (
+                <label key={a} className="cell choice">
+                  <input type="checkbox" name="split" value={a} checked={split.includes(a)} onChange={() => toggle(a)} />
+                  <span className="cell-main">{a}</span>
+                  <IconCheck className="tick" />
                 </label>
               ))}
             </div>
           </fieldset>
-          <label>
-            <span className="label">그 부분의 근거 줄 (선택)</span>
-            <select className="select" name="part-line" value={partLine} onChange={(e) => setPartLine(e.target.value)}>
-              <option value="">없음</option>
-              {lineNos.map((no) => (
-                <option key={no} value={no}>
-                  {no}줄
-                </option>
-              ))}
-            </select>
-          </label>
-          {total !== null && part !== null && part > 0 && part < total && (
-            <p className={`pen num ${s.partSum}`}>
-              {name.trim() || "항목"} {won(total - part)} ({split.length}명) + {partName.trim() || "부분"} {won(part)} (
-              {split.filter((a) => !partOut.includes(a)).length}명) = {won(total)}
-            </p>
-          )}
-        </div>
-      )}
 
-      {!fix && (
-        <label>
-          <span className="label">근거 줄 (선택)</span>
-          <select className="select" name="line" value={line} onChange={(e) => setLine(e.target.value)}>
-            <option value="">없음 · 총무 확인</option>
-            {lineNos.map((no) => (
-              <option key={no} value={no}>
-                {no}줄
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-      {err && (
-        <p className="alert" role="alert">
-          {err}
-        </p>
-      )}
-      <div className={s.formActions}>
-        <button
-          type="button"
-          className="btn ghost"
-          onClick={() => {
-            reset();
-            setOpen(false);
-          }}
-        >
-          취소
-        </button>
-        <button type="submit" className="btn" disabled={busy}>
-          {fix ? "이렇게 고치기" : "추가"}
-        </button>
-      </div>
-    </form>
+          <div className="section">
+            <div className="group">
+              <label className="cell">
+                <span className="cell-main">
+                  <span className="cell-title">일부 금액은 따로 나누기</span>
+                  <span className="cell-sub">예: 술 안 마신 사람은 빼고</span>
+                </span>
+                <input type="checkbox" className="switch" name="part" checked={partOn} onChange={(e) => setPartOn(e.target.checked)} />
+              </label>
+            </div>
+          </div>
+          {partOn && (
+            <>
+              <div className="section">
+                <div className="group">
+                  <label className="cell">
+                    <span className={s.fieldLabel}>따로 나눌 부분</span>
+                    <input
+                      className={`input ${s.alignEnd}`}
+                      name="part-name"
+                      autoComplete="off"
+                      value={partName}
+                      onChange={(e) => setPartName(e.target.value)}
+                      placeholder="예: 주류"
+                      maxLength={10}
+                    />
+                  </label>
+                  <label className="cell">
+                    <span className={s.fieldLabel}>그 부분 금액</span>
+                    <input
+                      className={`input ${s.alignEnd}`}
+                      name="part-amount"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      value={partAmount}
+                      onChange={(e) => setPartAmount(e.target.value)}
+                      placeholder="예: 31,000"
+                    />
+                  </label>
+                  <label className="cell">
+                    <span className="cell-main">그 부분의 근거 줄</span>
+                    <select className="select" name="part-line" value={partLine} onChange={(e) => setPartLine(e.target.value)}>
+                      <option value="">없음</option>
+                      {lineNos.map((no) => (
+                        <option key={no} value={no}>
+                          {no}줄
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <fieldset className="section">
+                <legend className="section-header">그 부분에서 빠질 사람</legend>
+                <div className="group">
+                  {split.map((a) => (
+                    <label key={a} className="cell choice">
+                      <input type="checkbox" name="part-out" value={a} checked={partOut.includes(a)} onChange={() => togglePartOut(a)} />
+                      <span className="cell-main">{a}</span>
+                      <IconCheck className="tick" />
+                    </label>
+                  ))}
+                </div>
+                {total !== null && part !== null && part > 0 && part < total && (
+                  <p className={`section-footer num ${s.partSum}`}>
+                    {name.trim() || "항목"} {won(total - part)} ({split.length}명) + {partName.trim() || "부분"} {won(part)} (
+                    {split.filter((a) => !partOut.includes(a)).length}명) = {won(total)}
+                  </p>
+                )}
+              </fieldset>
+            </>
+          )}
+
+          {!fix && (
+            <div className="section">
+              <div className="group">
+                <label className="cell">
+                  <span className="cell-main">근거 줄</span>
+                  <select className="select" name="line" value={line} onChange={(e) => setLine(e.target.value)}>
+                    <option value="">없음 · 총무 확인</option>
+                    {lineNos.map((no) => (
+                      <option key={no} value={no}>
+                        {no}줄
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </div>
+          )}
+          {err && (
+            <div className={`card err ${s.formErr}`} role="alert">
+              <p>{err}</p>
+            </div>
+          )}
+          <div className="actions">
+            <button type="submit" className="btn wide" disabled={busy}>
+              {fix ? "이렇게 고치기" : "추가"}
+            </button>
+          </div>
+        </form>
+      </Sheet>
+    </>
   );
 }

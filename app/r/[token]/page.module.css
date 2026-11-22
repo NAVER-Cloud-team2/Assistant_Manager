@@ -1,82 +1,90 @@
-/* S6 결과 페이지 전용 스타일 — 담당: D. 색·글자·표·도장은 app/globals.css와 components/Seal(C)을 따른다. */
-.result {
-  padding: 0 20px 56px;
-}
-.empty {
-  gap: 8px;
-  padding-top: 28px;
-}
+/* S6 결과 페이지 전용 스타일 — 담당: D. 공통 모양(묶음 목록·카드·표)은 app/globals.css, 확정 표시는 components/Seal(C)을 따른다. */
 
-.header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: start;
-  padding: 22px 0 14px;
-  border-bottom: 1px solid var(--rule-strong);
+/* 표지: 지갑 카드처럼 색이 번진 바탕 위에 행사 이름과 확정 표시 */
+.cover {
+  position: relative;
+  overflow: hidden;
+  padding: 18px var(--side) 30px;
+  background:
+    radial-gradient(120% 130% at 0% 0%, #ff9a62 0%, transparent 55%),
+    radial-gradient(110% 120% at 100% 10%, #ff4f8b 0%, transparent 58%),
+    radial-gradient(140% 120% at 60% 110%, #8a6bff 0%, transparent 62%),
+    #ff6273;
+  color: #fff;
+}
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(170deg, rgb(255 255 255 / 0.26), transparent 45%);
+  pointer-events: none;
+}
+.coverInner {
+  position: relative;
+  z-index: 1;
+  width: min(100%, calc(var(--column) - 2 * var(--side)));
+  margin-inline: auto;
+  padding-right: 104px;
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0.95;
+}
+.kicker svg {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.7);
+}
+.title {
+  margin-top: 26px;
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.024em;
 }
 .until {
   margin-top: 6px;
+  font-size: 15px;
+  opacity: 0.92;
 }
-/* 좁은 휴대폰: 만료일 한 줄이 도장 옆에 들어가도록 도장을 조금 줄인다 */
-@media (max-width: 420px) {
-  .header svg {
-    width: 88px;
-    height: 88px;
-  }
+.seal {
+  position: absolute;
+  right: -4px;
+  bottom: -6px;
+  filter: drop-shadow(0 8px 18px rgb(120 0 30 / 0.35));
 }
 
 .notice {
   margin-top: 16px;
 }
-.notice p {
-  margin-top: 4px;
-}
-
-.sub {
-  padding: 26px 0 8px;
-  border-bottom: 1px solid var(--rule-strong);
-  font-size: 16px;
-  line-height: 1.4;
-  font-weight: 700;
-}
-.tip {
-  padding: 8px 0;
+.notice strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--orange-text);
 }
 .same {
-  color: var(--pencil);
+  color: var(--label-2);
 }
 .changed {
   font-weight: 700;
 }
 
 /* 사람별 부담: 이름을 누르면 항목별 계산 이유 */
-.person {
-  border-bottom: 1px solid var(--rule);
-}
-.person summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 60px;
-  padding: 10px 0;
-}
-.person summary:focus-visible {
-  outline-offset: -2px;
-}
-.lead {
-  display: grid;
-  flex: 1;
-  gap: 1px;
-  min-width: 0;
+.person > summary {
+  min-height: 64px;
 }
 .alias {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .balance {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -87,39 +95,56 @@
   white-space: nowrap;
 }
 .lines {
-  margin-bottom: 12px;
-  padding-left: 12px;
-  border-left: 3px double var(--rule-strong);
+  margin: 0 12px 12px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--bg);
 }
-.lines li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0 12px;
-  padding: 6px 0;
-}
-.lines li + li {
-  border-top: 1px dashed var(--rule);
-}
-.reason {
-  grid-column: 1 / -1;
-  font-size: 13px;
-  color: var(--pencil);
+.lines :global(.cell) {
+  background: transparent;
 }
 .skipped {
-  padding: 0 0 12px 15px;
-}
-
-.transfer {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--rule);
+  padding: 0 20px 14px;
+  color: var(--label-2);
+  font-size: 13px;
 }
 
 .footer {
-  margin-top: 24px;
-  font-size: 13px;
-  color: var(--pencil);
+  margin-top: 18px;
+  text-align: center;
+}
+
+/* 아직 발행 전 */
+.empty {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.empty :global(.column) {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 0 24px;
+}
+.mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  font-weight: 600;
+}
+.mark svg {
+  width: 28px;
+  height: 28px;
+}
+.emptyIcon {
+  width: 56px;
+  height: 56px;
+  color: var(--label-3);
+}
+.emptyTitle {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }

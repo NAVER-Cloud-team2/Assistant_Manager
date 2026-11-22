@@ -1,53 +1,123 @@
-/* S1 행사 만들기 — 담당: C (공통 모양은 app/globals.css, 이 화면에만 쓰는 것만 여기 둔다) */
-.group {
-  padding-top: 16px;
-  font-size: 14px;
-  font-weight: 600;
+/* S1 행사 만들기 — 담당: C. iOS 시트처럼 보이는 폼 (공통 모양은 app/globals.css) */
+.form {
+  padding-bottom: 22px;
+  border-radius: 28px;
+  background: var(--bg);
 }
-/* 참여자 한 명: 별칭 칸과 위·아래·빼기. 여백의 번호는 칸 높이 가운데에 맞춘다 */
-.person {
+.head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 44px 44px 44px;
-  gap: 6px;
-  align-items: center;
+  justify-items: start;
+  gap: 4px;
+  padding: 8px 20px 0;
 }
-.person :global(.no) {
-  top: 50%;
-  transform: translateY(-50%);
+.grabber {
+  justify-self: center;
+  width: 36px;
+  height: 5px;
+  margin-bottom: 14px;
+  border-radius: 3px;
+  background: rgb(60 60 67 / 0.3);
 }
-.errors {
-  display: grid;
-  gap: 2px;
+.title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+.doneIcon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+  color: var(--green);
 }
 
-/* 만든 뒤: 관리 링크·결과 링크 */
-.link {
-  display: grid;
-  gap: 8px;
-  justify-items: start;
-  padding-top: 14px;
-  padding-bottom: 14px;
+/* 참여자 한 명: 빼기 · 별칭 · 손잡이 */
+.roster {
+  --inset: 56px;
 }
+.person {
+  gap: 12px;
+  min-height: 52px;
+  padding-block: 8px;
+}
+.lifted {
+  z-index: 2;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 28px rgb(0 0 0 / 0.16),
+    0 0 0 0.5px rgb(0 0 0 / 0.06);
+}
+.lifted::before {
+  visibility: hidden;
+}
+.remove {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--red);
+}
+.remove svg {
+  width: 24px;
+  height: 24px;
+}
+.remove:disabled {
+  color: #d1d1d6;
+}
+.grip {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -8px -12px -8px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--label-3);
+  cursor: grab;
+  touch-action: none;
+}
+.grip svg {
+  width: 22px;
+  height: 22px;
+}
+.grip:active {
+  cursor: grabbing;
+}
+.add {
+  gap: 12px;
+  color: var(--blue-text);
+  font-size: 17px;
+}
+.add svg {
+  width: 26px;
+  height: 26px;
+  margin-left: 1px;
+}
+
+/* 만든 뒤: 링크 */
 .url {
+  color: var(--label-2);
   font-size: 14px;
   word-break: break-all;
 }
 .warn {
-  display: grid;
-  gap: 4px;
-  width: 100%;
+  margin-top: 12px;
 }
-.warn li {
-  position: relative;
-  padding-left: 12px;
+.warn :global(.dots li::before) {
+  background: var(--orange);
 }
-.warn li::before {
-  content: "";
-  position: absolute;
-  left: 1px;
-  top: 0.68em;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--ink);
+.errors {
+  margin-top: 20px;
+}
+.errors :global(.dots li::before) {
+  background: var(--red);
 }

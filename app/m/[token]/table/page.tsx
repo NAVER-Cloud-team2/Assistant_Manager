@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { AdminMissing } from "@/components/AdminMissing";
+import { AdminScreen } from "@/components/AdminScreen";
+import { NoDraft } from "@/components/NoDraft";
 import { SettlementView } from "@/components/SettlementView";
-import { StepNav } from "@/components/StepNav";
 import { loadAdminView, loadStepState } from "../../_lib/admin";
 
 /** S4 정산표 — 담당: C */
@@ -13,27 +13,8 @@ export default async function TablePage({ params }: { params: Promise<{ token: s
   if (!view) return <AdminMissing />;
 
   return (
-    <main className="page" id="main">
-      <StepNav token={token} current="table" state={await loadStepState(view)} />
-      <div className="sheet">
-        <header className="blk head">
-          <p className="event">{view.meta.name}</p>
-          <h1 className="title">정산표</h1>
-        </header>
-        {view.draft ? (
-          <SettlementView draft={view.draft} />
-        ) : (
-          <section className="blk stack">
-            <p>
-              <b>붙여넣은 대화가 없어요.</b>
-            </p>
-            <p className="note">대화를 붙여넣지 않았거나, 마지막 수정 후 7일이 지나 지워졌어요.</p>
-            <Link className="btn wide" href={`/m/${token}/paste`}>
-              대화 붙여넣기
-            </Link>
-          </section>
-        )}
-      </div>
-    </main>
+    <AdminScreen token={token} current="table" state={await loadStepState(view)} eventName={view.meta.name} title="정산">
+      {view.draft ? <SettlementView draft={view.draft} eventName={view.meta.name} /> : <NoDraft token={token} />}
+    </AdminScreen>
   );
 }

@@ -1,6 +1,6 @@
 import { AdminMissing } from "@/components/AdminMissing";
+import { AdminScreen } from "@/components/AdminScreen";
 import { PasteFlow } from "@/components/PasteFlow";
-import { StepNav } from "@/components/StepNav";
 import { loadAdminView, loadStepState } from "../../_lib/admin";
 
 /** S2 붙여넣기 — 담당: C. 가림은 lib/mask.ts로 브라우저에서만. */
@@ -17,21 +17,14 @@ export default async function PastePage({ params }: { params: Promise<{ token: s
   if (!view) return <AdminMissing />;
 
   return (
-    <main className="page" id="main">
-      <StepNav token={token} current="paste" state={await loadStepState(view)} />
-      <div className="sheet">
-        <header className="blk head">
-          <p className="event">{view.meta.name}</p>
-          <h1 className="title">대화 붙여넣기</h1>
-        </header>
-        <PasteFlow
-          token={token}
-          eventId={view.meta.id}
-          roster={view.meta.roster}
-          hasDraft={view.draft !== null}
-          aiProvider={aiProviderName()}
-        />
-      </div>
-    </main>
+    <AdminScreen token={token} current="paste" state={await loadStepState(view)} eventName={view.meta.name} title="대화 붙여넣기">
+      <PasteFlow
+        token={token}
+        eventId={view.meta.id}
+        roster={view.meta.roster}
+        hasDraft={view.draft !== null}
+        aiProvider={aiProviderName()}
+      />
+    </AdminScreen>
   );
 }
